@@ -1,4 +1,8 @@
-"""LLM baseline stub — not trained / not wired in Week-1 scaffold."""
+"""LLM baseline stub — not wired. Exam 4 stays a keyword rubric.
+
+Never emit a fabricated judge score. `scripts/run_eval.py` reports
+`not_trained` even if an API key is present, until a real judge is hooked up.
+"""
 
 STATUS = "not_trained"
 
