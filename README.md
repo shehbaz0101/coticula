@@ -1,51 +1,95 @@
-# Vermithor VU-Bench v0 — Understanding Harness
+# Vermithor — VU-Bench v0
 
-**Thesis.** VU-Bench is an *understanding harness* for PDE surrogates: four exams
-(Predict, Conserve, Counterfactual, Explain) that score whether a model has
-grasped the dynamics—not just interpolated training trajectories. Week-1 ships
-classical finite-difference label generators, metric APIs, and an eval that
-writes real classical numbers. Learned baselines (FNO / PINO / LLM) are
-importable stubs marked `not_trained`.
+**VU = Vermithor Understanding Bench** (not the `uv` Python packager).
+
+Public repo: [github.com/shehbaz0101/vermithor](https://github.com/shehbaz0101/vermithor)
+(renamed from `shehbaz0101/vu-bench`).
+
+**Thesis.** VU-Bench is Vermithor’s *understanding harness* for PDE surrogates:
+four exams (Predict, Conserve, Counterfactual, Explain) that score whether a
+model has grasped the dynamics—not just interpolated training trajectories.
+
+Week 1 shipped classical finite-difference label generators and the exam APIs.
+Week 2 adds a laptop-scale **FNO** (Li et al., ICLR 2021) and a **PINO-style**
+path (data loss + PDE residual). Reports contain **only measured numbers**.
+Missing checkpoints stay `not_trained`. The LLM exam is a keyword rubric stub.
 
 ## Layout
 
 ```
-vu-bench/
+vermithor/
   datasets/{burgers,heat2d,manifests}/
   metrics/{predict,conserve,counterfactual,explain}.py
-  baselines/classical/          # NumPy FD solvers (labels)
-  baselines/{fno,pino,llm}/     # stubs
+  baselines/classical/          # NumPy FD solvers (labels + Exam 3 grader)
+  baselines/fno/                # tiny PyTorch FNO (Burgers 1D, heat 2D)
+  baselines/pino/               # PINO losses (same trunk + residual term)
+  baselines/llm/                # explain stub (no fabricated judge scores)
   scripts/generate_labels.py
+  scripts/train_fno.py
+  scripts/train_pino.py
   scripts/run_eval.py
+  checkpoints/                  # optional *.pt written by train_* 
   docs/DESIGN.md
-  tests/test_metrics_smoke.py
+  tests/
   reports/                      # latest.json + latest.md
 ```
 
 ## How to run
 
-Requires Python 3.11+ and NumPy / SciPy (see `pyproject.toml`).
+Requires Python 3.11+ and NumPy / SciPy. Torch is optional for classical-only
+eval and is required to train or score FNO / PINO.
 
 ```bash
-cd /workspace/vu-bench
-pip install -e ".[dev]"          # or: pip install numpy scipy pytest
+pip install -e ".[dev]"          # classical + pytest
+pip install -e ".[dev,torch]"    # + PyTorch (CPU is enough)
 
 python -m scripts.generate_labels
+
+# Tiny FNO on Burgers (defaults are laptop / single-GPU friendly)
+python -m scripts.train_fno --pde burgers
+python -m scripts.train_fno --pde heat2d
+
+# PINO = same trunk + light λ_pde * PDE residual (default 1e-3; see docs/DESIGN.md)
+python -m scripts.train_pino --pde burgers
+
 python -m scripts.run_eval
 pytest -q
 ```
+
+CPU CI / smoke (no labels needed):
+
+```bash
+python -m scripts.train_fno --smoke
+python -m scripts.train_pino --smoke --pde burgers
+```
+
+Useful knobs (all have small defaults): `--epochs`, `--width`, `--modes`,
+`--n-layers`, `--batch-size`, `--lambda-pde`, `--out`.
 
 Artifacts:
 
 - `datasets/burgers/burgers_v0.npz`, `datasets/heat2d/heat2d_v0.npz`
 - `datasets/manifests/labels_v0.json` (SHA256)
+- `checkpoints/fno_burgers.pt`, `checkpoints/fno_heat2d.pt`, `checkpoints/pino_*.pt`
 - `reports/latest.json`, `reports/latest.md` — four exam sections
 
-## Non-goals (Week 1)
+`run_eval` always scores the classical solver. It loads FNO / PINO only when a
+checkpoint is present. It does **not** invent metrics.
+
+## Exams
+
+| Exam | What is measured |
+|------|------------------|
+| 1 Predict | Rel-L2 and NMSE vs classical labels |
+| 2 Conserve | FD PDE residual + discrete energy drift of the predicted field |
+| 3 Counterfactual | Re-solve / re-predict at ν′ or α′; learned models graded vs the classical solver |
+| 4 Explain | Keyword-rubric stub. LLM hook stays `not_trained` without a wired judge |
+
+## Non-goals (unchanged)
 
 - No chip-cooling / industrial multiphysics demos
 - No AU-scale (astronomical-unit) or cosmology workloads
-- No fabricated SOTA numbers for FNO / PINO / LLM — stubs report `not_trained`
+- No fabricated SOTA numbers for FNO / PINO / LLM
 - No claim that keyword rubrics equal true explanation quality
 
 ## License
