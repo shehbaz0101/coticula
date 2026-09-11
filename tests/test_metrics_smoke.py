@@ -142,3 +142,6 @@ def test_report_exists_after_pipeline():
     assert data["exams"]["explain"]["llm"]["status"] == "not_trained"
     # Keyword rubric is a stub, not a fabricated LLM score.
     assert data["exams"]["explain"]["classical_keyword_stub"]["status"] == "stub_keyword_rubric"
+    if "vu" in data:
+        assert data["vu"] == "Vermithor Understanding Bench"
+        assert data.get("project") == "Vermithor"

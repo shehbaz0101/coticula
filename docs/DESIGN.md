@@ -1,7 +1,9 @@
-# VU-Bench v0 Design
+# Vermithor VU-Bench v0 Design
 
-**VU = Vermithor Understanding.** This harness belongs to the Vermithor
-project. It is not related to the `uv` Python packager.
+**VU = Vermithor Understanding Bench.** Project branding: **Vermithor**.
+This harness is not related to the `uv` Python packager.
+
+Public repo: https://github.com/shehbaz0101/vermithor
 
 ## Four exams
 

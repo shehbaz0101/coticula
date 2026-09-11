@@ -1,11 +1,13 @@
-# Vermithor VU-Bench v0 — Understanding Harness
+# Vermithor — VU-Bench v0
 
-**VU = Vermithor Understanding** (not the `uv` Python packager).
+**VU = Vermithor Understanding Bench** (not the `uv` Python packager).
 
-**Thesis.** VU-Bench is an *understanding harness* for PDE surrogates under the
-Vermithor project: four exams (Predict, Conserve, Counterfactual, Explain) that
-score whether a model has grasped the dynamics—not just interpolated training
-trajectories.
+Public repo: [github.com/shehbaz0101/vermithor](https://github.com/shehbaz0101/vermithor)
+(renamed from `shehbaz0101/vu-bench`).
+
+**Thesis.** VU-Bench is Vermithor’s *understanding harness* for PDE surrogates:
+four exams (Predict, Conserve, Counterfactual, Explain) that score whether a
+model has grasped the dynamics—not just interpolated training trajectories.
 
 Week 1 shipped classical finite-difference label generators and the exam APIs.
 Week 2 adds a laptop-scale **FNO** (Li et al., ICLR 2021) and a **PINO-style**
@@ -15,7 +17,7 @@ Missing checkpoints stay `not_trained`. The LLM exam is a keyword rubric stub.
 ## Layout
 
 ```
-vu-bench/
+vermithor/
   datasets/{burgers,heat2d,manifests}/
   metrics/{predict,conserve,counterfactual,explain}.py
   baselines/classical/          # NumPy FD solvers (labels + Exam 3 grader)
