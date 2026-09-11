@@ -33,7 +33,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--batch-size", type=int, default=None)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--pino", action="store_true", help="Add PDE residual loss (PINO)")
-    p.add_argument("--lambda-pde", type=float, default=0.1)
+    p.add_argument(
+        "--lambda-pde",
+        type=float,
+        default=1e-3,
+        help="PINO residual weight (light default: 1e-3 so L_data still leads)",
+    )
     p.add_argument("--lambda-ic", type=float, default=0.0)
     p.add_argument("--eval-n", type=int, default=None)
     p.add_argument("--seed", type=int, default=0)

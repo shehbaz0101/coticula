@@ -84,7 +84,9 @@ L = L_data + λ_pde * L_pde + λ_ic * L_ic
 | **L_ic** | \(\mathrm{MSE}(\hat u(t=0),\, u_0)\). Default \(\lambda_{\mathrm{ic}}=0\) because the operators lock the IC |
 
 FNO-only training is \(\lambda_{\mathrm{pde}}=\lambda_{\mathrm{ic}}=0\).
-Default PINO weights: \(\lambda_{\mathrm{pde}}=0.1\), \(\lambda_{\mathrm{ic}}=0\).
+Default PINO weights: \(\lambda_{\mathrm{pde}}=10^{-3}\), \(\lambda_{\mathrm{ic}}=0\).
+The small \(\lambda_{\mathrm{pde}}\) is intentional: raw FD residuals are
+O(1)–O(100) while data MSE is O(10^{-2}), so \(\lambda=0.1\) drowns \(L_{\mathrm{data}}\).
 
 Code: `baselines/pino/losses.py`. Entry points: `scripts/train_fno.py --pino`
 or `scripts/train_pino.py`.

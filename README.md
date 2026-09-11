@@ -47,7 +47,7 @@ python -m scripts.generate_labels
 python -m scripts.train_fno --pde burgers
 python -m scripts.train_fno --pde heat2d
 
-# PINO = same trunk + λ_pde * PDE residual (see docs/DESIGN.md)
+# PINO = same trunk + light λ_pde * PDE residual (default 1e-3; see docs/DESIGN.md)
 python -m scripts.train_pino --pde burgers
 
 python -m scripts.run_eval

@@ -26,6 +26,8 @@ L_ic    MSE of predicted t=0 vs the given IC. Default λ_ic=0 because BurgersFNO
         lock is disabled.
 
 FNO-only training is the special case λ_pde = λ_ic = 0.
+Default λ_pde = 1e-3 (light regularizer: raw FD residuals are O(1)–O(100)
+while data MSE is O(10^{-2}), so λ=0.1 drowns L_data).
 """
 from __future__ import annotations
 
@@ -97,7 +99,7 @@ def pino_loss(
     pde: str,
     dx: float,
     dt: float,
-    lambda_pde: float = 0.1,
+    lambda_pde: float = 1e-3,
     lambda_ic: float = 0.0,
 ) -> dict[str, torch.Tensor]:
     """Return a dict of scalar tensors: data, pde, ic, total (plus λ weights)."""
@@ -127,5 +129,6 @@ LOSS_TERMS_DOC = {
     "L_pde_burgers": "MSE of FD residual u_t + d(u^2)/dx/2 - nu u_xx (periodic, midpoint)",
     "L_pde_heat": "MSE of FD residual u_t - alpha laplace(u) on Dirichlet interior",
     "L_ic": "MSE(pred[t=0], u0); default weight 0 because operators lock the IC",
+    "lambda_pde_default": "1e-3 (light; residual amplitude >> data MSE)",
     "citation": "Li et al., Physics-Informed Neural Operator, arXiv:2111.03794",
 }
