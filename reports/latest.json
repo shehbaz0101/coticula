@@ -1,0 +1,192 @@
+{
+  "bench": "vu-bench-v0",
+  "generated_at_utc": "2026-09-11T23:28:47.071103+00:00",
+  "exams": {
+    "predict": {
+      "description": "Relative L2 / NMSE vs classical labels",
+      "classical_burgers": {
+        "rel_l2_mean": 0.0,
+        "rel_l2_std": 0.0,
+        "nmse": 0.0
+      },
+      "classical_heat2d": {
+        "rel_l2_mean": 0.0,
+        "rel_l2_std": 0.0,
+        "nmse": 0.0
+      },
+      "fno": {
+        "status": "not_trained"
+      },
+      "pino": {
+        "status": "not_trained"
+      },
+      "llm": {
+        "status": "not_trained"
+      }
+    },
+    "conserve": {
+      "description": "Residual / energy-style audit",
+      "classical_burgers": {
+        "residual_rel_l2": 0.01438256360444937,
+        "energy_max_abs_rel_drift": 0.47947528291854286,
+        "energy_final_mean_rel_drift": -0.2276746674054991
+      },
+      "classical_heat2d": {
+        "residual_rel_l2": 0.030331887526024864,
+        "energy_max_abs_rel_drift": 0.9895394289273816,
+        "energy_final_mean_rel_drift": -0.9449480723678509
+      },
+      "fno": {
+        "status": "not_trained"
+      },
+      "pino": {
+        "status": "not_trained"
+      }
+    },
+    "counterfactual": {
+      "description": "Re-solve with changed param; traj delta",
+      "classical_burgers": {
+        "nu_orig": 0.03366327592946545,
+        "nu_cf": 0.0673265518589309,
+        "rel_l2_traj_delta": 0.1189839588021209,
+        "final_rel_l2": 0.1677248791691741,
+        "u_base_final_norm": 2.9611668129248048,
+        "u_cf_final_norm": 2.7453453938704953
+      },
+      "classical_heat2d": {
+        "alpha_orig": 0.1267732437050385,
+        "alpha_cf": 0.19015986555755776,
+        "rel_l2_traj_delta": 0.20807637858580916,
+        "final_rel_l2": 0.46643357586682177,
+        "u_base_final_norm": 2.2394187495981437,
+        "u_cf_final_norm": 1.1959709955146307
+      },
+      "fno": {
+        "status": "not_trained"
+      },
+      "pino": {
+        "status": "not_trained"
+      }
+    },
+    "explain": {
+      "description": "Keyword rubric stub over free-text rationale",
+      "classical_keyword_stub": {
+        "facets": {
+          "pde_terms": {
+            "hits": [
+              "viscosity",
+              "diffusion",
+              "advection",
+              "nonlinear",
+              "burgers",
+              "residual"
+            ],
+            "coverage": 0.75,
+            "n_keywords": 8
+          },
+          "numerics": {
+            "hits": [
+              "stability",
+              "cfl",
+              "periodic"
+            ],
+            "coverage": 0.42857142857142855,
+            "n_keywords": 7
+          },
+          "physics": {
+            "hits": [
+              "energy",
+              "shock",
+              "smooth"
+            ],
+            "coverage": 0.42857142857142855,
+            "n_keywords": 7
+          }
+        },
+        "overall": 0.5357142857142857,
+        "status": "stub_keyword_rubric"
+      },
+      "llm": {
+        "status": "not_trained"
+      }
+    }
+  },
+  "baselines": {
+    "classical": {
+      "status": "ok",
+      "burgers": {
+        "model": "classical_fd",
+        "status": "ok",
+        "n_eval": 16,
+        "predict": {
+          "rel_l2_mean": 0.0,
+          "rel_l2_std": 0.0,
+          "nmse": 0.0
+        },
+        "conserve": {
+          "residual_rel_l2": 0.01438256360444937,
+          "energy_max_abs_rel_drift": 0.47947528291854286,
+          "energy_final_mean_rel_drift": -0.2276746674054991
+        },
+        "counterfactual": {
+          "nu_orig": 0.03366327592946545,
+          "nu_cf": 0.0673265518589309,
+          "rel_l2_traj_delta": 0.1189839588021209,
+          "final_rel_l2": 0.1677248791691741,
+          "u_base_final_norm": 2.9611668129248048,
+          "u_cf_final_norm": 2.7453453938704953
+        }
+      },
+      "heat2d": {
+        "model": "classical_fd",
+        "status": "ok",
+        "n_eval": 12,
+        "predict": {
+          "rel_l2_mean": 0.0,
+          "rel_l2_std": 0.0,
+          "nmse": 0.0
+        },
+        "conserve": {
+          "residual_rel_l2": 0.030331887526024864,
+          "energy_max_abs_rel_drift": 0.9895394289273816,
+          "energy_final_mean_rel_drift": -0.9449480723678509
+        },
+        "counterfactual": {
+          "alpha_orig": 0.1267732437050385,
+          "alpha_cf": 0.19015986555755776,
+          "rel_l2_traj_delta": 0.20807637858580916,
+          "final_rel_l2": 0.46643357586682177,
+          "u_base_final_norm": 2.2394187495981437,
+          "u_cf_final_norm": 1.1959709955146307
+        }
+      }
+    },
+    "fno": {
+      "model": "fno",
+      "status": "not_trained",
+      "predict": null,
+      "conserve": null,
+      "counterfactual": null,
+      "explain": null,
+      "note": "fno Week-1 stub \u2014 not trained; no fabricated metrics."
+    },
+    "pino": {
+      "model": "pino",
+      "status": "not_trained",
+      "predict": null,
+      "conserve": null,
+      "counterfactual": null,
+      "explain": null,
+      "note": "pino Week-1 stub \u2014 not trained; no fabricated metrics."
+    },
+    "llm": {
+      "model": "llm",
+      "status": "not_trained",
+      "predict": null,
+      "conserve": null,
+      "counterfactual": null,
+      "explain": null,
+      "note": "llm Week-1 stub \u2014 not trained; no fabricated metrics."
+    }
+  }
+}
