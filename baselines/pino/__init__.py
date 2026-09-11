@@ -18,6 +18,7 @@ LOSS_TERMS_DOC = {
     "L_pde_burgers": "MSE of FD residual u_t + d(u^2)/dx/2 - nu u_xx (periodic, midpoint)",
     "L_pde_heat": "MSE of FD residual u_t - alpha laplace(u) on Dirichlet interior",
     "L_ic": "MSE(pred[t=0], u0); default weight 0 because operators lock the IC",
+    "lambda_pde_default": "1e-3 (light; residual amplitude >> data MSE)",
     "citation": "Li et al., Physics-Informed Neural Operator, arXiv:2111.03794",
 }
 

@@ -1,6 +1,8 @@
 {
   "bench": "vu-bench-v0",
-  "generated_at_utc": "2026-09-11T23:28:47.071103+00:00",
+  "project": "Vermithor",
+  "vu": "Vermithor Understanding",
+  "generated_at_utc": "2026-09-11T23:44:54.790621+00:00",
   "exams": {
     "predict": {
       "description": "Relative L2 / NMSE vs classical labels",
@@ -15,10 +17,31 @@
         "nmse": 0.0
       },
       "fno": {
-        "status": "not_trained"
+        "status": "ok",
+        "burgers": {
+          "status": "ok",
+          "rel_l2_mean": 0.15731430293430546,
+          "rel_l2_std": 0.019062221822182045,
+          "nmse": 0.024002863918811734
+        },
+        "heat2d": {
+          "status": "ok",
+          "rel_l2_mean": 0.32213354866110144,
+          "rel_l2_std": 0.13714203262483732,
+          "nmse": 0.12034007776633975
+        }
       },
       "pino": {
-        "status": "not_trained"
+        "status": "ok",
+        "burgers": {
+          "status": "ok",
+          "rel_l2_mean": 0.18801567340975292,
+          "rel_l2_std": 0.023482323229519722,
+          "nmse": 0.0343254304132264
+        },
+        "heat2d": {
+          "status": "not_trained"
+        }
       },
       "llm": {
         "status": "not_trained"
@@ -37,14 +60,35 @@
         "energy_final_mean_rel_drift": -0.9449480723678509
       },
       "fno": {
-        "status": "not_trained"
+        "status": "ok",
+        "burgers": {
+          "status": "ok",
+          "residual_rel_l2": 4.848761558153149,
+          "energy_max_abs_rel_drift": 0.5392739704137562,
+          "energy_final_mean_rel_drift": -0.26655166805391245
+        },
+        "heat2d": {
+          "status": "ok",
+          "residual_rel_l2": 13.033851350070861,
+          "energy_max_abs_rel_drift": 0.9646469660830614,
+          "energy_final_mean_rel_drift": -0.9510302316080754
+        }
       },
       "pino": {
-        "status": "not_trained"
+        "status": "ok",
+        "burgers": {
+          "status": "ok",
+          "residual_rel_l2": 1.7328502815031381,
+          "energy_max_abs_rel_drift": 0.44064580134956866,
+          "energy_final_mean_rel_drift": -0.2711703809690253
+        },
+        "heat2d": {
+          "status": "not_trained"
+        }
       }
     },
     "counterfactual": {
-      "description": "Re-solve with changed param; traj delta",
+      "description": "Changed coefficient; FNO/PINO graded vs classical solver",
       "classical_burgers": {
         "nu_orig": 0.03366327592946545,
         "nu_cf": 0.0673265518589309,
@@ -56,16 +100,55 @@
       "classical_heat2d": {
         "alpha_orig": 0.1267732437050385,
         "alpha_cf": 0.19015986555755776,
-        "rel_l2_traj_delta": 0.20807637858580916,
+        "rel_l2_traj_delta": 0.20807637858580913,
         "final_rel_l2": 0.46643357586682177,
         "u_base_final_norm": 2.2394187495981437,
         "u_cf_final_norm": 1.1959709955146307
       },
       "fno": {
-        "status": "not_trained"
+        "status": "ok",
+        "burgers": {
+          "status": "ok",
+          "nu_orig": 0.02686259114743051,
+          "nu_cf": 0.05372518229486102,
+          "rel_l2_vs_classical_cf": 0.17930227454083478,
+          "nmse_vs_classical_cf": 0.03214930565526607,
+          "rel_l2_traj_delta_classical": 0.1473826107330392,
+          "final_rel_l2_vs_classical_cf": 0.44864614354318166,
+          "u_cf_final_norm_classical": 2.110023922233247,
+          "u_cf_final_norm_pred": 2.6824967861175537,
+          "rel_l2_traj_delta_model": 0.003954554442316294
+        },
+        "heat2d": {
+          "status": "ok",
+          "alpha_orig": 0.19424857904956805,
+          "alpha_cf": 0.2913728685743521,
+          "rel_l2_vs_classical_cf": 0.9553082255019414,
+          "nmse_vs_classical_cf": 1.1556761195097152,
+          "rel_l2_traj_delta_classical": 0.23381200394276164,
+          "final_rel_l2_vs_classical_cf": 6.800094358437265,
+          "u_cf_final_norm_classical": 0.18064725952267952,
+          "u_cf_final_norm_pred": 1.401840329170227,
+          "rel_l2_traj_delta_model": 0.017032336443662643
+        }
       },
       "pino": {
-        "status": "not_trained"
+        "status": "ok",
+        "burgers": {
+          "status": "ok",
+          "nu_orig": 0.02686259114743051,
+          "nu_cf": 0.05372518229486102,
+          "rel_l2_vs_classical_cf": 0.2397134290352192,
+          "nmse_vs_classical_cf": 0.057462528059374754,
+          "rel_l2_traj_delta_classical": 0.1473826107330392,
+          "final_rel_l2_vs_classical_cf": 0.5168776084728006,
+          "u_cf_final_norm_classical": 2.110023922233247,
+          "u_cf_final_norm_pred": 2.786327838897705,
+          "rel_l2_traj_delta_model": 0.002610347932204604
+        },
+        "heat2d": {
+          "status": "not_trained"
+        }
       }
     },
     "explain": {
@@ -107,7 +190,8 @@
         "status": "stub_keyword_rubric"
       },
       "llm": {
-        "status": "not_trained"
+        "status": "not_trained",
+        "note": "No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores."
       }
     }
   },
@@ -154,7 +238,7 @@
         "counterfactual": {
           "alpha_orig": 0.1267732437050385,
           "alpha_cf": 0.19015986555755776,
-          "rel_l2_traj_delta": 0.20807637858580916,
+          "rel_l2_traj_delta": 0.20807637858580913,
           "final_rel_l2": 0.46643357586682177,
           "u_base_final_norm": 2.2394187495981437,
           "u_cf_final_norm": 1.1959709955146307
@@ -163,30 +247,165 @@
     },
     "fno": {
       "model": "fno",
-      "status": "not_trained",
-      "predict": null,
-      "conserve": null,
-      "counterfactual": null,
-      "explain": null,
-      "note": "fno Week-1 stub \u2014 not trained; no fabricated metrics."
+      "status": "ok",
+      "burgers": {
+        "model": "fno",
+        "status": "ok",
+        "n_eval": 12,
+        "eval_idx": [
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ],
+        "predict": {
+          "rel_l2_mean": 0.15731430293430546,
+          "rel_l2_std": 0.019062221822182045,
+          "nmse": 0.024002863918811734
+        },
+        "conserve": {
+          "residual_rel_l2": 4.848761558153149,
+          "energy_max_abs_rel_drift": 0.5392739704137562,
+          "energy_final_mean_rel_drift": -0.26655166805391245
+        },
+        "counterfactual": {
+          "nu_orig": 0.02686259114743051,
+          "nu_cf": 0.05372518229486102,
+          "rel_l2_vs_classical_cf": 0.17930227454083478,
+          "nmse_vs_classical_cf": 0.03214930565526607,
+          "rel_l2_traj_delta_classical": 0.1473826107330392,
+          "final_rel_l2_vs_classical_cf": 0.44864614354318166,
+          "u_cf_final_norm_classical": 2.110023922233247,
+          "u_cf_final_norm_pred": 2.6824967861175537,
+          "rel_l2_traj_delta_model": 0.003954554442316294
+        },
+        "training": {
+          "objective": "fno",
+          "epochs": 40,
+          "lambda_pde": 0.0,
+          "lambda_ic": 0.0,
+          "final_val_rel_l2": 0.15731431543827057
+        }
+      },
+      "heat2d": {
+        "model": "fno",
+        "status": "ok",
+        "n_eval": 8,
+        "eval_idx": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "predict": {
+          "rel_l2_mean": 0.32213354866110144,
+          "rel_l2_std": 0.13714203262483732,
+          "nmse": 0.12034007776633975
+        },
+        "conserve": {
+          "residual_rel_l2": 13.033851350070861,
+          "energy_max_abs_rel_drift": 0.9646469660830614,
+          "energy_final_mean_rel_drift": -0.9510302316080754
+        },
+        "counterfactual": {
+          "alpha_orig": 0.19424857904956805,
+          "alpha_cf": 0.2913728685743521,
+          "rel_l2_vs_classical_cf": 0.9553082255019414,
+          "nmse_vs_classical_cf": 1.1556761195097152,
+          "rel_l2_traj_delta_classical": 0.23381200394276164,
+          "final_rel_l2_vs_classical_cf": 6.800094358437265,
+          "u_cf_final_norm_classical": 0.18064725952267952,
+          "u_cf_final_norm_pred": 1.401840329170227,
+          "rel_l2_traj_delta_model": 0.017032336443662643
+        },
+        "training": {
+          "objective": "fno",
+          "epochs": 20,
+          "lambda_pde": 0.0,
+          "lambda_ic": 0.0,
+          "final_val_rel_l2": 0.3221336603164673
+        }
+      },
+      "checkpoints": {
+        "burgers": "/workspace/checkpoints/fno_burgers.pt",
+        "heat2d": "/workspace/checkpoints/fno_heat2d.pt"
+      }
     },
     "pino": {
       "model": "pino",
-      "status": "not_trained",
-      "predict": null,
-      "conserve": null,
-      "counterfactual": null,
-      "explain": null,
-      "note": "pino Week-1 stub \u2014 not trained; no fabricated metrics."
+      "status": "ok",
+      "burgers": {
+        "model": "pino",
+        "status": "ok",
+        "n_eval": 12,
+        "eval_idx": [
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ],
+        "predict": {
+          "rel_l2_mean": 0.18801567340975292,
+          "rel_l2_std": 0.023482323229519722,
+          "nmse": 0.0343254304132264
+        },
+        "conserve": {
+          "residual_rel_l2": 1.7328502815031381,
+          "energy_max_abs_rel_drift": 0.44064580134956866,
+          "energy_final_mean_rel_drift": -0.2711703809690253
+        },
+        "counterfactual": {
+          "nu_orig": 0.02686259114743051,
+          "nu_cf": 0.05372518229486102,
+          "rel_l2_vs_classical_cf": 0.2397134290352192,
+          "nmse_vs_classical_cf": 0.057462528059374754,
+          "rel_l2_traj_delta_classical": 0.1473826107330392,
+          "final_rel_l2_vs_classical_cf": 0.5168776084728006,
+          "u_cf_final_norm_classical": 2.110023922233247,
+          "u_cf_final_norm_pred": 2.786327838897705,
+          "rel_l2_traj_delta_model": 0.002610347932204604
+        },
+        "training": {
+          "objective": "pino",
+          "epochs": 40,
+          "lambda_pde": 0.001,
+          "lambda_ic": 0.0,
+          "final_val_rel_l2": 0.18801568448543549
+        }
+      },
+      "heat2d": {
+        "status": "not_trained",
+        "reason": "missing_checkpoint",
+        "checkpoint": "/workspace/checkpoints/pino_heat2d.pt"
+      },
+      "checkpoints": {
+        "burgers": "/workspace/checkpoints/pino_burgers.pt",
+        "heat2d": "/workspace/checkpoints/pino_heat2d.pt"
+      }
     },
     "llm": {
-      "model": "llm",
       "status": "not_trained",
-      "predict": null,
-      "conserve": null,
-      "counterfactual": null,
-      "explain": null,
-      "note": "llm Week-1 stub \u2014 not trained; no fabricated metrics."
+      "note": "No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores."
     }
   }
 }

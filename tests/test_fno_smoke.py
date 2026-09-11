@@ -48,7 +48,7 @@ def test_heat_fno_forward_cpu_dirichlet():
 
 
 def test_pino_loss_terms_finite_and_documented():
-    for key in ("L", "L_data", "L_pde_burgers", "L_pde_heat", "L_ic", "citation"):
+    for key in ("L", "L_data", "L_pde_burgers", "L_pde_heat", "L_ic", "lambda_pde_default", "citation"):
         assert key in LOSS_TERMS_DOC
     u = torch.randn(2, 9, 16)
     truth = u + 0.01 * torch.randn_like(u)
@@ -103,13 +103,13 @@ def test_train_pino_few_steps(tmp_path):
         batch_size=4,
         eval_n=2,
         pino=True,
-        lambda_pde=0.1,
+        lambda_pde=1e-3,
         device="cpu",
         out_path=out,
         log_every=1,
     )
     assert out.exists()
-    assert result["training"]["lambda_pde"] == 0.1
+    assert result["training"]["lambda_pde"] == 1e-3
     assert result["training"]["objective"] == "pino"
 
 
