@@ -1,8 +1,9 @@
 {
   "bench": "vu-bench-v0",
   "project": "Vermithor",
-  "vu": "Vermithor Understanding",
-  "generated_at_utc": "2026-09-11T23:44:54.790621+00:00",
+  "vu": "Vermithor Understanding Bench",
+  "repo": "https://github.com/shehbaz0101/vermithor",
+  "generated_at_utc": "2026-09-11T23:46:14.734192+00:00",
   "exams": {
     "predict": {
       "description": "Relative L2 / NMSE vs classical labels",

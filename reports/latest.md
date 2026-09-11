@@ -1,8 +1,9 @@
 # Vermithor VU-Bench v0 — latest eval
 
-_Generated (UTC): 2026-09-11T23:44:54.790621+00:00_
+_Generated (UTC): 2026-09-11T23:46:14.734192+00:00_
 
-**VU = Vermithor Understanding** (not the `uv` Python packager).
+**VU = Vermithor Understanding Bench** (not the `uv` Python packager).
+Project: **Vermithor**. Repo: https://github.com/shehbaz0101/vermithor
 
 ## Exam 1 — Predict
 
@@ -43,4 +44,4 @@ _Generated (UTC): 2026-09-11T23:44:54.790621+00:00_
 - Classical numbers are from re-solving stored ICs (self-consistency / label check).
 - FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.
 - No fabricated SOTA. Exam 4 is a keyword stub, not a trained judge.
-- VU = Vermithor Understanding. Non-goals: no chip cooling, no AU-scale FM.
+- VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.

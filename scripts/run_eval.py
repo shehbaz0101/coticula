@@ -331,7 +331,8 @@ def build_report(
     return {
         "bench": "vu-bench-v0",
         "project": "Vermithor",
-        "vu": "Vermithor Understanding",
+        "vu": "Vermithor Understanding Bench",
+        "repo": "https://github.com/shehbaz0101/vermithor",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "exams": {
             "predict": {
@@ -439,7 +440,8 @@ def render_md(report: dict) -> str:
         "",
         f"_Generated (UTC): {report['generated_at_utc']}_",
         "",
-        "**VU = Vermithor Understanding** (not the `uv` Python packager).",
+        "**VU = Vermithor Understanding Bench** (not the `uv` Python packager).",
+        "Project: **Vermithor**. Repo: https://github.com/shehbaz0101/vermithor",
         "",
         "## Exam 1 — Predict",
         "",
@@ -485,7 +487,7 @@ def render_md(report: dict) -> str:
         "- Classical numbers are from re-solving stored ICs (self-consistency / label check).",
         "- FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.",
         "- No fabricated SOTA. Exam 4 is a keyword stub, not a trained judge.",
-        "- VU = Vermithor Understanding. Non-goals: no chip cooling, no AU-scale FM.",
+        "- VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.",
         "",
     ]
     return "\n".join(lines)
