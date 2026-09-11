@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vu-bench"
 version = "0.1.0"
-description = "Vermithor VU-Bench v0 — Understanding Harness for PDE surrogates"
+description = "Vermithor VU-Bench v0 — Vermithor Understanding harness for PDE surrogates"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

@@ -1,1 +1,1 @@
-"""Baselines: classical solvers + FNO/PINO/LLM stubs."""
+"""Baselines: classical FD solvers, Week-2 FNO/PINO, LLM explain stub."""
