@@ -1,0 +1,11 @@
+{
+  "n_traj": 32,
+  "n": 32,
+  "nt": 40,
+  "alpha_range": [
+    0.05,
+    0.2
+  ],
+  "seed": 1,
+  "equation": "heat2d"
+}

@@ -1,0 +1,26 @@
+{
+  "version": "vu-bench-v0",
+  "n_files": 4,
+  "files": [
+    {
+      "path": "datasets/burgers/burgers_v0.npz",
+      "sha256": "5da87a02e311e97d7d73f771b4981b3dba081c19aa0c96d2d8be3d28455504cf",
+      "bytes": 1903819
+    },
+    {
+      "path": "datasets/burgers/burgers_v0_meta.json",
+      "sha256": "d7f94740f8547894a78051ab629cf1e9c82faa162f28712e879468ea06e6d2b5",
+      "bytes": 124
+    },
+    {
+      "path": "datasets/heat2d/heat2d_v0.npz",
+      "sha256": "d9565e276d590b482f904544e96907793fe41e5bcf3977768e5ca18b1eaeb278",
+      "bytes": 9020964
+    },
+    {
+      "path": "datasets/heat2d/heat2d_v0_meta.json",
+      "sha256": "21bdfd01ca1fdd3a39f614e33dc1d13b50372422c774519393a0c7d4debbd48d",
+      "bytes": 121
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "n_traj": 48,
+  "nx": 64,
+  "nt": 80,
+  "nu_range": [
+    0.005,
+    0.05
+  ],
+  "seed": 0,
+  "equation": "burgers1d"
+}
