@@ -18,7 +18,11 @@ from baselines.classical.burgers1d import solve_burgers
 from baselines.classical.heat2d import generate_dataset as gen_heat
 from baselines.classical.heat2d import solve_heat2d
 from metrics.conserve import audit_burgers, audit_heat
-from metrics.counterfactual import burgers_counterfactual, heat_counterfactual
+from metrics.counterfactual import (
+    burgers_counterfactual,
+    grade_burgers_cf_prediction,
+    heat_counterfactual,
+)
 from metrics.explain import score_explanation
 from metrics.predict import batch_relative_l2, nmse, relative_l2
 
@@ -89,17 +93,29 @@ def test_counterfactual_heat_changes():
     assert cf["rel_l2_traj_delta"] > 1e-6
 
 
+def test_grade_burgers_cf_against_classical():
+    out = solve_burgers(nu=0.02, nx=32, nt=20, seed=9)
+    graded = grade_burgers_cf_prediction(out["u"], out["u"][0], 0.02, 0.08, nx=32, nt=20)
+    assert graded["rel_l2_vs_classical_cf"] > 1e-6
+    assert np.isfinite(graded["nmse_vs_classical_cf"])
+
+
 def test_explain_keyword_rubric():
     r = score_explanation("viscosity diffusion energy conservation residual")
     assert 0.0 < r["overall"] <= 1.0
     assert r["status"] == "stub_keyword_rubric"
 
 
-def test_stubs_importable_not_trained():
-    assert fno.STATUS == "not_trained"
-    assert pino.STATUS == "not_trained"
+def test_learned_baselines_status_and_no_invented_weights():
+    """FNO/PINO architectures are in-repo; missing ckpts stay not_trained. LLM stays stub."""
+    assert fno.STATUS == "implemented"
+    assert pino.STATUS == "implemented"
     assert llm.STATUS == "not_trained"
-    assert fno.load_model()["status"] == "not_trained"
+    missing = fno.load_model(checkpoint=ROOT / "checkpoints" / "definitely_missing.pt")
+    assert missing["status"] == "not_trained"
+    assert missing["model"] is None
+    missing_pino = pino.load_model(checkpoint=ROOT / "checkpoints" / "definitely_missing.pt")
+    assert missing_pino["status"] == "not_trained"
 
 
 def test_report_exists_after_pipeline():
@@ -110,8 +126,22 @@ def test_report_exists_after_pipeline():
     data = json.loads(report.read_text(encoding="utf-8"))
     for key in ("predict", "conserve", "counterfactual", "explain"):
         assert key in data["exams"]
-    assert data["exams"]["fno" if False else "predict"]["fno"]["status"] == "not_trained"
     assert data["baselines"]["classical"]["status"] == "ok"
     bp = data["exams"]["predict"]["classical_burgers"]
     assert isinstance(bp["rel_l2_mean"], float)
     assert np.isfinite(bp["rel_l2_mean"])
+    # FNO/PINO: either measured finite numbers or an honest not_trained — never a fake SOTA.
+    for name in ("fno", "pino"):
+        block = data["exams"]["predict"][name]
+        assert block["status"] in ("ok", "not_trained")
+        if block["status"] == "ok":
+            for pde in ("burgers", "heat2d"):
+                sub = block.get(pde) or {}
+                if sub.get("status") == "ok":
+                    assert np.isfinite(sub["rel_l2_mean"])
+    assert data["exams"]["explain"]["llm"]["status"] == "not_trained"
+    # Keyword rubric is a stub, not a fabricated LLM score.
+    assert data["exams"]["explain"]["classical_keyword_stub"]["status"] == "stub_keyword_rubric"
+    if "vu" in data:
+        assert data["vu"] == "Vermithor Understanding Bench"
+        assert data.get("project") == "Vermithor"
