@@ -1,18 +1,32 @@
-# Vermithor — VU-Bench v0
+# Physics understanding bench
 
-**VU = Vermithor Understanding Bench** (not the `uv` Python packager).
+Repo: [github.com/shehbaz0101/vermithor](https://github.com/shehbaz0101/vermithor)
 
-Public repo: [github.com/shehbaz0101/vermithor](https://github.com/shehbaz0101/vermithor)
+I built this as a small, reproducible way to test whether PDE surrogates actually
+understand the physics, not just fit training trajectories.
 
-**Thesis.** VU-Bench is Vermithor’s *understanding harness* for PDE surrogates:
-four exams (Predict, Conserve, Counterfactual, Explain) that score whether a
-model has grasped the dynamics—not just interpolated training trajectories.
+The harness runs four exams on Burgers (1D) and the heat equation (2D):
 
-Reports contain **only measured numbers**. Missing checkpoints stay
-`not_trained`. The optional LLM judge is env-gated and **never invents scores**.
+1. **Predict** field trajectories
+2. **Conserve** check PDE residuals / energy drift
+3. **Counterfactual** response when a coefficient changes
+4. **Explain** short answers graded with a keyword rubric
 
-Writeup draft (tables + non-claims): [docs/WRITEUP.md](docs/WRITEUP.md).
-Design / train support / trust rules: [docs/DESIGN.md](docs/DESIGN.md).
+Baselines include classical finite differences, a tiny FNO, and a PINO-style
+physics loss. Reports only include measured numbers. Missing checkpoints stay
+`not_trained`. An optional LLM judge is env-gated and never invents scores.
+
+More detail: [docs/WRITEUP.md](docs/WRITEUP.md) · [docs/DESIGN.md](docs/DESIGN.md)
+
+## Outcomes (v0.1.0)
+
+- Public harness with one-command eval and OOD probes
+- Fail-closed trust flags (`ood` / `untrusted`) so pretty heatmaps do not hide bad physics
+- Measured tradeoff: FNO can look better on L2 while residual stays worse than PINO
+- CI on GitHub Actions (pytest + CPU smoke trains)
+- Cite-ready packaging (`CITATION.cff`, changelog, release notes)
+
+Release: https://github.com/shehbaz0101/vermithor/releases/tag/v0.1.0
 
 ## Quickstart
 
@@ -31,7 +45,7 @@ python -m scripts.train_fno --pde burgers
 python -m scripts.train_fno --pde heat2d
 python -m scripts.train_pino --pde burgers
 
-python -m scripts.run_eval          # IID exams 1–4 + OOD + trust flags
+python -m scripts.run_eval          # IID exams 1-4 + OOD + trust flags
 python -m scripts.run_ood           # OOD only → reports/ood.json
 python -m scripts.run_eval --skip-ood
 pytest -q
@@ -45,17 +59,17 @@ python -m scripts.train_pino --smoke --pde burgers
 python -m scripts.verify_manifests
 ```
 
-CI workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — `pytest -q`
+CI workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)  -  `pytest -q`
 plus the `--smoke` trains above on `ubuntu-latest`. Full `generate_labels` /
 `run_eval` is **not** in CI (NPZ labels are gitignored; a full train is heavier
 than a PR check).
 
-## Week 1–5 status
+## Week 1-5 status
 
 | Week | Status | What shipped |
 |------|--------|----------------|
 | 1 | done | Classical FD labels, exam APIs, eval harness, smoke tests |
-| 2 | done | Laptop-scale FNO + PINO residual; Exams 1–3 measured when a `*.pt` loads |
+| 2 | done | Laptop-scale FNO + PINO residual; Exams 1-3 measured when a `*.pt` loads |
 | 3 | done | OOD probes (param / resolution / IC), fail-closed trust, [WRITEUP.md](docs/WRITEUP.md) |
 | 4 | done | GitHub Actions CI, Exam 4 **fixed item set** (36 law-keyword items), SHA pins for labels + OOD generators, README polish |
 | 5 | this | Cite-ready v0.1.0 packaging: `CITATION.cff`, changelog, release notes. **No new metrics.** |
@@ -69,31 +83,31 @@ Fail-closed layer: `metrics/trust.py`. A pretty field is never a silent success.
 | `trusted` | In declared train support **and** residual rel-L2 ≤ 1.0 **and** Predict rel-L2 ≤ 0.5 |
 | `ood` | Left train support (param / resolution / IC family); residual and L2 still below those cuts |
 | `untrusted` | Residual or Predict L2 exceeds a cut (wins over `ood` if both apply) |
-| `reference` | Classical FD labeler row — not a learned-transfer claim |
-| `not_trained` | Checkpoint, torch, or LLM judge absent — **not** a placeholder accuracy |
+| `reference` | Classical FD labeler row  -  not a learned-transfer claim |
+| `not_trained` | Checkpoint, torch, or LLM judge absent  -  **not** a placeholder accuracy |
 
 OOD / untrusted fields must carry `metrics.trust.refuse_silent_heatmap()`.
 Thresholds are documented defaults, not tuned after seeing scores.
 `trusted` is **not** a claim that the model understands the PDE.
 
-IID Exam 1–3 tables and the OOD section are **not mixed**. Transfer scores
+IID Exam 1-3 tables and the OOD section are **not mixed**. Transfer scores
 live under `ood` in `reports/latest.json`.
 
 ## Latest measured results (this repo)
 
 Copied from [`reports/latest.md`](reports/latest.md) (Week 3 eval run
 `2026-09-12T00:18:43Z` on the shipped checkpoints). **Not invented.**
-`—` / `not_trained` means that checkpoint or judge was absent.
+` - ` / `not_trained` means that checkpoint or judge was absent.
 
 | Baseline | Burgers rel-L2 | Heat2D rel-L2 | Burgers residual | Trust |
 |----------|---------------:|--------------:|-----------------:|-------|
 | classical_fd | 0 | 0 | 1.44e-2 | `reference` |
 | FNO | 1.57e-1 | 3.22e-1 | 4.85 | `untrusted` |
-| PINO | 1.88e-1 | — | 1.73 | `untrusted` / `not_trained` |
-| LLM | — | — | — | `not_trained` |
+| PINO | 1.88e-1 |  -  | 1.73 | `untrusted` / `not_trained` |
+| LLM |  -  |  -  |  -  | `not_trained` |
 
 Exam 4 gold-reference keyword coverage is computed from the pinned item set
-(authored gold texts vs expected law keywords) — see the Exam 4 section of
+(authored gold texts vs expected law keywords)  -  see the Exam 4 section of
 `reports/latest.md` after `run_eval`. That number is a rubric ceiling, **not**
 an LLM or FNO explanation score.
 
@@ -134,7 +148,7 @@ SHA manifests live in `datasets/manifests/`:
 | `ood_generators_v0.json` | `datasets/ood/probe_plan_v0.json` (knobs, seeds, `default_probe_plan()`) |
 | `exam4_v0.json` | `datasets/exam4/items_v0.json` |
 
-OOD trajectories are **generated on the fly** from the pinned recipe — they
+OOD trajectories are **generated on the fly** from the pinned recipe  -  they
 are not stored as NPZ. `*.npz` is gitignored; after a fresh clone:
 
 ```bash
@@ -167,13 +181,13 @@ checkpoint is present. It does **not** invent metrics.
 
 ## Cite / Release
 
-**v0.1.0** packages Weeks 1–4 of this harness. Cite the software with
+**v0.1.0** packages Weeks 1-4 of this harness. Cite the software with
 [`CITATION.cff`](CITATION.cff) (author: Shehbaz Pathan; version 0.1.0;
 https://github.com/shehbaz0101/vermithor). GitHub’s “Cite this repository”
 button reads that file.
 
 A GitHub Release for annotated tag `v0.1.0` is intended **after** this
-packaging merges to `main` — this repo increment does not cut the tag.
+packaging merges to `main`  -  this repo increment does not cut the tag.
 What’s in the tag, how to reproduce, and non-claims:
 [`docs/RELEASE_v0.1.0.md`](docs/RELEASE_v0.1.0.md).
 Changelog (no duplicated tables): [`CHANGELOG.md`](CHANGELOG.md).
