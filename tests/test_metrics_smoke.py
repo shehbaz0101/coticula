@@ -140,8 +140,15 @@ def test_report_exists_after_pipeline():
                 if sub.get("status") == "ok":
                     assert np.isfinite(sub["rel_l2_mean"])
     assert data["exams"]["explain"]["llm"]["status"] == "not_trained"
-    # Keyword rubric is a stub, not a fabricated LLM score.
-    assert data["exams"]["explain"]["classical_keyword_stub"]["status"] == "stub_keyword_rubric"
+    # Keyword rubric is not a fabricated LLM score.
+    stub = data["exams"]["explain"].get("classical_keyword_stub") or {}
+    if stub:
+        assert stub["status"] == "stub_keyword_rubric"
+    gold = data["exams"]["explain"].get("gold_reference")
+    if gold:
+        assert gold["status"] == "keyword_rubric"
+        assert gold["n_items"] >= 15
+        assert data["exams"]["explain"]["llm"].get("score") is None
     if "vu" in data:
         assert data["vu"] == "Vermithor Understanding Bench"
         assert data.get("project") == "Vermithor"

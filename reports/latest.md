@@ -1,4 +1,4 @@
-# Vermithor VU-Bench v0 — latest eval (Week 3)
+# Vermithor VU-Bench v0 — latest eval (Week 4)
 
 _Generated (UTC): 2026-09-12T00:18:43.378079+00:00_
 
@@ -47,8 +47,17 @@ Project: **Vermithor**. Repo: https://github.com/shehbaz0101/vermithor
 
 ## Exam 4 — Explain
 
-- Keyword rubric overall: `0.5357` (status: stub_keyword_rubric)
-- LLM: `not_trained` — No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores.
+- Item set: `datasets/exam4/items_v0.json` (n=36, sha256 `30747ef03aae71c8…`)
+- Gold-reference keyword coverage: `1.0000` (status: keyword_rubric) — authored gold texts vs expected law keywords, not a model score.
+- Perfect / zero items: `36` / `0`
+- Legacy single-rationale stub overall: `0.5357` (status: stub_keyword_rubric)
+- LLM: `not_trained` — LLM judge off (no VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores. (score=None)
+
+| PDE / slice | n | mean keyword coverage |
+|---|---:|---:|
+| burgers1d | 12 | 1.0000 |
+| harness | 12 | 1.0000 |
+| heat2d | 12 | 1.0000 |
 
 ## OOD / transfer (distinct from IID)
 
@@ -114,5 +123,5 @@ Classical heat at α′ differs from α by a large trajectory Δ, but the FNO fi
 - Classical IID numbers are from re-solving stored ICs (self-consistency / label check).
 - OOD numbers are a separate section: fresh classical solves outside train support.
 - FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.
-- No fabricated SOTA. Exam 4 is a keyword stub, not a trained judge.
+- No fabricated SOTA. Exam 4 is a pinned keyword item set, not a trained judge.
 - VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.

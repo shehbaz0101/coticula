@@ -9,3 +9,4 @@ build/
 .DS_Store
 *.npz
 .ipynb_checkpoints/
+checkpoints/_smoke_*.pt

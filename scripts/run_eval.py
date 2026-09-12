@@ -1,8 +1,9 @@
 """Run VU-Bench exams: classical FD + trained FNO/PINO (if checkpoints exist).
 
 Writes reports/latest.json and reports/latest.md with **only measured numbers**.
-Missing checkpoints stay `not_trained`. Exam 4 is a keyword rubric; the LLM
-hook is not scored unless a real judge is wired (never fabricated).
+Missing checkpoints stay `not_trained`. Exam 4 grades a pinned item set
+against expected law keywords. The LLM hook is env-gated and is not scored
+unless a real judge is wired (never fabricated).
 
 Week 3: OOD / transfer probes (param, resolution, IC family) are a separate
 section from IID exams 1–3. Fail-closed trust flags (`ood` / `untrusted`)
@@ -11,7 +12,6 @@ travel with the numbers. Use ``--skip-ood`` for IID-only.
 from __future__ import annotations
 
 import json
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,7 +34,7 @@ from baselines.fno.io import (
 )
 from metrics.conserve import audit_burgers, audit_heat
 from metrics.counterfactual import burgers_counterfactual, heat_counterfactual
-from metrics.explain import score_explanation
+from metrics.explain import grade_exam4, llm_judge_exam4, score_explanation
 from metrics.predict import batch_relative_l2
 from metrics.trust import (
     BURGERS_TRAIN_SUPPORT,
@@ -306,17 +306,13 @@ def _eval_learned(
 
 
 def llm_explain_section() -> dict:
-    """Optional LLM hook — stubbed. Never invents a judge score."""
-    key = os.environ.get("VU_LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    if not key:
-        return {
-            "status": getattr(llm_mod, "STATUS", "not_trained"),
-            "note": "No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores.",
-        }
-    return {
-        "status": "not_trained",
-        "note": "API key present but LLM judge is not wired; refusing to fabricate scores.",
-    }
+    """Optional LLM hook — stubbed / env-gated. Never invents a judge score."""
+    block = llm_judge_exam4()
+    # Keep the baselines.llm STATUS in sync when the stub is unused.
+    if block.get("status") != "not_trained":
+        return block
+    block.setdefault("baseline_status", getattr(llm_mod, "STATUS", "not_trained"))
+    return block
 
 
 def _exam_predict_block(section: dict) -> dict:
@@ -380,6 +376,7 @@ def build_report(
         "boundaries matter for residual audits."
     )
     explain = score_explanation(rationale)
+    exam4 = grade_exam4(use_gold=True)
     llm_block = llm_explain_section()
 
     return {
@@ -387,7 +384,7 @@ def build_report(
         "project": "Vermithor",
         "vu": "Vermithor Understanding Bench",
         "repo": "https://github.com/shehbaz0101/vermithor",
-        "week": 3,
+        "week": 4,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "trust_policy": TRUST_POLICY,
         "exams": {
@@ -414,7 +411,14 @@ def build_report(
                 "pino": _exam_cf_block(pino_ex),
             },
             "explain": {
-                "description": "Keyword rubric stub over free-text rationale",
+                "description": (
+                    "Exam 4: fixed item set graded by expected law-keyword coverage. "
+                    "LLM judge stays not_trained unless a real judge is wired."
+                ),
+                "n_items": exam4["n_items"],
+                "item_set": exam4["item_set"],
+                "item_set_sha256": exam4["item_set_sha256"],
+                "gold_reference": exam4,
                 "classical_keyword_stub": explain,
                 "llm": llm_block,
             },
@@ -460,6 +464,33 @@ def _status_cell(block: dict | None) -> str:
     return str(block.get("status", "not_trained"))
 
 
+def _exam4_md_lines(explain: dict, stub: dict) -> list[str]:
+    gold = explain.get("gold_reference") or {}
+    n = explain.get("n_items") or gold.get("n_items")
+    sha = explain.get("item_set_sha256") or gold.get("item_set_sha256") or "—"
+    mean = gold.get("mean_coverage")
+    mean_s = f"{mean:.4f}" if isinstance(mean, (int, float)) else "—"
+    lines = [
+        f"- Item set: `{explain.get('item_set', 'datasets/exam4/items_v0.json')}` "
+        f"(n={n}, sha256 `{sha[:16]}…`)",
+        f"- Gold-reference keyword coverage: `{mean_s}` "
+        f"(status: {gold.get('status', 'keyword_rubric')}) — authored gold texts vs expected law keywords, not a model score.",
+        f"- Perfect / zero items: `{gold.get('n_perfect', '—')}` / `{gold.get('n_zero', '—')}`",
+        f"- Legacy single-rationale stub overall: `{stub['overall']:.4f}` (status: {stub['status']})",
+        f"- LLM: `{explain['llm']['status']}` — {explain['llm'].get('note', '')} "
+        f"(score={explain['llm'].get('score')})",
+        "",
+    ]
+    by_pde = gold.get("by_pde") or {}
+    if by_pde:
+        lines.append("| PDE / slice | n | mean keyword coverage |")
+        lines.append("|---|---:|---:|")
+        for name, row in by_pde.items():
+            lines.append(f"| {name} | {row['n']} | {row['mean_coverage']:.4f} |")
+        lines.append("")
+    return lines
+
+
 def render_md(report: dict) -> str:
     ex = report["exams"]
     bp = ex["predict"]["classical_burgers"]
@@ -494,7 +525,7 @@ def render_md(report: dict) -> str:
         )
 
     lines = [
-        "# Vermithor VU-Bench v0 — latest eval (Week 3)",
+        "# Vermithor VU-Bench v0 — latest eval (Week 4)",
         "",
         f"_Generated (UTC): {report['generated_at_utc']}_",
         "",
@@ -551,9 +582,7 @@ def render_md(report: dict) -> str:
         "",
         "## Exam 4 — Explain",
         "",
-        f"- Keyword rubric overall: `{expl['overall']:.4f}` (status: {expl['status']})",
-        f"- LLM: `{ex['explain']['llm']['status']}` — {ex['explain']['llm'].get('note', '')}",
-        "",
+        *_exam4_md_lines(ex["explain"], expl),
     ]
     lines.extend(_render_ood_md(report.get("ood")))
     lines.extend(_render_failure_md(report.get("failure_analysis")))
@@ -564,7 +593,7 @@ def render_md(report: dict) -> str:
             "- Classical IID numbers are from re-solving stored ICs (self-consistency / label check).",
             "- OOD numbers are a separate section: fresh classical solves outside train support.",
             "- FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.",
-            "- No fabricated SOTA. Exam 4 is a keyword stub, not a trained judge.",
+            "- No fabricated SOTA. Exam 4 is a pinned keyword item set, not a trained judge.",
             "- VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.",
             "",
         ]

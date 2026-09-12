@@ -1,0 +1,14 @@
+{
+  "version": "vu-bench-v0",
+  "n_files": 1,
+  "files": [
+    {
+      "path": "datasets/ood/probe_plan_v0.json",
+      "sha256": "7a8e6df8ac8d76dc5192884f077b88d0eed0abd4edb28cf9e6f07eded5c4041a",
+      "bytes": 4319
+    }
+  ],
+  "kind": "ood_generators",
+  "regenerate": "python -m scripts.pin_datasets",
+  "note": "Pins the OOD generator recipe (knobs + probe plan + seeds). Trajectories are rematerialized by metrics.ood.materialize_probe."
+}

@@ -6,7 +6,14 @@ from .counterfactual import (
     grade_heat_cf_prediction,
     heat_counterfactual,
 )
-from .explain import batch_score, score_explanation
+from .explain import (
+    batch_score,
+    grade_exam4,
+    llm_judge_exam4,
+    load_exam4,
+    score_explanation,
+    score_item,
+)
 from .ood import (
     generate_burgers_cases,
     generate_heat_cases,
@@ -42,6 +49,10 @@ __all__ = [
     "grade_heat_cf_prediction",
     "score_explanation",
     "batch_score",
+    "load_exam4",
+    "score_item",
+    "grade_exam4",
+    "llm_judge_exam4",
     "decide_trust",
     "param_in_range",
     "attach_trust",

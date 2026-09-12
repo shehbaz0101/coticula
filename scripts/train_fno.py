@@ -74,7 +74,12 @@ def main(argv: list[str] | None = None) -> None:
 
     for pde in pdes:
         out = args.out
-        if out is None or (args.pde == "both"):
+        if args.smoke and (out is None or args.pde == "both"):
+            # Do not clobber published checkpoints/fno_*.pt used by run_eval.
+            from baselines.fno.io import CHECKPOINT_DIR
+
+            out = CHECKPOINT_DIR / f"_smoke_{objective}_{pde}.pt"
+        elif out is None or (args.pde == "both"):
             out = default_ckpt(pde, objective)
         if pde == "burgers":
             data = _smoke_burgers() if args.smoke else None

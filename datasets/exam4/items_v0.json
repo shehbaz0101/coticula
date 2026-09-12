@@ -1,0 +1,298 @@
+{
+  "version": "vu-bench-v0-exam4",
+  "bench": "Vermithor Understanding Bench",
+  "n_items": 36,
+  "scoring": "keyword_coverage_vs_expected_law_keywords",
+  "llm_judge": "not_wired",
+  "note": "Fixed explanation set. Grade is hit-rate of expected law keywords in a rationale. Not a trained judge; not an LLM score.",
+  "items": [
+    {
+      "id": "e4_b01",
+      "pde": "burgers1d",
+      "facet": "pde_terms",
+      "prompt": "Write the viscous Burgers PDE in 1D and name the two spatial mechanisms.",
+      "expected_keywords": ["advection", "viscosity", "diffusion"],
+      "gold_rationale": "Viscous Burgers is u_t + u u_x = ν u_xx: nonlinear advection balanced by viscosity-driven diffusion."
+    },
+    {
+      "id": "e4_b02",
+      "pde": "burgers1d",
+      "facet": "physics",
+      "prompt": "What does increasing viscosity do to a steep Burgers front?",
+      "expected_keywords": ["viscosity", "smooth", "shock", "diffusion"],
+      "gold_rationale": "Larger viscosity strengthens diffusion, which smooths a forming shock instead of letting it steepen."
+    },
+    {
+      "id": "e4_b03",
+      "pde": "burgers1d",
+      "facet": "physics",
+      "prompt": "What happens to Burgers solutions as viscosity approaches zero?",
+      "expected_keywords": ["shock", "viscosity", "dissipation"],
+      "gold_rationale": "As viscosity → 0 the solution can form a shock; remaining dissipation concentrates in a thin layer."
+    },
+    {
+      "id": "e4_b04",
+      "pde": "burgers1d",
+      "facet": "pde_terms",
+      "prompt": "Why is the convective term in Burgers nonlinear?",
+      "expected_keywords": ["nonlinear", "advection", "transport"],
+      "gold_rationale": "The flux u²/2 makes advection speed equal to the field itself, so transport is nonlinear."
+    },
+    {
+      "id": "e4_b05",
+      "pde": "burgers1d",
+      "facet": "physics",
+      "prompt": "Is kinetic energy conserved for viscous Burgers on a periodic domain?",
+      "expected_keywords": ["energy", "dissipation", "viscosity", "conservation"],
+      "gold_rationale": "Periodic viscous Burgers has no kinetic-energy conservation: viscosity produces dissipation, so energy decays."
+    },
+    {
+      "id": "e4_b06",
+      "pde": "burgers1d",
+      "facet": "numerics",
+      "prompt": "Which spatial boundary condition does the v0 Burgers labeler use?",
+      "expected_keywords": ["periodic", "boundary"],
+      "gold_rationale": "The classical Burgers solver is periodic in x; wrap-around boundary stencils close the grid."
+    },
+    {
+      "id": "e4_b07",
+      "pde": "burgers1d",
+      "facet": "counterfactual",
+      "prompt": "If viscosity is doubled from the same IC, should the trajectory stay the same?",
+      "expected_keywords": ["viscosity", "diffusion", "counterfactual"],
+      "gold_rationale": "A counterfactual at 2ν increases diffusion, so the trajectory must differ from the original viscosity solve."
+    },
+    {
+      "id": "e4_b08",
+      "pde": "burgers1d",
+      "facet": "numerics",
+      "prompt": "Name a stability concern for an explicit finite-difference Burgers step.",
+      "expected_keywords": ["cfl", "stability", "finite difference"],
+      "gold_rationale": "An explicit finite difference Burgers step must respect a CFL-like stability bound on dt relative to dx and ν."
+    },
+    {
+      "id": "e4_b09",
+      "pde": "burgers1d",
+      "facet": "pde_terms",
+      "prompt": "What does a large Exam 2 residual_rel_l2 mean for a predicted Burgers field?",
+      "expected_keywords": ["residual", "discretization", "burgers"],
+      "gold_rationale": "A large residual means the predicted Burgers field fails the discrete PDE (the finite-difference discretization residual is field-scale)."
+    },
+    {
+      "id": "e4_b10",
+      "pde": "burgers1d",
+      "facet": "ood",
+      "prompt": "Which initial-condition family is in the Burgers v0 train support?",
+      "expected_keywords": ["fourier", "periodic"],
+      "gold_rationale": "Train ICs are random low Fourier modes on the periodic interval, not pulses or fronts."
+    },
+    {
+      "id": "e4_b11",
+      "pde": "burgers1d",
+      "facet": "ood",
+      "prompt": "Why is a Gaussian pulse IC an OOD probe for the Burgers FNO?",
+      "expected_keywords": ["ood", "gaussian", "fourier"],
+      "gold_rationale": "A localized gaussian pulse is an IC-family OOD shift: labels used Fourier modes, not a pulse."
+    },
+    {
+      "id": "e4_b12",
+      "pde": "burgers1d",
+      "facet": "trust",
+      "prompt": "Can a Burgers surrogate look close in L2 while still being untrusted?",
+      "expected_keywords": ["residual", "untrusted", "l2"],
+      "gold_rationale": "Yes: Predict L2 can be moderate while the residual is O(1), so the fail-closed flag is untrusted."
+    },
+    {
+      "id": "e4_h01",
+      "pde": "heat2d",
+      "facet": "pde_terms",
+      "prompt": "Write the 2D heat equation used in VU-Bench and name the spatial operator.",
+      "expected_keywords": ["diffusion", "laplacian", "heat"],
+      "gold_rationale": "The heat equation is u_t = α Δu: diffusion through the Laplacian of the field."
+    },
+    {
+      "id": "e4_h02",
+      "pde": "heat2d",
+      "facet": "physics",
+      "prompt": "What does increasing the diffusivity α do to a heat solution?",
+      "expected_keywords": ["diffusion", "decay", "smooth"],
+      "gold_rationale": "Larger α speeds diffusion, so peaks decay faster and the field becomes smooth sooner."
+    },
+    {
+      "id": "e4_h03",
+      "pde": "heat2d",
+      "facet": "pde_terms",
+      "prompt": "Why does the heat residual involve a discrete Laplacian?",
+      "expected_keywords": ["laplacian", "residual", "discretization"],
+      "gold_rationale": "The PDE residual is u_t − α Laplacian(u); a finite-difference discretization of that operator is audited."
+    },
+    {
+      "id": "e4_h04",
+      "pde": "heat2d",
+      "facet": "numerics",
+      "prompt": "Which boundary condition does the v0 heat labeler enforce?",
+      "expected_keywords": ["dirichlet", "boundary"],
+      "gold_rationale": "Heat is solved on a square with Dirichlet walls fixed at zero on every boundary."
+    },
+    {
+      "id": "e4_h05",
+      "pde": "heat2d",
+      "facet": "physics",
+      "prompt": "Does the L2 energy of a Dirichlet heat solution grow in time?",
+      "expected_keywords": ["energy", "decay", "dissipation"],
+      "gold_rationale": "No: Dirichlet heat produces dissipation, so the discrete energy decays rather than growing."
+    },
+    {
+      "id": "e4_h06",
+      "pde": "heat2d",
+      "facet": "physics",
+      "prompt": "Why do high-wavenumber heat modes vanish first?",
+      "expected_keywords": ["diffusion", "decay", "smooth"],
+      "gold_rationale": "Diffusion damps high wavenumbers fastest, so the field becomes smooth as those modes decay."
+    },
+    {
+      "id": "e4_h07",
+      "pde": "heat2d",
+      "facet": "counterfactual",
+      "prompt": "If α is scaled by 1.5 from the same IC, what should a faithful surrogate do?",
+      "expected_keywords": ["diffusion", "counterfactual", "alpha"],
+      "gold_rationale": "The counterfactual at 1.5 alpha must change the trajectory: stronger diffusion, not a copy of the original alpha field."
+    },
+    {
+      "id": "e4_h08",
+      "pde": "heat2d",
+      "facet": "ood",
+      "prompt": "Why is a two-bump IC outside heat v0 train support?",
+      "expected_keywords": ["ood", "gaussian", "ic"],
+      "gold_rationale": "Train ICs are a single gaussian bump. A two-bump field is an IC-family OOD probe."
+    },
+    {
+      "id": "e4_h09",
+      "pde": "heat2d",
+      "facet": "ood",
+      "prompt": "What does a spatial resolution probe test for the heat FNO?",
+      "expected_keywords": ["resolution", "ood", "grid"],
+      "gold_rationale": "A resolution OOD probe changes the spatial grid (n ≠ 32) while leaving α and the IC family fixed."
+    },
+    {
+      "id": "e4_h10",
+      "pde": "heat2d",
+      "facet": "physics",
+      "prompt": "Name the conserved-looking quantity Exam 2 tracks on heat, and whether it is conserved.",
+      "expected_keywords": ["energy", "decay", "conservation"],
+      "gold_rationale": "Exam 2 tracks discrete energy drift. Heat has no conservation of that energy; it should decay."
+    },
+    {
+      "id": "e4_h11",
+      "pde": "heat2d",
+      "facet": "pde_terms",
+      "prompt": "What residual does Exam 2 compute for a heat prediction?",
+      "expected_keywords": ["residual", "laplacian", "heat"],
+      "gold_rationale": "Exam 2 forms the heat residual u_t − α Laplacian(u) on the Dirichlet interior and reports relative L2."
+    },
+    {
+      "id": "e4_h12",
+      "pde": "heat2d",
+      "facet": "ood",
+      "prompt": "Why might a sinusoid IC be a harsh heat transfer case?",
+      "expected_keywords": ["sinusoid", "ood", "diffusion"],
+      "gold_rationale": "A sinusoid IC is an OOD family (not a gaussian bump) and can excite different diffusion scales than train."
+    },
+    {
+      "id": "e4_x01",
+      "pde": "harness",
+      "facet": "exams",
+      "prompt": "What does Exam 1 (Predict) measure?",
+      "expected_keywords": ["l2", "nmse", "labels"],
+      "gold_rationale": "Exam 1 scores relative L2 and NMSE of the predicted field against classical labels."
+    },
+    {
+      "id": "e4_x02",
+      "pde": "harness",
+      "facet": "exams",
+      "prompt": "What does Exam 2 (Conserve) measure?",
+      "expected_keywords": ["residual", "energy", "pde"],
+      "gold_rationale": "Exam 2 audits the discrete PDE residual and energy drift of the predicted rollout."
+    },
+    {
+      "id": "e4_x03",
+      "pde": "harness",
+      "facet": "exams",
+      "prompt": "How is a learned model graded on Exam 3?",
+      "expected_keywords": ["counterfactual", "classical", "coefficient"],
+      "gold_rationale": "Exam 3 changes a coefficient (ν or α) and grades the learned prediction against the classical counterfactual solve."
+    },
+    {
+      "id": "e4_x04",
+      "pde": "harness",
+      "facet": "trust",
+      "prompt": "When is a surrogate flagged untrusted?",
+      "expected_keywords": ["untrusted", "residual", "threshold"],
+      "gold_rationale": "Untrusted means residual rel-L2 > 1 or Predict rel-L2 > 0.5 — documented fail-closed thresholds."
+    },
+    {
+      "id": "e4_x05",
+      "pde": "harness",
+      "facet": "trust",
+      "prompt": "When is a case flagged ood rather than untrusted?",
+      "expected_keywords": ["ood", "support", "residual"],
+      "gold_rationale": "OOD means the query left train support (param, resolution, or IC) while residual and L2 still sit below thresholds."
+    },
+    {
+      "id": "e4_x06",
+      "pde": "harness",
+      "facet": "trust",
+      "prompt": "What must be true for status trusted?",
+      "expected_keywords": ["trusted", "support", "residual"],
+      "gold_rationale": "Trusted requires in-support and residual/L2 below the fail-closed cuts. It is not a claim that the model understands the PDE."
+    },
+    {
+      "id": "e4_x07",
+      "pde": "harness",
+      "facet": "trust",
+      "prompt": "May an OOD or untrusted field be shown as a silent pretty heatmap?",
+      "expected_keywords": ["heatmap", "untrusted", "ood"],
+      "gold_rationale": "No. refuse_silent_heatmap() must caption OOD or untrusted fields — no silent pretty heatmap."
+    },
+    {
+      "id": "e4_x08",
+      "pde": "harness",
+      "facet": "ood",
+      "prompt": "Why can FNO attempt a spatial resolution transfer probe?",
+      "expected_keywords": ["fno", "resolution", "spectral"],
+      "gold_rationale": "FNO spectral convolution is resolution-agnostic in space, so a spatial resolution probe is well-posed."
+    },
+    {
+      "id": "e4_x09",
+      "pde": "harness",
+      "facet": "ood",
+      "prompt": "Does VU-Bench claim temporal resolution transfer for the v0 FNO?",
+      "expected_keywords": ["time", "channels", "transfer"],
+      "gold_rationale": "No temporal transfer is claimed: time is locked as output channels, so only spatial transfer is probed."
+    },
+    {
+      "id": "e4_x10",
+      "pde": "harness",
+      "facet": "pde_terms",
+      "prompt": "What extra term does PINO add relative to supervised FNO?",
+      "expected_keywords": ["residual", "pino", "pde"],
+      "gold_rationale": "PINO adds λ_pde times a PDE residual loss on top of data MSE; it is not a claim of SOTA."
+    },
+    {
+      "id": "e4_x11",
+      "pde": "harness",
+      "facet": "ood",
+      "prompt": "Must OOD transfer scores be mixed into Exam 1 tables?",
+      "expected_keywords": ["ood", "iid", "transfer"],
+      "gold_rationale": "No. OOD transfer lives in a separate report section and must not be mixed into IID Exam 1 tables."
+    },
+    {
+      "id": "e4_x12",
+      "pde": "harness",
+      "facet": "explain",
+      "prompt": "Does a high Exam 4 keyword score mean the model explained the physics?",
+      "expected_keywords": ["keyword", "rubric", "explanation"],
+      "gold_rationale": "No. Exam 4 is a keyword rubric over expected law terms, not a trained explanation judge and not an LLM score."
+    }
+  ]
+}
