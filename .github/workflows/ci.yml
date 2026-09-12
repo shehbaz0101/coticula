@@ -1,0 +1,41 @@
+# Vermithor VU-Bench v0 — CPU CI
+# Fast path: pytest + tiny --smoke train. Full label gen / run_eval is not
+# in CI (NPZ labels are gitignored; full train is heavier than a PR check).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  cpu:
+    name: pytest + smoke train (CPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install (classical + CPU torch)
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Verify dataset pins (Exam 4 + OOD recipe; skip missing NPZ)
+        run: python -m scripts.verify_manifests
+
+      - name: Pytest
+        run: pytest -q
+
+      - name: CPU smoke train (FNO + PINO Burgers)
+        run: |
+          python -m scripts.train_fno --smoke
+          python -m scripts.train_pino --smoke --pde burgers

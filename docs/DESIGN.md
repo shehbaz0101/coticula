@@ -12,7 +12,7 @@ Public repo: https://github.com/shehbaz0101/vermithor
 | **Predict** | Can the model match future fields? | Relative L2 + NMSE vs classical labels |
 | **Conserve** | Does the rollout respect the PDE / energy? | FD residual relative L2; discrete energy drift |
 | **Counterfactual** | What if a coefficient changes? | Classical: re-solve IC at ν′ / α′. FNO/PINO: predict at ν′ / α′ and **grade vs the classical solver** at the new coefficient |
-| **Explain** | Can a rationale cite the right physics? | Keyword rubric stub (LLM not scored; no fabricated judge) |
+| **Explain** | Can a rationale cite the right physics? | Pinned Exam 4 item set (36); keyword coverage vs expected law keywords. LLM hook env-gated, never fabricated |
 
 Classical FD solvers both *generate labels* and act as the first baseline.
 Self-consistency (re-solve IC → compare to stored traj) should yield near-zero
@@ -38,7 +38,7 @@ predict error; residual/energy audits are diagnostic of the discrete scheme.
 5. `scripts/run_eval.py` writes JSON+MD with only measured numbers.
 6. `pytest` passes on CPU (no GPU required). FNO tests `importorskip("torch")`.
 
-### Week 3 (this increment)
+### Week 3 (shipped)
 
 1. OOD / transfer probes for Burgers and heat2d, **reported separately from IID**:
    param shift (ν / α outside the label range), spatial resolution transfer
@@ -54,16 +54,33 @@ predict error; residual/energy audits are diagnostic of the discrete scheme.
 5. `docs/WRITEUP.md` is an arXiv-style draft filled from that run.
 6. `pytest` covers OOD helpers on CPU.
 
-Later (not this increment): LLM/rationale judge beyond the keyword stub;
-larger counterfactual suites.
+### Week 4 (this increment)
 
-## 3-week plan (summary)
+1. GitHub Actions CI (`.github/workflows/ci.yml`) on push/PR: `ubuntu-latest`,
+   `pytest -q`, and CPU `--smoke` trains (`train_fno --smoke`,
+   `train_pino --smoke --pde burgers`). Full label generation / `run_eval` is
+   **not** in CI (NPZ gitignored; heavier than a PR check) — documented in README.
+2. Exam 4 is a **fixed item set** (≥15, v0 = 36) with expected law keywords,
+   graded in `metrics/explain.py` and written by `run_eval`. Optional LLM judge
+   stays env-gated (`VU_LLM_JUDGE`) and **never invents scores**.
+3. SHA manifests cover labels **and** OOD generators (pinned probe plan /
+   knobs / seeds). Regenerate path: `generate_labels` / `pin_datasets` /
+   `verify_manifests`.
+4. README: quickstart, Week 1–4 status, how to read trust flags, WRITEUP link,
+   optional results table from `reports/latest.md`.
+5. `pytest` covers Exam 4 + pins on CPU.
+
+Later: a real LLM/rationale judge (still must not fabricate); larger
+counterfactual suites.
+
+## 4-week plan (summary)
 
 | Week | Focus |
 |------|--------|
 | **1** | Classical labels, metrics APIs, eval harness, smoke tests |
 | **2** | Train small FNO + PINO residual; wire Predict / Conserve / Counterfactual |
-| **3** (this) | OOD / transfer probes, fail-closed trust, failure analysis, writeup draft |
+| **3** | OOD / transfer probes, fail-closed trust, failure analysis, writeup draft |
+| **4** (this) | CI, Exam 4 item set, dataset pins, README polish |
 
 ## Equations
 
@@ -142,7 +159,9 @@ pretty heatmaps.
 - Every numeric field in `reports/latest.*` is computed in that eval run.
 - `not_trained` means the checkpoint (or torch, or LLM judge) was absent — not
   a placeholder accuracy.
-- Exam 4 keyword coverage is a stub (`status: stub_keyword_rubric`).
+- Exam 4 grades a pinned item set (`status: keyword_rubric`). The legacy
+  single-text helper remains `stub_keyword_rubric`. LLM judge is `not_trained`
+  with `score: null` until a real judge is wired.
 - OOD metrics live under `ood` (and the markdown OOD section), never mixed
   into Exam 1–3 IID tables.
 - Trust flags travel with the measured numbers; they are not a substitute
