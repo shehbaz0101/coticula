@@ -3,7 +3,7 @@
   "project": "Vermithor",
   "vu": "Vermithor Understanding Bench",
   "repo": "https://github.com/shehbaz0101/vermithor",
-  "week": 3,
+  "week": 4,
   "generated_at_utc": "2026-09-12T00:18:43.378079+00:00",
   "trust_policy": {
     "name": "vu-bench-v0-fail-closed",
@@ -167,7 +167,614 @@
       }
     },
     "explain": {
-      "description": "Keyword rubric stub over free-text rationale",
+      "description": "Exam 4: fixed item set graded by expected law-keyword coverage. LLM judge stays not_trained unless a real judge is wired.",
+      "n_items": 36,
+      "item_set": "datasets/exam4/items_v0.json",
+      "item_set_sha256": "30747ef03aae71c8eec3c8879670588d82e84f15560443643365a425ac6ca986",
+      "gold_reference": {
+        "status": "keyword_rubric",
+        "n_items": 36,
+        "item_set": "datasets/exam4/items_v0.json",
+        "item_set_sha256": "30747ef03aae71c8eec3c8879670588d82e84f15560443643365a425ac6ca986",
+        "answer_source": "gold",
+        "mean_coverage": 1.0,
+        "n_perfect": 36,
+        "n_zero": 0,
+        "by_facet": {
+          "counterfactual": {
+            "n": 2,
+            "mean_coverage": 1.0
+          },
+          "exams": {
+            "n": 3,
+            "mean_coverage": 1.0
+          },
+          "explain": {
+            "n": 1,
+            "mean_coverage": 1.0
+          },
+          "numerics": {
+            "n": 3,
+            "mean_coverage": 1.0
+          },
+          "ood": {
+            "n": 8,
+            "mean_coverage": 1.0
+          },
+          "pde_terms": {
+            "n": 7,
+            "mean_coverage": 1.0
+          },
+          "physics": {
+            "n": 7,
+            "mean_coverage": 1.0
+          },
+          "trust": {
+            "n": 5,
+            "mean_coverage": 1.0
+          }
+        },
+        "by_pde": {
+          "burgers1d": {
+            "n": 12,
+            "mean_coverage": 1.0
+          },
+          "harness": {
+            "n": 12,
+            "mean_coverage": 1.0
+          },
+          "heat2d": {
+            "n": 12,
+            "mean_coverage": 1.0
+          }
+        },
+        "per_item": [
+          {
+            "id": "e4_b01",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "advection",
+              "viscosity",
+              "diffusion"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b02",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 4,
+            "hits": [
+              "viscosity",
+              "smooth",
+              "shock",
+              "diffusion"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b03",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "shock",
+              "viscosity",
+              "dissipation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b04",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "nonlinear",
+              "advection",
+              "transport"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b05",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 4,
+            "hits": [
+              "energy",
+              "dissipation",
+              "viscosity",
+              "conservation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b06",
+            "pde": "burgers1d",
+            "facet": "numerics",
+            "n_expected": 2,
+            "hits": [
+              "periodic",
+              "boundary"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b07",
+            "pde": "burgers1d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "viscosity",
+              "diffusion",
+              "counterfactual"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b08",
+            "pde": "burgers1d",
+            "facet": "numerics",
+            "n_expected": 3,
+            "hits": [
+              "cfl",
+              "stability",
+              "finite difference"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b09",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "discretization",
+              "burgers"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b10",
+            "pde": "burgers1d",
+            "facet": "ood",
+            "n_expected": 2,
+            "hits": [
+              "fourier",
+              "periodic"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b11",
+            "pde": "burgers1d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "gaussian",
+              "fourier"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b12",
+            "pde": "burgers1d",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "untrusted",
+              "l2"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h01",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "laplacian",
+              "heat"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h02",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "decay",
+              "smooth"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h03",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "laplacian",
+              "residual",
+              "discretization"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h04",
+            "pde": "heat2d",
+            "facet": "numerics",
+            "n_expected": 2,
+            "hits": [
+              "dirichlet",
+              "boundary"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h05",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "energy",
+              "decay",
+              "dissipation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h06",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "decay",
+              "smooth"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h07",
+            "pde": "heat2d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "counterfactual",
+              "alpha"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h08",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "gaussian",
+              "ic"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h09",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "resolution",
+              "ood",
+              "grid"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h10",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "energy",
+              "decay",
+              "conservation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h11",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "laplacian",
+              "heat"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h12",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "sinusoid",
+              "ood",
+              "diffusion"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x01",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "l2",
+              "nmse",
+              "labels"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x02",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "energy",
+              "pde"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x03",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "counterfactual",
+              "classical",
+              "coefficient"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x04",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "untrusted",
+              "residual",
+              "threshold"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x05",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "support",
+              "residual"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x06",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "trusted",
+              "support",
+              "residual"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x07",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "heatmap",
+              "untrusted",
+              "ood"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x08",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "fno",
+              "resolution",
+              "spectral"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x09",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "time",
+              "channels",
+              "transfer"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x10",
+            "pde": "harness",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "pino",
+              "pde"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x11",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "iid",
+              "transfer"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x12",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [
+              "keyword",
+              "rubric",
+              "explanation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          }
+        ],
+        "note": "Keyword coverage vs expected law keywords. Not a trained judge and not an LLM score.",
+        "llm_judge": {
+          "status": "not_trained",
+          "note": "see llm_judge_exam4"
+        }
+      },
       "classical_keyword_stub": {
         "facets": {
           "pde_terms": {
@@ -206,7 +813,8 @@
       },
       "llm": {
         "status": "not_trained",
-        "note": "No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores."
+        "score": null,
+        "note": "LLM judge off (no VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores."
       }
     }
   },
@@ -551,7 +1159,8 @@
     },
     "llm": {
       "status": "not_trained",
-      "note": "No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores."
+      "score": null,
+      "note": "LLM judge off (no VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores."
     }
   },
   "ood": {
@@ -2172,5 +2781,6 @@
         }
       }
     ]
-  }
+  },
+  "exam4_graded_at_utc": "2026-09-12T00:38:50.937661+00:00"
 }
