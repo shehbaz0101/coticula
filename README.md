@@ -11,8 +11,10 @@ model has grasped the dynamics—not just interpolated training trajectories.
 
 Week 1 shipped classical finite-difference label generators and the exam APIs.
 Week 2 adds a laptop-scale **FNO** (Li et al., ICLR 2021) and a **PINO-style**
-path (data loss + PDE residual). Reports contain **only measured numbers**.
-Missing checkpoints stay `not_trained`. The LLM exam is a keyword rubric stub.
+path (data loss + PDE residual). Week 3 adds an **OOD / transfer** layer
+(param, resolution, IC family), **fail-closed** `ood` / `untrusted` flags, and
+a writeup draft. Reports contain **only measured numbers**. Missing checkpoints
+stay `not_trained`. The LLM exam is a keyword rubric stub.
 
 ## Layout
 
@@ -27,11 +29,15 @@ vermithor/
   scripts/generate_labels.py
   scripts/train_fno.py
   scripts/train_pino.py
-  scripts/run_eval.py
-  checkpoints/                  # optional *.pt written by train_* 
+  scripts/run_eval.py           # IID exams + OOD (default)
+  scripts/run_ood.py            # OOD / transfer probes only
+  metrics/trust.py              # fail-closed ood / untrusted
+  metrics/ood.py                # probe generators + scorers
+  checkpoints/                  # optional *.pt written by train_*
   docs/DESIGN.md
+  docs/WRITEUP.md               # arXiv-style draft (measured tables)
   tests/
-  reports/                      # latest.json + latest.md
+  reports/                      # latest.json + latest.md (IID + OOD)
 ```
 
 ## How to run
@@ -52,9 +58,25 @@ python -m scripts.train_fno --pde heat2d
 # PINO = same trunk + light λ_pde * PDE residual (default 1e-3; see docs/DESIGN.md)
 python -m scripts.train_pino --pde burgers
 
-python -m scripts.run_eval
+python -m scripts.run_eval          # IID exams 1–4 + OOD probes + trust flags
+python -m scripts.run_ood           # OOD only → reports/ood.json
+python -m scripts.run_eval --skip-ood
 pytest -q
 ```
+
+Week 3 how-to (trust layer):
+
+```bash
+# After labels + optional checkpoints:
+python -m scripts.run_eval
+# Read IID tables vs the OOD section — they are not mixed.
+# Trust banners: metrics.trust.refuse_silent_heatmap
+# Writeup draft filled from that run:
+#   docs/WRITEUP.md
+```
+
+Roadmap: [docs/DESIGN.md](docs/DESIGN.md) (3-week plan + train support +
+fail-closed rules). Writeup: [docs/WRITEUP.md](docs/WRITEUP.md).
 
 CPU CI / smoke (no labels needed):
 
@@ -74,7 +96,10 @@ Artifacts:
 - `reports/latest.json`, `reports/latest.md` — four exam sections
 
 `run_eval` always scores the classical solver. It loads FNO / PINO only when a
-checkpoint is present. It does **not** invent metrics.
+checkpoint is present. It does **not** invent metrics. OOD probes generate
+fresh classical solves outside the v0 train ranges and score transfer
+separately. A case that is OOD or has a residual / L2 above the documented
+threshold is flagged `ood` or `untrusted` — not a silent pretty heatmap.
 
 ## Exams
 
@@ -84,6 +109,8 @@ checkpoint is present. It does **not** invent metrics.
 | 2 Conserve | FD PDE residual + discrete energy drift of the predicted field |
 | 3 Counterfactual | Re-solve / re-predict at ν′ or α′; learned models graded vs the classical solver |
 | 4 Explain | Keyword-rubric stub. LLM hook stays `not_trained` without a wired judge |
+| Trust (W3) | Fail-closed `trusted` / `ood` / `untrusted` / `reference` |
+| OOD (W3) | Param shift, spatial resolution transfer, IC-family shift |
 
 ## Non-goals (unchanged)
 
