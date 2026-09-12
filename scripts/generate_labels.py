@@ -1,7 +1,9 @@
-"""Generate classical Burgers + heat2d labels and SHA256 manifests."""
+"""Generate classical Burgers + heat2d labels and SHA256 manifests.
+
+Also refreshes OOD-generator and Exam 4 pins (same as ``scripts.pin_datasets``).
+"""
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -14,30 +16,12 @@ if str(ROOT) not in sys.path:
 
 from baselines.classical.burgers1d import generate_dataset as gen_burgers
 from baselines.classical.heat2d import generate_dataset as gen_heat
-
-
-def _sha256_file(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+from datasets.pins import file_entry, pin_exam4, pin_ood, write_manifest
 
 
 def _save_npz(path: Path, arrays: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(path, **arrays)
-
-
-def write_manifest(entries: list[dict], out_path: Path) -> dict:
-    payload = {
-        "version": "vu-bench-v0",
-        "n_files": len(entries),
-        "files": entries,
-    }
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    return payload
 
 
 def main() -> None:
@@ -79,20 +63,26 @@ def main() -> None:
     meta_h.write_text(json.dumps(heat["meta"], indent=2) + "\n", encoding="utf-8")
     print(f"  wrote {h_path} shape={heat['u'].shape}")
 
-    entries = []
-    for p in [b_path, meta_b, h_path, meta_h]:
-        entries.append(
-            {
-                "path": str(p.relative_to(ROOT)),
-                "sha256": _sha256_file(p),
-                "bytes": p.stat().st_size,
-            }
-        )
+    entries = [file_entry(p) for p in [b_path, meta_b, h_path, meta_h]]
     man_path = man_dir / "labels_v0.json"
-    write_manifest(entries, man_path)
+    write_manifest(
+        entries,
+        man_path,
+        kind="labels",
+        regenerate="python -m scripts.generate_labels",
+        note=(
+            "NPZ labels are gitignored. Re-run this script to recreate them, "
+            "then python -m scripts.pin_datasets if you only need pin refresh."
+        ),
+    )
     print(f"Manifest: {man_path}")
     for e in entries:
         print(f"  {e['path']}: {e['sha256'][:16]}... ({e['bytes']} bytes)")
+
+    ood = pin_ood()
+    exam4 = pin_exam4()
+    print(f"OOD generator pin: {ood['files'][0]['path']}")
+    print(f"Exam 4 pin: {exam4['files'][0]['path']}")
 
 
 if __name__ == "__main__":

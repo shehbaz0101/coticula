@@ -22,5 +22,8 @@
       "sha256": "21bdfd01ca1fdd3a39f614e33dc1d13b50372422c774519393a0c7d4debbd48d",
       "bytes": 121
     }
-  ]
+  ],
+  "kind": "labels",
+  "regenerate": "python -m scripts.generate_labels",
+  "note": "NPZ labels are gitignored. Re-run generate_labels to recreate them. pin_datasets keeps last published SHAs when NPZ are absent."
 }

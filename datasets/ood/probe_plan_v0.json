@@ -1,0 +1,200 @@
+{
+  "entry_points": {
+    "default_probe_plan": "metrics.ood.default_probe_plan",
+    "generate_burgers_cases": "metrics.ood.generate_burgers_cases",
+    "generate_heat_cases": "metrics.ood.generate_heat_cases",
+    "make_burgers_ic": "metrics.ood.make_burgers_ic",
+    "make_heat_ic": "metrics.ood.make_heat_ic",
+    "materialize_probe": "metrics.ood.materialize_probe"
+  },
+  "kind": "ood_generators",
+  "knobs": {
+    "burgers_ood_ic": [
+      "gaussian_pulse",
+      "tanh_front"
+    ],
+    "burgers_ood_nu": {
+      "above": 0.15,
+      "below": 0.001
+    },
+    "burgers_ood_nx": [
+      32,
+      128
+    ],
+    "heat_ood_alpha": {
+      "above": 0.5,
+      "below": 0.01
+    },
+    "heat_ood_ic": [
+      "two_bump",
+      "sinusoid"
+    ],
+    "heat_ood_n": [
+      16,
+      48
+    ]
+  },
+  "note": "OOD trajectories are generated on the fly from this recipe. Do not mix these probes into IID Exam 1 tables.",
+  "probe_plan": [
+    {
+      "family": "fourier_modes",
+      "id": "burgers_param_below",
+      "n": 4,
+      "nu": 0.001,
+      "nx": 64,
+      "pde": "burgers",
+      "probe": "param_shift",
+      "seed": 10001
+    },
+    {
+      "family": "fourier_modes",
+      "id": "burgers_param_above",
+      "n": 4,
+      "nu": 0.15,
+      "nx": 64,
+      "pde": "burgers",
+      "probe": "param_shift",
+      "seed": 10021
+    },
+    {
+      "alpha": 0.01,
+      "family": "gaussian_bump",
+      "id": "heat2d_param_below",
+      "n": 4,
+      "n_grid": 32,
+      "pde": "heat2d",
+      "probe": "param_shift",
+      "seed": 10041
+    },
+    {
+      "alpha": 0.5,
+      "family": "gaussian_bump",
+      "id": "heat2d_param_above",
+      "n": 4,
+      "n_grid": 32,
+      "pde": "heat2d",
+      "probe": "param_shift",
+      "seed": 10061
+    },
+    {
+      "family": "fourier_modes",
+      "id": "burgers_resolution_nx32",
+      "n": 2,
+      "nu": 0.0275,
+      "nx": 32,
+      "pde": "burgers",
+      "probe": "resolution_shift",
+      "resample_from": 64,
+      "seed": 10081
+    },
+    {
+      "family": "fourier_modes",
+      "id": "burgers_resolution_nx128",
+      "n": 2,
+      "nu": 0.0275,
+      "nx": 128,
+      "pde": "burgers",
+      "probe": "resolution_shift",
+      "resample_from": 64,
+      "seed": 10101
+    },
+    {
+      "alpha": 0.125,
+      "family": "gaussian_bump",
+      "id": "heat2d_resolution_n16",
+      "n": 2,
+      "n_grid": 16,
+      "pde": "heat2d",
+      "probe": "resolution_shift",
+      "resample_from": 32,
+      "seed": 10121
+    },
+    {
+      "alpha": 0.125,
+      "family": "gaussian_bump",
+      "id": "heat2d_resolution_n48",
+      "n": 2,
+      "n_grid": 48,
+      "pde": "heat2d",
+      "probe": "resolution_shift",
+      "resample_from": 32,
+      "seed": 10141
+    },
+    {
+      "family": "gaussian_pulse",
+      "id": "burgers_ic_gaussian_pulse",
+      "n": 2,
+      "nu": 0.0275,
+      "nx": 64,
+      "pde": "burgers",
+      "probe": "ic_family_shift",
+      "seed": 10161
+    },
+    {
+      "family": "tanh_front",
+      "id": "burgers_ic_tanh_front",
+      "n": 2,
+      "nu": 0.0275,
+      "nx": 64,
+      "pde": "burgers",
+      "probe": "ic_family_shift",
+      "seed": 10181
+    },
+    {
+      "alpha": 0.125,
+      "family": "two_bump",
+      "id": "heat2d_ic_two_bump",
+      "n": 2,
+      "n_grid": 32,
+      "pde": "heat2d",
+      "probe": "ic_family_shift",
+      "seed": 10201
+    },
+    {
+      "alpha": 0.125,
+      "family": "sinusoid",
+      "id": "heat2d_ic_sinusoid",
+      "n": 2,
+      "n_grid": 32,
+      "pde": "heat2d",
+      "probe": "ic_family_shift",
+      "seed": 10221
+    }
+  ],
+  "regenerate": [
+    "python -m scripts.generate_labels",
+    "python -m scripts.pin_datasets",
+    "python -m scripts.verify_manifests"
+  ],
+  "train_support": {
+    "burgers": {
+      "L": 6.283185307179586,
+      "T": 1.0,
+      "ic_family": "fourier_modes",
+      "nt": 80,
+      "param": "nu",
+      "param_range": [
+        0.005,
+        0.05
+      ],
+      "pde": "burgers1d",
+      "resolution": 64,
+      "resolution_key": "nx"
+    },
+    "heat2d": {
+      "L": 1.0,
+      "T": 0.5,
+      "ic_family": "gaussian_bump",
+      "nt": 40,
+      "param": "alpha",
+      "param_range": [
+        0.05,
+        0.2
+      ],
+      "pde": "heat2d",
+      "resolution": 32,
+      "resolution_key": "n"
+    }
+  },
+  "version": "vu-bench-v0"
+}
