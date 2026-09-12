@@ -1,0 +1,39 @@
+# Cite-ready software citation for Vermithor / VU-Bench.
+# GitHub "Cite this repository" reads this file. No DOI is registered yet.
+cff-version: 1.2.0
+message: If you use Vermithor or VU-Bench, please cite it using these metadata.
+type: software
+title: Vermithor (VU-Bench)
+abstract: >-
+  Vermithor Understanding Bench (VU-Bench) is a small understanding harness
+  for PDE surrogates. Four exams (Predict, Conserve, Counterfactual, Explain)
+  score whether a model has grasped the dynamics of viscous Burgers (1D) and
+  heat (2D), not just interpolated training trajectories. v0.1.0 packages the
+  Week 1–4 scaffold: classical finite-difference labels, laptop-scale FNO and
+  PINO-style baselines, OOD probes, fail-closed trust flags, a pinned Exam 4
+  item set, and SHA dataset pins. Reports contain only measured numbers;
+  missing checkpoints stay not_trained.
+authors:
+  - family-names: Pathan
+    given-names: Shehbaz
+version: "0.1.0"
+date-released: "2026-09-12"
+url: "https://github.com/shehbaz0101/vermithor"
+repository-code: "https://github.com/shehbaz0101/vermithor"
+keywords:
+  - Vermithor
+  - VU-Bench
+  - PDE
+  - surrogate
+  - Fourier neural operator
+  - PINO
+  - understanding harness
+preferred-citation:
+  type: software
+  title: Vermithor (VU-Bench)
+  authors:
+    - family-names: Pathan
+      given-names: Shehbaz
+  version: "0.1.0"
+  url: "https://github.com/shehbaz0101/vermithor"
+  year: 2026
