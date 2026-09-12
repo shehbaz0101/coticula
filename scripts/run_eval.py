@@ -3,6 +3,10 @@
 Writes reports/latest.json and reports/latest.md with **only measured numbers**.
 Missing checkpoints stay `not_trained`. Exam 4 is a keyword rubric; the LLM
 hook is not scored unless a real judge is wired (never fabricated).
+
+Week 3: OOD / transfer probes (param, resolution, IC family) are a separate
+section from IID exams 1–3. Fail-closed trust flags (`ood` / `untrusted`)
+travel with the numbers. Use ``--skip-ood`` for IID-only.
 """
 from __future__ import annotations
 
@@ -32,6 +36,13 @@ from metrics.conserve import audit_burgers, audit_heat
 from metrics.counterfactual import burgers_counterfactual, heat_counterfactual
 from metrics.explain import score_explanation
 from metrics.predict import batch_relative_l2
+from metrics.trust import (
+    BURGERS_TRAIN_SUPPORT,
+    HEAT_TRAIN_SUPPORT,
+    TRUST_POLICY,
+    attach_trust,
+)
+from scripts.run_ood import build_failure_analysis, evaluate_ood
 
 
 def _load_burgers() -> dict:
@@ -81,7 +92,7 @@ def eval_classical_burgers(data: dict, n_eval: int = 16) -> dict:
         T=T,
     )
 
-    return {
+    block = {
         "model": "classical_fd",
         "status": "ok",
         "n_eval": n_eval,
@@ -93,6 +104,14 @@ def eval_classical_burgers(data: dict, n_eval: int = 16) -> dict:
         "conserve": conserve,
         "counterfactual": cf,
     }
+    return attach_trust(
+        block,
+        support=BURGERS_TRAIN_SUPPORT,
+        param=float(np.mean(nu)),
+        resolution=nx,
+        ic_family=BURGERS_TRAIN_SUPPORT["ic_family"],
+        role="labeler",
+    )
 
 
 def eval_classical_heat(data: dict, n_eval: int = 12) -> dict:
@@ -126,7 +145,7 @@ def eval_classical_heat(data: dict, n_eval: int = 12) -> dict:
         T=T,
     )
 
-    return {
+    block = {
         "model": "classical_fd",
         "status": "ok",
         "n_eval": n_eval,
@@ -138,6 +157,14 @@ def eval_classical_heat(data: dict, n_eval: int = 12) -> dict:
         "conserve": conserve,
         "counterfactual": cf,
     }
+    return attach_trust(
+        block,
+        support=HEAT_TRAIN_SUPPORT,
+        param=float(np.mean(alpha)),
+        resolution=n,
+        ic_family=HEAT_TRAIN_SUPPORT["ic_family"],
+        role="labeler",
+    )
 
 
 def _not_trained(name: str, reason: str, path: str | None = None) -> dict:
@@ -204,6 +231,15 @@ def _eval_learned(
             device=device,
             model_name=name,
         )
+        nu_eval = burgers["nu"][np.asarray(out["burgers"]["eval_idx"], dtype=int)]
+        out["burgers"] = attach_trust(
+            out["burgers"],
+            support=BURGERS_TRAIN_SUPPORT,
+            param=float(np.mean(nu_eval)),
+            resolution=int(len(burgers["x"])),
+            ic_family=BURGERS_TRAIN_SUPPORT["ic_family"],
+            role="surrogate",
+        )
         out["burgers"]["training"] = {
             k: loaded_b["training"].get(k)
             for k in (
@@ -233,6 +269,15 @@ def _eval_learned(
             n_eval=n_eval_h,
             device=device,
             model_name=name,
+        )
+        a_eval = heat["alpha"][np.asarray(out["heat2d"]["eval_idx"], dtype=int)]
+        out["heat2d"] = attach_trust(
+            out["heat2d"],
+            support=HEAT_TRAIN_SUPPORT,
+            param=float(np.mean(a_eval)),
+            resolution=int(len(heat["x"])),
+            ic_family=HEAT_TRAIN_SUPPORT["ic_family"],
+            role="surrogate",
         )
         out["heat2d"]["training"] = {
             k: loaded_h["training"].get(k)
@@ -313,11 +358,20 @@ def _exam_cf_block(section: dict) -> dict:
     return block
 
 
+def _trust_status(section: dict | None) -> str:
+    if not section or section.get("status") == "not_trained":
+        return "not_trained"
+    trust = section.get("trust") or {}
+    return str(trust.get("status") or section.get("status") or "not_trained")
+
+
 def build_report(
     burgers_ex: dict,
     heat_ex: dict,
     fno_ex: dict,
     pino_ex: dict,
+    ood: dict | None = None,
+    failure_analysis: dict | None = None,
 ) -> dict:
     rationale = (
         "The viscous Burgers equation balances nonlinear advection against "
@@ -333,7 +387,9 @@ def build_report(
         "project": "Vermithor",
         "vu": "Vermithor Understanding Bench",
         "repo": "https://github.com/shehbaz0101/vermithor",
+        "week": 3,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "trust_policy": TRUST_POLICY,
         "exams": {
             "predict": {
                 "description": "Relative L2 / NMSE vs classical labels",
@@ -369,6 +425,8 @@ def build_report(
             "pino": pino_ex,
             "llm": llm_block,
         },
+        "ood": ood,
+        "failure_analysis": failure_analysis,
     }
 
 
@@ -436,7 +494,7 @@ def render_md(report: dict) -> str:
         )
 
     lines = [
-        "# Vermithor VU-Bench v0 — latest eval",
+        "# Vermithor VU-Bench v0 — latest eval (Week 3)",
         "",
         f"_Generated (UTC): {report['generated_at_utc']}_",
         "",
@@ -477,20 +535,130 @@ def render_md(report: dict) -> str:
         _cf_line(pino_cf, "burgers", "PINO Burgers"),
         _cf_line(pino_cf, "heat2d", "PINO Heat"),
         "",
+        "## Trust (fail-closed)",
+        "",
+        f"- Policy: `{TRUST_POLICY['name']}` — residual > {TRUST_POLICY['residual_untrusted']} or "
+        f"Predict rel-L2 > {TRUST_POLICY['predict_untrusted']} → `untrusted`; "
+        "outside train support → `ood`.",
+        f"- classical Burgers: `{_trust_status(report['baselines']['classical']['burgers'])}`",
+        f"- classical Heat: `{_trust_status(report['baselines']['classical']['heat2d'])}`",
+        f"- FNO Burgers: `{_trust_status((report['baselines']['fno'] or {}).get('burgers'))}`",
+        f"- FNO Heat: `{_trust_status((report['baselines']['fno'] or {}).get('heat2d'))}`",
+        f"- PINO Burgers: `{_trust_status((report['baselines']['pino'] or {}).get('burgers'))}`",
+        f"- PINO Heat: `{_trust_status((report['baselines']['pino'] or {}).get('heat2d'))}`",
+        "- OOD / untrusted fields must not be shown as silent pretty heatmaps "
+        "(see `metrics.trust.refuse_silent_heatmap`).",
+        "",
         "## Exam 4 — Explain",
         "",
         f"- Keyword rubric overall: `{expl['overall']:.4f}` (status: {expl['status']})",
         f"- LLM: `{ex['explain']['llm']['status']}` — {ex['explain']['llm'].get('note', '')}",
         "",
-        "## Notes",
+    ]
+    lines.extend(_render_ood_md(report.get("ood")))
+    lines.extend(_render_failure_md(report.get("failure_analysis")))
+    lines.extend(
+        [
+            "## Notes",
+            "",
+            "- Classical IID numbers are from re-solving stored ICs (self-consistency / label check).",
+            "- OOD numbers are a separate section: fresh classical solves outside train support.",
+            "- FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.",
+            "- No fabricated SOTA. Exam 4 is a keyword stub, not a trained judge.",
+            "- VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def _fmt_trust_summary(summary: dict | None) -> str:
+    if not summary:
+        return "—"
+    counts = summary.get("counts") or {}
+    n = summary.get("n_scored", 0)
+    parts = [f"{k}={v}" for k, v in counts.items() if v]
+    return f"n={n} ({', '.join(parts)})"
+
+
+def _ood_cell(block: dict | None) -> str:
+    if not block:
+        return "—"
+    if block.get("status") != "ok" or "predict" not in block:
+        return str(block.get("status", "not_trained"))
+    trust = (block.get("trust") or {}).get("status", "?")
+    l2 = block["predict"]["rel_l2_mean"]
+    res = block["conserve"]["residual_rel_l2"]
+    return f"{l2:.3e} / {res:.3e} [{trust}]"
+
+
+def _render_ood_md(ood: dict | None) -> list[str]:
+    if not ood:
+        return [
+            "## OOD / transfer (distinct from IID)",
+            "",
+            "- skipped (`--skip-ood` or OOD runner not called)",
+            "",
+        ]
+    lines = [
+        "## OOD / transfer (distinct from IID)",
         "",
-        "- Classical numbers are from re-solving stored ICs (self-consistency / label check).",
-        "- FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.",
-        "- No fabricated SOTA. Exam 4 is a keyword stub, not a trained judge.",
-        "- VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.",
+        ood.get("description", ""),
+        "",
+        f"- Resolution note: {ood.get('resolution_note', '')}",
+        f"- Trust rollup: `{_fmt_trust_summary(ood.get('trust_summary'))}`",
+        "",
+        "| Probe | param / grid / IC | classical residual | FNO L2 / residual [trust] | PINO L2 / residual [trust] |",
+        "|---|---|---:|---|---|",
+    ]
+    for row in ood.get("probes") or []:
+        meta = row.get("meta") or {}
+        if meta.get("pde") == "burgers":
+            ident = f"ν={meta.get('nu'):.4g}, nx={meta.get('nx')}, IC={meta.get('ic_family')}"
+        else:
+            ident = (
+                f"α={meta.get('alpha'):.4g}, n={meta.get('n_grid')}, "
+                f"IC={meta.get('ic_family')}"
+            )
+        cl = row.get("classical") or {}
+        cl_res = "—"
+        if cl.get("status") == "ok":
+            cl_res = f"{cl['conserve']['residual_rel_l2']:.3e}"
+        lines.append(
+            f"| {meta.get('id')} | {ident} | {cl_res} | "
+            f"{_ood_cell(row.get('fno'))} | {_ood_cell(row.get('pino'))} |"
+        )
+    lines.append("")
+    return lines
+
+
+def _render_failure_md(fa: dict | None) -> list[str]:
+    if not fa or not fa.get("notes"):
+        return [
+            "## Failure analysis",
+            "",
+            "- No measured comparison available this run (missing checkpoint or OOD skip).",
+            "",
+        ]
+    lines = [
+        "## Failure analysis",
+        "",
+        fa.get("description", ""),
         "",
     ]
-    return "\n".join(lines)
+    for note in fa["notes"]:
+        lines.append(f"### {note['title']}")
+        lines.append("")
+        lines.append(note["observation"])
+        lines.append("")
+        meas = note.get("measured") or {}
+        for k, v in meas.items():
+            if isinstance(v, float):
+                lines.append(f"- `{k}`: `{v:.6e}`")
+            else:
+                lines.append(f"- `{k}`: `{v}`")
+        lines.append("")
+    return lines
 
 
 def _json_default(obj):
@@ -503,7 +671,17 @@ def _json_default(obj):
     raise TypeError(type(obj))
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
+    import argparse
+
+    p = argparse.ArgumentParser(description="VU-Bench IID exams + optional OOD probes")
+    p.add_argument(
+        "--skip-ood",
+        action="store_true",
+        help="IID exams only (no param/resolution/IC transfer probes)",
+    )
+    args = p.parse_args(argv)
+
     burgers = _load_burgers()
     heat = _load_heat()
     print("Evaluating classical Burgers...")
@@ -529,7 +707,12 @@ def main() -> None:
         n_eval_b=16,
         n_eval_h=12,
     )
-    report = build_report(b_ex, h_ex, fno_ex, pino_ex)
+    ood = None
+    if not args.skip_ood:
+        print("Evaluating OOD / transfer probes...")
+        ood = evaluate_ood()
+    fa = build_failure_analysis(b_ex, h_ex, fno_ex, pino_ex, ood)
+    report = build_report(b_ex, h_ex, fno_ex, pino_ex, ood=ood, failure_analysis=fa)
 
     out_dir = ROOT / "reports"
     out_dir.mkdir(parents=True, exist_ok=True)

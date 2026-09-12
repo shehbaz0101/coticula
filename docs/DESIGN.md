@@ -28,7 +28,7 @@ predict error; residual/energy audits are diagnostic of the discrete scheme.
 3. FNO / PINO / LLM sections explicitly `not_trained` when untrained.
 4. `pytest` smoke tests pass (metrics + import stubs + report keys).
 
-### Week 2 (this increment)
+### Week 2 (shipped)
 
 1. A tiny PyTorch FNO trains on Burgers and/or heat2d labels and writes a checkpoint.
 2. A PINO-style path adds a PDE residual term; loss terms are documented below.
@@ -38,13 +38,32 @@ predict error; residual/energy audits are diagnostic of the discrete scheme.
 5. `scripts/run_eval.py` writes JSON+MD with only measured numbers.
 6. `pytest` passes on CPU (no GPU required). FNO tests `importorskip("torch")`.
 
+### Week 3 (this increment)
+
+1. OOD / transfer probes for Burgers and heat2d, **reported separately from IID**:
+   param shift (ν / α outside the label range), spatial resolution transfer
+   (FNO spectral conv), optional IC-family shift.
+2. Fail-closed trust flags: `ood` or `untrusted` when a case leaves train
+   support or the residual / Predict L2 exceeds documented thresholds.
+   OOD / untrusted fields must not be shown as silent pretty heatmaps
+   (`metrics.trust.refuse_silent_heatmap`).
+3. Failure-analysis notes compare measured L2 vs residual (FNO vs PINO) and
+   at least one counterfactual / OOD case. No fabricated metrics.
+4. `scripts/run_eval.py` (and `scripts/run_ood.py`) write only measured IID + OOD
+   numbers into `reports/latest.{json,md}`.
+5. `docs/WRITEUP.md` is an arXiv-style draft filled from that run.
+6. `pytest` covers OOD helpers on CPU.
+
+Later (not this increment): LLM/rationale judge beyond the keyword stub;
+larger counterfactual suites.
+
 ## 3-week plan (summary)
 
 | Week | Focus |
 |------|--------|
 | **1** | Classical labels, metrics APIs, eval harness, smoke tests |
-| **2** (this) | Train small FNO + PINO residual; wire Predict / Conserve / Counterfactual |
-| **3** | Counterfactual suites at scale; LLM/rationale judge beyond keyword stub; freeze v0 report format |
+| **2** | Train small FNO + PINO residual; wire Predict / Conserve / Counterfactual |
+| **3** (this) | OOD / transfer probes, fail-closed trust, failure analysis, writeup draft |
 
 ## Equations
 
@@ -93,12 +112,41 @@ O(1)–O(100) while data MSE is O(10^{-2}), so \(\lambda=0.1\) drowns \(L_{\math
 Code: `baselines/pino/losses.py`. Entry points: `scripts/train_fno.py --pino`
 or `scripts/train_pino.py`.
 
+## Train support (v0 labels)
+
+| PDE | Param range | Grid | IC family |
+|-----|-------------|------|-----------|
+| Burgers | ν ∈ [0.005, 0.05] | nx=64, nt=80 | `fourier_modes` |
+| Heat-2D | α ∈ [0.05, 0.2] | n=32, nt=40 | `gaussian_bump` |
+
+OOD knobs (isolated; see `metrics/ood.py`): ν ∈ {0.001, 0.15}, α ∈ {0.01, 0.50},
+Burgers nx ∈ {32, 128}, heat n ∈ {16, 48}, Burgers ICs `gaussian_pulse` /
+`tanh_front`, heat ICs `two_bump` / `sinusoid`. Time is **not** transferred:
+FNO/PINO emit a fixed number of time channels.
+
+## Fail-closed trust (`metrics/trust.py`)
+
+| Status | Meaning |
+|--------|---------|
+| `trusted` | In train support **and** residual_rel_l2 ≤ 1.0 **and** Predict rel-L2 ≤ 0.5 |
+| `ood` | Leaves train support (param / resolution / IC family); residual still below threshold |
+| `untrusted` | Residual or Predict L2 exceeds a threshold (wins over `ood` if both apply) |
+| `reference` | Classical FD labeler row (not a transfer claim) |
+
+Thresholds are documented defaults, not tuned after seeing scores. A field
+with `ood` or `untrusted` must carry `refuse_silent_heatmap()` — no silent
+pretty heatmaps.
+
 ## Reporting rules
 
 - Every numeric field in `reports/latest.*` is computed in that eval run.
 - `not_trained` means the checkpoint (or torch, or LLM judge) was absent — not
   a placeholder accuracy.
 - Exam 4 keyword coverage is a stub (`status: stub_keyword_rubric`).
+- OOD metrics live under `ood` (and the markdown OOD section), never mixed
+  into Exam 1–3 IID tables.
+- Trust flags travel with the measured numbers; they are not a substitute
+  for the numbers.
 
 ## Non-goals (unchanged)
 

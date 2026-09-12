@@ -3,7 +3,21 @@
   "project": "Vermithor",
   "vu": "Vermithor Understanding Bench",
   "repo": "https://github.com/shehbaz0101/vermithor",
-  "generated_at_utc": "2026-09-11T23:46:14.734192+00:00",
+  "week": 3,
+  "generated_at_utc": "2026-09-12T00:18:43.378079+00:00",
+  "trust_policy": {
+    "name": "vu-bench-v0-fail-closed",
+    "residual_untrusted": 1.0,
+    "predict_untrusted": 0.5,
+    "statuses": [
+      "trusted",
+      "ood",
+      "untrusted",
+      "reference"
+    ],
+    "rule": "If residual_rel_l2 > residual_untrusted or predict rel-L2 > predict_untrusted \u2192 untrusted. Else if the case leaves train support \u2192 ood. Else \u2192 trusted. Classical labeler rows use status=reference.",
+    "heatmap_rule": "Do not present an OOD or untrusted field as a silent pretty heatmap. Any plot must carry the trust banner from refuse_silent_heatmap()."
+  },
   "exams": {
     "predict": {
       "description": "Relative L2 / NMSE vs classical labels",
@@ -220,6 +234,31 @@
           "final_rel_l2": 0.1677248791691741,
           "u_base_final_norm": 2.9611668129248048,
           "u_cf_final_norm": 2.7453453938704953
+        },
+        "trust": {
+          "status": "reference",
+          "ood": false,
+          "untrusted": false,
+          "reasons": [],
+          "role": "labeler",
+          "thresholds": {
+            "residual_untrusted": 1.0,
+            "predict_untrusted": 0.5
+          },
+          "inputs": {
+            "param": 0.02783749466257708,
+            "param_range": [
+              0.005,
+              0.05
+            ],
+            "residual_rel_l2": 0.01438256360444937,
+            "predict_rel_l2": 0.0,
+            "resolution": 64,
+            "train_resolution": 64,
+            "ic_family": "fourier_modes",
+            "train_ic_family": "fourier_modes"
+          },
+          "banner": "reference labeler: classical FD generated this case; not a learned-transfer claim"
         }
       },
       "heat2d": {
@@ -243,6 +282,31 @@
           "final_rel_l2": 0.46643357586682177,
           "u_base_final_norm": 2.2394187495981437,
           "u_cf_final_norm": 1.1959709955146307
+        },
+        "trust": {
+          "status": "reference",
+          "ood": false,
+          "untrusted": false,
+          "reasons": [],
+          "role": "labeler",
+          "thresholds": {
+            "residual_untrusted": 1.0,
+            "predict_untrusted": 0.5
+          },
+          "inputs": {
+            "param": 0.12994954043582432,
+            "param_range": [
+              0.05,
+              0.2
+            ],
+            "residual_rel_l2": 0.030331887526024864,
+            "predict_rel_l2": 0.0,
+            "resolution": 32,
+            "train_resolution": 32,
+            "ic_family": "gaussian_bump",
+            "train_ic_family": "gaussian_bump"
+          },
+          "banner": "reference labeler: classical FD generated this case; not a learned-transfer claim"
         }
       }
     },
@@ -288,6 +352,33 @@
           "u_cf_final_norm_pred": 2.6824967861175537,
           "rel_l2_traj_delta_model": 0.003954554442316294
         },
+        "trust": {
+          "status": "untrusted",
+          "ood": false,
+          "untrusted": true,
+          "reasons": [
+            "residual_too_high"
+          ],
+          "role": "surrogate",
+          "thresholds": {
+            "residual_untrusted": 1.0,
+            "predict_untrusted": 0.5
+          },
+          "inputs": {
+            "param": 0.02984378927791632,
+            "param_range": [
+              0.005,
+              0.05
+            ],
+            "residual_rel_l2": 4.848761558153149,
+            "predict_rel_l2": 0.15731430293430546,
+            "resolution": 64,
+            "train_resolution": 64,
+            "ic_family": "fourier_modes",
+            "train_ic_family": "fourier_modes"
+          },
+          "banner": "UNTRUSTED (residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+        },
         "training": {
           "objective": "fno",
           "epochs": 40,
@@ -330,6 +421,33 @@
           "u_cf_final_norm_classical": 0.18064725952267952,
           "u_cf_final_norm_pred": 1.401840329170227,
           "rel_l2_traj_delta_model": 0.017032336443662643
+        },
+        "trust": {
+          "status": "untrusted",
+          "ood": false,
+          "untrusted": true,
+          "reasons": [
+            "residual_too_high"
+          ],
+          "role": "surrogate",
+          "thresholds": {
+            "residual_untrusted": 1.0,
+            "predict_untrusted": 0.5
+          },
+          "inputs": {
+            "param": 0.13000769026325065,
+            "param_range": [
+              0.05,
+              0.2
+            ],
+            "residual_rel_l2": 13.033851350070861,
+            "predict_rel_l2": 0.32213354866110144,
+            "resolution": 32,
+            "train_resolution": 32,
+            "ic_family": "gaussian_bump",
+            "train_ic_family": "gaussian_bump"
+          },
+          "banner": "UNTRUSTED (residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
         },
         "training": {
           "objective": "fno",
@@ -386,6 +504,33 @@
           "u_cf_final_norm_pred": 2.786327838897705,
           "rel_l2_traj_delta_model": 0.002610347932204604
         },
+        "trust": {
+          "status": "untrusted",
+          "ood": false,
+          "untrusted": true,
+          "reasons": [
+            "residual_too_high"
+          ],
+          "role": "surrogate",
+          "thresholds": {
+            "residual_untrusted": 1.0,
+            "predict_untrusted": 0.5
+          },
+          "inputs": {
+            "param": 0.02984378927791632,
+            "param_range": [
+              0.005,
+              0.05
+            ],
+            "residual_rel_l2": 1.7328502815031381,
+            "predict_rel_l2": 0.18801567340975292,
+            "resolution": 64,
+            "train_resolution": 64,
+            "ic_family": "fourier_modes",
+            "train_ic_family": "fourier_modes"
+          },
+          "banner": "UNTRUSTED (residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+        },
         "training": {
           "objective": "pino",
           "epochs": 40,
@@ -408,5 +553,1624 @@
       "status": "not_trained",
       "note": "No API key (VU_LLM_API_KEY / OPENAI_API_KEY); keyword rubric only. No fabricated LLM scores."
     }
+  },
+  "ood": {
+    "description": "Transfer probes distinct from IID exams 1\u20133. Ground truth is a fresh classical FD solve. Learned rows are fail-closed (ood / untrusted).",
+    "train_support": {
+      "burgers": {
+        "pde": "burgers1d",
+        "param": "nu",
+        "param_range": [
+          0.005,
+          0.05
+        ],
+        "resolution": 64,
+        "resolution_key": "nx",
+        "nt": 80,
+        "L": 6.283185307179586,
+        "T": 1.0,
+        "ic_family": "fourier_modes"
+      },
+      "heat2d": {
+        "pde": "heat2d",
+        "param": "alpha",
+        "param_range": [
+          0.05,
+          0.2
+        ],
+        "resolution": 32,
+        "resolution_key": "n",
+        "nt": 40,
+        "L": 1.0,
+        "T": 0.5,
+        "ic_family": "gaussian_bump"
+      }
+    },
+    "trust_policy": {
+      "name": "vu-bench-v0-fail-closed",
+      "residual_untrusted": 1.0,
+      "predict_untrusted": 0.5,
+      "statuses": [
+        "trusted",
+        "ood",
+        "untrusted",
+        "reference"
+      ],
+      "rule": "If residual_rel_l2 > residual_untrusted or predict rel-L2 > predict_untrusted \u2192 untrusted. Else if the case leaves train support \u2192 ood. Else \u2192 trusted. Classical labeler rows use status=reference.",
+      "heatmap_rule": "Do not present an OOD or untrusted field as a silent pretty heatmap. Any plot must carry the trust banner from refuse_silent_heatmap()."
+    },
+    "resolution_note": "FNO spatial conv is resolution-agnostic; time is locked as output channels (Burgers nt=80, heat nt=40). No temporal transfer is claimed.",
+    "baselines": {
+      "fno": {
+        "status": "ok",
+        "checkpoints": {
+          "burgers": "/workspace/checkpoints/fno_burgers.pt",
+          "heat2d": "/workspace/checkpoints/fno_heat2d.pt"
+        },
+        "reasons": {
+          "burgers": null,
+          "heat2d": null
+        }
+      },
+      "pino": {
+        "status": "ok",
+        "checkpoints": {
+          "burgers": "/workspace/checkpoints/pino_burgers.pt",
+          "heat2d": "/workspace/checkpoints/pino_heat2d.pt"
+        },
+        "reasons": {
+          "burgers": null,
+          "heat2d": "missing_checkpoint"
+        }
+      }
+    },
+    "probes": [
+      {
+        "meta": {
+          "id": "burgers_param_below",
+          "pde": "burgers",
+          "probe": "param_shift",
+          "n": 4,
+          "ic_family": "fourier_modes",
+          "param": 0.001,
+          "nx": 64,
+          "nt": 80,
+          "nu": 0.001
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.04185535818468935,
+            "energy_max_abs_rel_drift": 0.18613432841457173,
+            "energy_final_mean_rel_drift": -0.07634381527278894
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "param_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.001,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 0.04185535818468935,
+              "predict_rel_l2": 0.0,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "reference labeler (param_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.26965448900632333,
+            "rel_l2_std": 0.03191645437114036,
+            "nmse": 0.07287798078274393
+          },
+          "conserve": {
+            "residual_rel_l2": 5.274466822421546,
+            "energy_max_abs_rel_drift": 0.4814840350173055,
+            "energy_final_mean_rel_drift": -0.3167279280803614
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "param_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.001,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 5.274466822421546,
+              "predict_rel_l2": 0.26965448900632333,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (param_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.2951887930795275,
+            "rel_l2_std": 0.02690098961734617,
+            "nmse": 0.08720036170072132
+          },
+          "conserve": {
+            "residual_rel_l2": 1.8902482916163748,
+            "energy_max_abs_rel_drift": 0.3981680720084244,
+            "energy_final_mean_rel_drift": -0.31264556112924646
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "param_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.001,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 1.8902482916163748,
+              "predict_rel_l2": 0.2951887930795275,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (param_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "burgers_param_above",
+          "pde": "burgers",
+          "probe": "param_shift",
+          "n": 4,
+          "ic_family": "fourier_modes",
+          "param": 0.15,
+          "nx": 64,
+          "nt": 80,
+          "nu": 0.15
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.009857991918840485,
+            "energy_max_abs_rel_drift": 0.7238321975686803,
+            "energy_final_mean_rel_drift": -0.5565242244211698
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "param_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.15,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 0.009857991918840485,
+              "predict_rel_l2": 0.0,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "reference labeler (param_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.29355482254758225,
+            "rel_l2_std": 0.0659549584763757,
+            "nmse": 0.0876714742326287
+          },
+          "conserve": {
+            "residual_rel_l2": 4.826927526217415,
+            "energy_max_abs_rel_drift": 0.4161349564125458,
+            "energy_final_mean_rel_drift": -0.26227700697215395
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "param_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.15,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 4.826927526217415,
+              "predict_rel_l2": 0.29355482254758225,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (param_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.3022355519015442,
+            "rel_l2_std": 0.07559406742410109,
+            "nmse": 0.0937240411228122
+          },
+          "conserve": {
+            "residual_rel_l2": 1.9335490372786537,
+            "energy_max_abs_rel_drift": 0.32765617532632657,
+            "energy_final_mean_rel_drift": -0.2580496728501404
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "param_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.15,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 1.9335490372786537,
+              "predict_rel_l2": 0.3022355519015442,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (param_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "heat2d_param_below",
+          "pde": "heat2d",
+          "probe": "param_shift",
+          "n": 4,
+          "ic_family": "gaussian_bump",
+          "param": 0.01,
+          "n_grid": 32,
+          "nt": 40,
+          "alpha": 0.01
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.010475484128205153,
+            "energy_max_abs_rel_drift": 0.4655618215626911,
+            "energy_final_mean_rel_drift": -0.4165003819624356
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "param_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.01,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 0.010475484128205153,
+              "predict_rel_l2": 0.0,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "reference labeler (param_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.5684832261152545,
+            "rel_l2_std": 0.006427686111469543,
+            "nmse": 0.4184123925586718
+          },
+          "conserve": {
+            "residual_rel_l2": 6.353075223006973,
+            "energy_max_abs_rel_drift": 0.9557559660480899,
+            "energy_final_mean_rel_drift": -0.9508412623150522
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "param_shift",
+              "residual_too_high",
+              "predict_l2_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.01,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 6.353075223006973,
+              "predict_rel_l2": 0.5684832261152545,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "UNTRUSTED (param_shift, residual_too_high, predict_l2_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "status": "not_trained",
+          "reason": "missing_checkpoint",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "heat2d_param_above",
+          "pde": "heat2d",
+          "probe": "param_shift",
+          "n": 4,
+          "ic_family": "gaussian_bump",
+          "param": 0.5,
+          "n_grid": 32,
+          "nt": 40,
+          "alpha": 0.5
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.18791166525725558,
+            "energy_max_abs_rel_drift": 0.9999809702587822,
+            "energy_final_mean_rel_drift": -0.9999720969964492
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "param_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.5,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 0.18791166525725558,
+              "predict_rel_l2": 0.0,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "reference labeler (param_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 4,
+          "predict": {
+            "rel_l2_mean": 1.1330011201186059,
+            "rel_l2_std": 0.16733529220410367,
+            "nmse": 1.4133013669644594
+          },
+          "conserve": {
+            "residual_rel_l2": 43.26958343971169,
+            "energy_max_abs_rel_drift": 0.961704725414656,
+            "energy_final_mean_rel_drift": -0.9544003538979199
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "param_shift",
+              "residual_too_high",
+              "predict_l2_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.5,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 43.26958343971169,
+              "predict_rel_l2": 1.1330011201186059,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "UNTRUSTED (param_shift, residual_too_high, predict_l2_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "status": "not_trained",
+          "reason": "missing_checkpoint",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "burgers_resolution_nx32",
+          "pde": "burgers",
+          "probe": "resolution_shift",
+          "n": 2,
+          "ic_family": "fourier_modes",
+          "param": 0.0275,
+          "nx": 32,
+          "nt": 80,
+          "nu": 0.0275
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.008786122714523711,
+            "energy_max_abs_rel_drift": 0.13788104737711845,
+            "energy_final_mean_rel_drift": -0.13568257621736468
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "resolution_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 0.008786122714523711,
+              "predict_rel_l2": 0.0,
+              "resolution": 32,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "reference labeler (resolution_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.13974438667310835,
+            "rel_l2_std": 0.006886907613481069,
+            "nmse": 0.01946635691698744
+          },
+          "conserve": {
+            "residual_rel_l2": 4.529278778747326,
+            "energy_max_abs_rel_drift": 0.26326987379804084,
+            "energy_final_mean_rel_drift": -0.23660427965513106
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "resolution_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 4.529278778747326,
+              "predict_rel_l2": 0.13974438667310835,
+              "resolution": 32,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (resolution_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.17179911829239197,
+            "rel_l2_std": 0.0047131465576673165,
+            "nmse": 0.029444968018661786
+          },
+          "conserve": {
+            "residual_rel_l2": 1.6118864265932444,
+            "energy_max_abs_rel_drift": 0.2620388972008879,
+            "energy_final_mean_rel_drift": -0.2404669732639374
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "resolution_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 1.6118864265932444,
+              "predict_rel_l2": 0.17179911829239197,
+              "resolution": 32,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (resolution_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "burgers_resolution_nx128",
+          "pde": "burgers",
+          "probe": "resolution_shift",
+          "n": 2,
+          "ic_family": "fourier_modes",
+          "param": 0.0275,
+          "nx": 128,
+          "nt": 80,
+          "nu": 0.0275
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.011241558519205176,
+            "energy_max_abs_rel_drift": 0.19033935289890894,
+            "energy_final_mean_rel_drift": -0.1335859479610454
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "resolution_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 0.011241558519205176,
+              "predict_rel_l2": 0.0,
+              "resolution": 128,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "reference labeler (resolution_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.13473832693136578,
+            "rel_l2_std": 0.009405097833390427,
+            "nmse": 0.01777737038718361
+          },
+          "conserve": {
+            "residual_rel_l2": 3.87183888815745,
+            "energy_max_abs_rel_drift": 0.22182218379741508,
+            "energy_final_mean_rel_drift": -0.21653310196154224
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "resolution_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 3.87183888815745,
+              "predict_rel_l2": 0.13473832693136578,
+              "resolution": 128,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (resolution_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.15822107797848622,
+            "rel_l2_std": 0.0045566250614373915,
+            "nmse": 0.024789837626407896
+          },
+          "conserve": {
+            "residual_rel_l2": 1.3115659370966148,
+            "energy_max_abs_rel_drift": 0.23042584686145554,
+            "energy_final_mean_rel_drift": -0.22442410533426482
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "resolution_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 1.3115659370966148,
+              "predict_rel_l2": 0.15822107797848622,
+              "resolution": 128,
+              "train_resolution": 64,
+              "ic_family": "fourier_modes",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (resolution_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "heat2d_resolution_n16",
+          "pde": "heat2d",
+          "probe": "resolution_shift",
+          "n": 2,
+          "ic_family": "gaussian_bump",
+          "param": 0.125,
+          "n_grid": 16,
+          "nt": 40,
+          "alpha": 0.125
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.09737900479756173,
+            "energy_max_abs_rel_drift": 0.9648893693256599,
+            "energy_final_mean_rel_drift": -0.9623864240383464
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "resolution_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 0.09737900479756173,
+              "predict_rel_l2": 0.0,
+              "resolution": 16,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "reference labeler (resolution_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.1867419454675383,
+            "rel_l2_std": 0.009685705246730666,
+            "nmse": 0.05213866093776037
+          },
+          "conserve": {
+            "residual_rel_l2": 6.570729583567446,
+            "energy_max_abs_rel_drift": 0.9559113230483901,
+            "energy_final_mean_rel_drift": -0.9540938970007402
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "resolution_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 6.570729583567446,
+              "predict_rel_l2": 0.1867419454675383,
+              "resolution": 16,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "UNTRUSTED (resolution_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "status": "not_trained",
+          "reason": "missing_checkpoint",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "heat2d_resolution_n48",
+          "pde": "heat2d",
+          "probe": "resolution_shift",
+          "n": 2,
+          "ic_family": "gaussian_bump",
+          "param": 0.125,
+          "n_grid": 48,
+          "nt": 40,
+          "alpha": 0.125
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.04184129090143621,
+            "energy_max_abs_rel_drift": 0.9625559133265901,
+            "energy_final_mean_rel_drift": -0.9616764524474923
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "resolution_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 0.04184129090143621,
+              "predict_rel_l2": 0.0,
+              "resolution": 48,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "reference labeler (resolution_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.1971336631898444,
+            "rel_l2_std": 0.011080894990694534,
+            "nmse": 0.06261117785146612
+          },
+          "conserve": {
+            "residual_rel_l2": 21.03298435298167,
+            "energy_max_abs_rel_drift": 0.9653936201023547,
+            "energy_final_mean_rel_drift": -0.961433254901368
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "resolution_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 21.03298435298167,
+              "predict_rel_l2": 0.1971336631898444,
+              "resolution": 48,
+              "train_resolution": 32,
+              "ic_family": "gaussian_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "UNTRUSTED (resolution_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "status": "not_trained",
+          "reason": "missing_checkpoint",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "burgers_ic_gaussian_pulse",
+          "pde": "burgers",
+          "probe": "ic_family_shift",
+          "n": 2,
+          "ic_family": "gaussian_pulse",
+          "param": 0.0275,
+          "nx": 64,
+          "nt": 80,
+          "nu": 0.0275
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.007487464882043783,
+            "energy_max_abs_rel_drift": 0.048105677089173494,
+            "energy_final_mean_rel_drift": -0.048101936569716286
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "ic_family_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 0.007487464882043783,
+              "predict_rel_l2": 0.0,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "gaussian_pulse",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "reference labeler (ic_family_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.5200208009816409,
+            "rel_l2_std": 0.0015721317844802352,
+            "nmse": 0.4789469706171532
+          },
+          "conserve": {
+            "residual_rel_l2": 4.141924513606742,
+            "energy_max_abs_rel_drift": 0.5045987386167899,
+            "energy_final_mean_rel_drift": -0.4983241872791144
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "ic_family_shift",
+              "residual_too_high",
+              "predict_l2_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 4.141924513606742,
+              "predict_rel_l2": 0.5200208009816409,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "gaussian_pulse",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (ic_family_shift, residual_too_high, predict_l2_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.56946368220597,
+            "rel_l2_std": 0.0002174007786019394,
+            "nmse": 0.5743430948081416
+          },
+          "conserve": {
+            "residual_rel_l2": 2.2828671038875528,
+            "energy_max_abs_rel_drift": 0.5378098606531986,
+            "energy_final_mean_rel_drift": -0.5331331127452246
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "ic_family_shift",
+              "residual_too_high",
+              "predict_l2_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 2.2828671038875528,
+              "predict_rel_l2": 0.56946368220597,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "gaussian_pulse",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (ic_family_shift, residual_too_high, predict_l2_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "burgers_ic_tanh_front",
+          "pde": "burgers",
+          "probe": "ic_family_shift",
+          "n": 2,
+          "ic_family": "tanh_front",
+          "param": 0.0275,
+          "nx": 64,
+          "nt": 80,
+          "nu": 0.0275
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.008757252069730544,
+            "energy_max_abs_rel_drift": 0.2878867253710278,
+            "energy_final_mean_rel_drift": -0.28649337932894126
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "ic_family_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 0.008757252069730544,
+              "predict_rel_l2": 0.0,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "tanh_front",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "reference labeler (ic_family_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.24461452544704304,
+            "rel_l2_std": 0.04698976413550161,
+            "nmse": 0.06248921744268057
+          },
+          "conserve": {
+            "residual_rel_l2": 4.3527190679722985,
+            "energy_max_abs_rel_drift": 0.4302572468645364,
+            "energy_final_mean_rel_drift": -0.37808467942421997
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "ic_family_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 4.3527190679722985,
+              "predict_rel_l2": 0.24461452544704304,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "tanh_front",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (ic_family_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.26217477728954186,
+            "rel_l2_std": 0.06511660013404688,
+            "nmse": 0.07350201554674203
+          },
+          "conserve": {
+            "residual_rel_l2": 2.052330095301802,
+            "energy_max_abs_rel_drift": 0.42663856558458624,
+            "energy_final_mean_rel_drift": -0.38123896233323684
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "ic_family_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.0275,
+              "param_range": [
+                0.005,
+                0.05
+              ],
+              "residual_rel_l2": 2.052330095301802,
+              "predict_rel_l2": 0.26217477728954186,
+              "resolution": 64,
+              "train_resolution": 64,
+              "ic_family": "tanh_front",
+              "train_ic_family": "fourier_modes"
+            },
+            "banner": "UNTRUSTED (ic_family_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "heat2d_ic_two_bump",
+          "pde": "heat2d",
+          "probe": "ic_family_shift",
+          "n": 2,
+          "ic_family": "two_bump",
+          "param": 0.125,
+          "n_grid": 32,
+          "nt": 40,
+          "alpha": 0.125
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.026382264303419993,
+            "energy_max_abs_rel_drift": 0.9724684418806099,
+            "energy_final_mean_rel_drift": -0.9695789312435632
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "ic_family_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 0.026382264303419993,
+              "predict_rel_l2": 0.0,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "two_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "reference labeler (ic_family_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.24196043492248726,
+            "rel_l2_std": 0.010985503501096075,
+            "nmse": 0.08474548962680493
+          },
+          "conserve": {
+            "residual_rel_l2": 14.064617759339406,
+            "energy_max_abs_rel_drift": 0.9672799424253707,
+            "energy_final_mean_rel_drift": -0.9594575259118667
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "ic_family_shift",
+              "residual_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 14.064617759339406,
+              "predict_rel_l2": 0.24196043492248726,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "two_bump",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "UNTRUSTED (ic_family_shift, residual_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "status": "not_trained",
+          "reason": "missing_checkpoint",
+          "model": "pino"
+        }
+      },
+      {
+        "meta": {
+          "id": "heat2d_ic_sinusoid",
+          "pde": "heat2d",
+          "probe": "ic_family_shift",
+          "n": 2,
+          "ic_family": "sinusoid",
+          "param": 0.125,
+          "n_grid": 32,
+          "nt": 40,
+          "alpha": 0.125
+        },
+        "classical": {
+          "status": "ok",
+          "role": "labeler",
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.0,
+            "rel_l2_std": 0.0,
+            "nmse": 0.0
+          },
+          "conserve": {
+            "residual_rel_l2": 0.3852942304046492,
+            "energy_max_abs_rel_drift": 0.9999999999920001,
+            "energy_final_mean_rel_drift": -0.9999999999919864
+          },
+          "trust": {
+            "status": "reference",
+            "ood": true,
+            "untrusted": false,
+            "reasons": [
+              "ic_family_shift"
+            ],
+            "role": "labeler",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 0.3852942304046492,
+              "predict_rel_l2": 0.0,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "sinusoid",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "reference labeler (ic_family_shift): classical FD generated this case; not a learned-transfer claim"
+          }
+        },
+        "fno": {
+          "n": 2,
+          "predict": {
+            "rel_l2_mean": 0.8185936274815809,
+            "rel_l2_std": 0.006662068265564591,
+            "nmse": 0.6692892689948925
+          },
+          "conserve": {
+            "residual_rel_l2": 25.762928766131942,
+            "energy_max_abs_rel_drift": 0.9936758749866481,
+            "energy_final_mean_rel_drift": -0.993661007340348
+          },
+          "trust": {
+            "status": "untrusted",
+            "ood": true,
+            "untrusted": true,
+            "reasons": [
+              "ic_family_shift",
+              "residual_too_high",
+              "predict_l2_too_high"
+            ],
+            "role": "surrogate",
+            "thresholds": {
+              "residual_untrusted": 1.0,
+              "predict_untrusted": 0.5
+            },
+            "inputs": {
+              "param": 0.125,
+              "param_range": [
+                0.05,
+                0.2
+              ],
+              "residual_rel_l2": 25.762928766131942,
+              "predict_rel_l2": 0.8185936274815809,
+              "resolution": 32,
+              "train_resolution": 32,
+              "ic_family": "sinusoid",
+              "train_ic_family": "gaussian_bump"
+            },
+            "banner": "UNTRUSTED (ic_family_shift, residual_too_high, predict_l2_too_high): residual or predict error exceeds fail-closed threshold \u2014 do not present a silent pretty heatmap"
+          },
+          "status": "ok",
+          "model": "fno"
+        },
+        "pino": {
+          "status": "not_trained",
+          "reason": "missing_checkpoint",
+          "model": "pino"
+        }
+      }
+    ],
+    "by_probe": {
+      "param_shift": [
+        "burgers_param_below",
+        "burgers_param_above",
+        "heat2d_param_below",
+        "heat2d_param_above"
+      ],
+      "resolution_shift": [
+        "burgers_resolution_nx32",
+        "burgers_resolution_nx128",
+        "heat2d_resolution_n16",
+        "heat2d_resolution_n48"
+      ],
+      "ic_family_shift": [
+        "burgers_ic_gaussian_pulse",
+        "burgers_ic_tanh_front",
+        "heat2d_ic_two_bump",
+        "heat2d_ic_sinusoid"
+      ]
+    },
+    "trust_summary": {
+      "n_scored": 30,
+      "counts": {
+        "trusted": 0,
+        "ood": 0,
+        "untrusted": 18,
+        "reference": 12,
+        "other": 0
+      }
+    }
+  },
+  "failure_analysis": {
+    "description": "Qualitative comparisons using only measured fields from this run. No fabricated metrics.",
+    "notes": [
+      {
+        "title": "FNO vs PINO on Burgers (IID): L2 vs residual",
+        "kind": "residual_vs_l2",
+        "split": "iid",
+        "observation": "On IID Burgers, FNO has a lower Predict rel-L2 than PINO but a larger FD residual. A silent heatmap of the FNO field would look 'closer' to the label while Exam 2 and the fail-closed trust flag show a worse PDE violation. PINO's residual term reduces that violation at a modest L2 cost \u2014 not a SOTA claim, a measured tradeoff.",
+        "measured": {
+          "fno_rel_l2": 0.15731430293430546,
+          "fno_residual_rel_l2": 4.848761558153149,
+          "pino_rel_l2": 0.18801567340975292,
+          "pino_residual_rel_l2": 1.7328502815031381,
+          "fno_trust": "untrusted",
+          "pino_trust": "untrusted"
+        }
+      },
+      {
+        "title": "FNO heat2d counterfactual insensitivity",
+        "kind": "counterfactual",
+        "split": "iid_exam3",
+        "observation": "Classical heat at \u03b1\u2032 differs from \u03b1 by a large trajectory \u0394, but the FNO field barely moves when \u03b1 is scaled. Exam 3 vs the classical solve at \u03b1\u2032 is therefore large \u2014 a failure of coefficient response, not just interpolation error.",
+        "measured": {
+          "alpha_orig": 0.19424857904956805,
+          "alpha_cf": 0.2913728685743521,
+          "rel_l2_traj_delta_classical": 0.23381200394276164,
+          "rel_l2_traj_delta_model": 0.017032336443662643,
+          "rel_l2_vs_classical_cf": 0.9553082255019414
+        }
+      },
+      {
+        "title": "OOD Burgers \u03bd below train range",
+        "kind": "ood_param_shift",
+        "split": "ood",
+        "observation": "\u03bd=0.001 is below the v0 train range [0.005, 0.05]. Numbers below are transfer scores vs a fresh classical solve \u2014 not IID Exam 1. Trust flags are fail-closed.",
+        "measured": {
+          "nu": 0.001,
+          "fno_rel_l2": 0.26965448900632333,
+          "fno_residual_rel_l2": 5.274466822421546,
+          "fno_trust": "untrusted",
+          "pino_rel_l2": 0.2951887930795275,
+          "pino_residual_rel_l2": 1.8902482916163748,
+          "pino_trust": "untrusted"
+        }
+      }
+    ]
   }
 }

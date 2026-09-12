@@ -145,3 +145,9 @@ def test_report_exists_after_pipeline():
     if "vu" in data:
         assert data["vu"] == "Vermithor Understanding Bench"
         assert data.get("project") == "Vermithor"
+    # Week 3: OOD is a distinct block, never mixed into Exam 1 IID tables.
+    if data.get("ood"):
+        assert "probes" in data["ood"]
+        assert "predict" in data["exams"]
+    if data.get("trust_policy"):
+        assert "residual_untrusted" in data["trust_policy"]
