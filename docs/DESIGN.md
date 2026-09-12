@@ -1,7 +1,8 @@
 # Coticula v0 Design
 
-**VU = Coticula Understanding Bench.** Project branding: **Coticula**.
-This harness is not related to the `uv` Python packager.
+Project branding: **Coticula** (Latin *coticula*, touchstone).
+Formerly Vermithor / VU-Bench. This harness is not related to the `uv`
+Python packager.
 
 Public repo: https://github.com/shehbaz0101/coticula
 
@@ -12,7 +13,7 @@ Public repo: https://github.com/shehbaz0101/coticula
 | **Predict** | Can the model match future fields? | Relative L2 + NMSE vs classical labels |
 | **Conserve** | Does the rollout respect the PDE / energy? | FD residual relative L2; discrete energy drift |
 | **Counterfactual** | What if a coefficient changes? | Classical: re-solve IC at ν′ / α′. FNO/PINO: predict at ν′ / α′ and **grade vs the classical solver** at the new coefficient |
-| **Explain** | Can a rationale cite the right physics? | Pinned Exam 4 item set (36); keyword coverage vs expected law keywords. LLM hook env-gated, never fabricated |
+| **Explain** | Can a rationale cite the right physics? | Pinned Exam 4 item set (48); keyword coverage vs expected law keywords. Gold / rule-based / metric-dump. LLM hook env-gated, never fabricated |
 
 Classical FD solvers both *generate labels* and act as the first baseline.
 Self-consistency (re-solve IC → compare to stored traj) should yield near-zero
@@ -54,15 +55,16 @@ predict error; residual/energy audits are diagnostic of the discrete scheme.
 5. `docs/WRITEUP.md` is an arXiv-style draft filled from that run.
 6. `pytest` covers OOD helpers on CPU.
 
-### Week 4 (this increment)
+### Week 4 (shipped)
 
 1. GitHub Actions CI (`.github/workflows/ci.yml`) on push/PR: `ubuntu-latest`,
    `pytest -q`, and CPU `--smoke` trains (`train_fno --smoke`,
    `train_pino --smoke --pde burgers`). Full label generation / `run_eval` is
    **not** in CI (NPZ gitignored; heavier than a PR check) — documented in README.
-2. Exam 4 is a **fixed item set** (≥15, v0 = 36) with expected law keywords,
-   graded in `metrics/explain.py` and written by `run_eval`. Optional LLM judge
-   stays env-gated (`VU_LLM_JUDGE`) and **never invents scores**.
+2. Exam 4 is a **fixed item set** (≥15, v0.1 = 36, v0.2 = 48) with expected
+   law keywords, graded in `metrics/explain.py` and written by `run_eval`.
+   Optional LLM judge stays env-gated (`COTICULA_LLM_JUDGE` / `VU_LLM_JUDGE`)
+   and **never invents scores**.
 3. SHA manifests cover labels **and** OOD generators (pinned probe plan /
    knobs / seeds). Regenerate path: `generate_labels` / `pin_datasets` /
    `verify_manifests`.
@@ -70,8 +72,19 @@ predict error; residual/energy audits are diagnostic of the discrete scheme.
    optional results table from `reports/latest.md`.
 5. `pytest` covers Exam 4 + pins on CPU.
 
-Later: a real LLM/rationale judge (still must not fabricate); larger
-counterfactual suites.
+### v0.2 (this increment)
+
+1. Exam 4 expanded to 48 items; prompts use Coticula (not VU-Bench).
+2. Structured **rule-based** and **metric-dump** Exam 4 baselines, clearly
+   labeled and never presented as LLM scores.
+3. Diagnostics: residual-vs-L2 scatter from measured IID+OOD cells;
+   classical horizon residual split; CF coefficient-sensitivity sweep
+   exported to `reports/diagnostics.json`.
+4. `docs/WRITEUP.md` tightened toward a short paper draft.
+5. Branding: Coticula everywhere as the product name.
+
+Later: a real LLM/rationale judge (still must not fabricate); optional
+learned CF-sensitivity when checkpoints are present.
 
 ## 4-week plan (summary)
 
@@ -80,7 +93,8 @@ counterfactual suites.
 | **1** | Classical labels, metrics APIs, eval harness, smoke tests |
 | **2** | Train small FNO + PINO residual; wire Predict / Conserve / Counterfactual |
 | **3** | OOD / transfer probes, fail-closed trust, failure analysis, writeup draft |
-| **4** (this) | CI, Exam 4 item set, dataset pins, README polish |
+| **4** | CI, Exam 4 item set, dataset pins, README polish |
+| **v0.2** | Exam 4 upgrade, diagnostics, paper-style writeup |
 
 ## Equations
 
@@ -159,9 +173,10 @@ pretty heatmaps.
 - Every numeric field in `reports/latest.*` is computed in that eval run.
 - `not_trained` means the checkpoint (or torch, or LLM judge) was absent — not
   a placeholder accuracy.
-- Exam 4 grades a pinned item set (`status: keyword_rubric`). The legacy
-  single-text helper remains `stub_keyword_rubric`. LLM judge is `not_trained`
-  with `score: null` until a real judge is wired.
+- Exam 4 grades a pinned item set (`status: keyword_rubric`). Gold, rule-based,
+  and metric-dump slices are labeled. The legacy single-text helper remains
+  `stub_keyword_rubric`. LLM judge is `not_trained` with `score: null` until
+  a real judge is wired.
 - OOD metrics live under `ood` (and the markdown OOD section), never mixed
   into Exam 1–3 IID tables.
 - Trust flags travel with the measured numbers; they are not a substitute

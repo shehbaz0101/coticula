@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "coticula"
-version = "0.1.0"
-description = "Coticula v0 — Coticula Understanding Bench for PDE surrogates"
+version = "0.2.0"
+description = "Coticula v0.2 — a touchstone harness for PDE surrogates"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

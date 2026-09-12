@@ -1,4 +1,4 @@
-"""Fail-closed trust flags for Vermithor VU-Bench.
+"""Fail-closed trust flags for Coticula.
 
 A case is never treated as a silent success heatmap:
 
@@ -44,7 +44,7 @@ RESIDUAL_UNTRUSTED = 1.0
 PREDICT_UNTRUSTED = 0.50
 
 TRUST_POLICY: dict = {
-    "name": "vu-bench-v0-fail-closed",
+    "name": "coticula-v0-fail-closed",
     "residual_untrusted": RESIDUAL_UNTRUSTED,
     "predict_untrusted": PREDICT_UNTRUSTED,
     "statuses": ["trusted", "ood", "untrusted", "reference"],

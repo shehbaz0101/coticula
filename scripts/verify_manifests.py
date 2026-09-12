@@ -20,7 +20,7 @@ from datasets.pins import verify_all
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Verify VU-Bench SHA manifests")
+    p = argparse.ArgumentParser(description="Verify Coticula SHA manifests")
     p.add_argument(
         "--require-labels",
         action="store_true",

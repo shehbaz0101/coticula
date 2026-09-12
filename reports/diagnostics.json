@@ -1,0 +1,321 @@
+{
+  "description": "v0.2 diagnostics. Residual-vs-L2 scatter re-uses measured IID + OOD cells. Horizon split and CF sensitivity are fresh classical solves on stored labels. No fabricated SOTA.",
+  "residual_vs_l2": {
+    "status": "ok",
+    "n": 21,
+    "pearson_residual_vs_l2": 0.7411755514841815,
+    "spearman_residual_vs_l2": 0.34155844155844156,
+    "rel_l2_median": 0.26217477728954186,
+    "residual_median": 4.529278778747326,
+    "rel_l2_min": 0.13473832693136578,
+    "rel_l2_max": 1.1330011201186059,
+    "residual_min": 1.3115659370966148,
+    "residual_max": 43.26958343971169,
+    "n_untrusted": 21,
+    "n_ood": 0,
+    "points": [
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "iid",
+        "probe": "iid",
+        "rel_l2": 0.15731430293430546,
+        "residual": 4.848761558153149,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "iid",
+        "probe": "iid",
+        "rel_l2": 0.32213354866110144,
+        "residual": 13.033851350070861,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "iid",
+        "probe": "iid",
+        "rel_l2": 0.18801567340975292,
+        "residual": 1.7328502815031381,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_param_below",
+        "rel_l2": 0.26965448900632333,
+        "residual": 5.274466822421546,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_param_below",
+        "rel_l2": 0.2951887930795275,
+        "residual": 1.8902482916163748,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_param_above",
+        "rel_l2": 0.29355482254758225,
+        "residual": 4.826927526217415,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_param_above",
+        "rel_l2": 0.3022355519015442,
+        "residual": 1.9335490372786537,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "ood",
+        "probe": "heat2d_param_below",
+        "rel_l2": 0.5684832261152545,
+        "residual": 6.353075223006973,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "ood",
+        "probe": "heat2d_param_above",
+        "rel_l2": 1.1330011201186059,
+        "residual": 43.26958343971169,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_resolution_nx32",
+        "rel_l2": 0.13974438667310835,
+        "residual": 4.529278778747326,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_resolution_nx32",
+        "rel_l2": 0.17179911829239197,
+        "residual": 1.6118864265932444,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_resolution_nx128",
+        "rel_l2": 0.13473832693136578,
+        "residual": 3.87183888815745,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_resolution_nx128",
+        "rel_l2": 0.15822107797848622,
+        "residual": 1.3115659370966148,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "ood",
+        "probe": "heat2d_resolution_n16",
+        "rel_l2": 0.1867419454675383,
+        "residual": 6.570729583567446,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "ood",
+        "probe": "heat2d_resolution_n48",
+        "rel_l2": 0.1971336631898444,
+        "residual": 21.03298435298167,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_ic_gaussian_pulse",
+        "rel_l2": 0.5200208009816409,
+        "residual": 4.141924513606742,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_ic_gaussian_pulse",
+        "rel_l2": 0.56946368220597,
+        "residual": 2.2828671038875528,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_ic_tanh_front",
+        "rel_l2": 0.24461452544704304,
+        "residual": 4.3527190679722985,
+        "trust": "untrusted"
+      },
+      {
+        "model": "pino",
+        "pde": "burgers",
+        "split": "ood",
+        "probe": "burgers_ic_tanh_front",
+        "rel_l2": 0.26217477728954186,
+        "residual": 2.052330095301802,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "ood",
+        "probe": "heat2d_ic_two_bump",
+        "rel_l2": 0.24196043492248726,
+        "residual": 14.064617759339406,
+        "trust": "untrusted"
+      },
+      {
+        "model": "fno",
+        "pde": "heat2d",
+        "split": "ood",
+        "probe": "heat2d_ic_sinusoid",
+        "rel_l2": 0.8185936274815809,
+        "residual": 25.762928766131942,
+        "trust": "untrusted"
+      }
+    ],
+    "note": "Each point is a measured (Predict rel-L2, residual rel-L2) pair from IID baselines or OOD probes. Correlation is descriptive, not a causal claim."
+  },
+  "labels": {
+    "status": "ok",
+    "burgers": {
+      "horizon_residual": {
+        "status": "ok",
+        "pde": "burgers",
+        "n_time_steps": 80,
+        "split_step": 40,
+        "residual_early": 0.01869675992319352,
+        "residual_late": 0.007067590635947217,
+        "residual_full": 0.012882175279570368,
+        "late_minus_early": -0.011629169287246301,
+        "note": "Early/late split of the stored horizon. Not a claim of temporal resolution transfer."
+      },
+      "cf_sensitivity": {
+        "status": "ok",
+        "pde": "burgers",
+        "model": "classical_fd",
+        "learned": false,
+        "n_scales": 5,
+        "rows": [
+          {
+            "scale": 0.5,
+            "nu_orig": 0.03366327592946545,
+            "nu_cf": 0.016831637964732724,
+            "classical_traj_delta": 0.08863579926454324,
+            "classical_final_rel_l2": 0.12610662158422656
+          },
+          {
+            "scale": 1.0,
+            "nu_orig": 0.03366327592946545,
+            "nu_cf": 0.03366327592946545,
+            "classical_traj_delta": 0.0,
+            "classical_final_rel_l2": 0.0
+          },
+          {
+            "scale": 1.5,
+            "nu_orig": 0.03366327592946545,
+            "nu_cf": 0.050494913894198176,
+            "classical_traj_delta": 0.06600968651115983,
+            "classical_final_rel_l2": 0.09379592380491555
+          },
+          {
+            "scale": 2.0,
+            "nu_orig": 0.03366327592946545,
+            "nu_cf": 0.0673265518589309,
+            "classical_traj_delta": 0.1189839588021209,
+            "classical_final_rel_l2": 0.1677248791691741
+          },
+          {
+            "scale": 3.0,
+            "nu_orig": 0.03366327592946545,
+            "nu_cf": 0.10098982778839635,
+            "classical_traj_delta": 0.20033825912593498,
+            "classical_final_rel_l2": 0.27603021450573184
+          }
+        ],
+        "note": "Counterfactual sensitivity: trajectory \u0394 vs coefficient scale. Learned columns appear only when a predict_fn was supplied."
+      }
+    },
+    "heat2d": {
+      "horizon_residual": {
+        "status": "ok",
+        "pde": "heat2d",
+        "n_time_steps": 40,
+        "split_step": 20,
+        "residual_early": 0.029355209673588113,
+        "residual_late": 0.005381227709496508,
+        "residual_full": 0.01736821869154231,
+        "late_minus_early": -0.023973981964091604,
+        "note": "Early/late split of the stored horizon. Not a claim of temporal resolution transfer."
+      },
+      "cf_sensitivity": {
+        "status": "ok",
+        "pde": "heat2d",
+        "model": "classical_fd",
+        "learned": false,
+        "n_scales": 4,
+        "rows": [
+          {
+            "scale": 0.5,
+            "alpha_orig": 0.1267732437050385,
+            "alpha_cf": 0.06338662185251925,
+            "classical_traj_delta": 0.33036968605277817,
+            "classical_final_rel_l2": 0.8905140943161787
+          },
+          {
+            "scale": 1.0,
+            "alpha_orig": 0.1267732437050385,
+            "alpha_cf": 0.1267732437050385,
+            "classical_traj_delta": 0.0,
+            "classical_final_rel_l2": 0.0
+          },
+          {
+            "scale": 1.5,
+            "alpha_orig": 0.1267732437050385,
+            "alpha_cf": 0.19015986555755776,
+            "classical_traj_delta": 0.20807637858580913,
+            "classical_final_rel_l2": 0.46643357586682177
+          },
+          {
+            "scale": 2.0,
+            "alpha_orig": 0.1267732437050385,
+            "alpha_cf": 0.253546487410077,
+            "classical_traj_delta": 0.34948901074199723,
+            "classical_final_rel_l2": 0.7148796249608792
+          }
+        ],
+        "note": "Counterfactual sensitivity: trajectory \u0394 vs diffusivity scale. Learned columns appear only when a predict_fn was supplied."
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "version": "vu-bench-v0",
+  "version": "coticula-v0",
   "n_files": 4,
   "files": [
     {
@@ -25,5 +25,5 @@
   ],
   "kind": "labels",
   "regenerate": "python -m scripts.generate_labels",
-  "note": "NPZ labels are gitignored. Re-run generate_labels to recreate them. pin_datasets keeps last published SHAs when NPZ are absent."
+  "note": "NPZ labels are gitignored. Re-run this script to recreate them, then python -m scripts.pin_datasets if you only need pin refresh."
 }

@@ -1,4 +1,4 @@
-# Vermithor VU-Bench v0 — CPU CI
+# Coticula v0 — CPU CI
 # Fast path: pytest + tiny --smoke train. Full label gen / run_eval is not
 # in CI (NPZ labels are gitignored; full train is heavier than a PR check).
 name: CI

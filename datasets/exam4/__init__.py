@@ -1,1 +1,1 @@
-"""Exam 4 fixed explanation item set (VU-Bench v0)."""
+"""Exam 4 fixed explanation item set (Coticula v0)."""

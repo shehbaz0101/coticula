@@ -1,12 +1,10 @@
 {
-  "bench": "vu-bench-v0",
-  "project": "Vermithor",
-  "vu": "Vermithor Understanding Bench",
-  "repo": "https://github.com/shehbaz0101/vermithor",
-  "week": 4,
-  "generated_at_utc": "2026-09-12T00:18:43.378079+00:00",
+  "bench": "coticula-v0",
+  "project": "Coticula",
+  "repo": "https://github.com/shehbaz0101/coticula",
+  "generated_at_utc": "2026-09-12T20:04:10.654852+00:00",
   "trust_policy": {
-    "name": "vu-bench-v0-fail-closed",
+    "name": "coticula-v0-fail-closed",
     "residual_untrusted": 1.0,
     "predict_untrusted": 0.5,
     "statuses": [
@@ -167,38 +165,38 @@
       }
     },
     "explain": {
-      "description": "Exam 4: fixed item set graded by expected law-keyword coverage. LLM judge stays not_trained unless a real judge is wired.",
-      "n_items": 36,
+      "description": "Exam 4: fixed item set graded by expected law-keyword coverage. Gold = authored ceiling. rule_based = facet templates + measured observations. metric_dump = numbers only. LLM stays not_trained unless a real judge is wired.",
+      "n_items": 48,
       "item_set": "datasets/exam4/items_v0.json",
-      "item_set_sha256": "30747ef03aae71c8eec3c8879670588d82e84f15560443643365a425ac6ca986",
+      "item_set_sha256": "48323ca8ea9d8277ed46f78b517afbcce2340e3ffff28c7064ea7fb7171d9006",
       "gold_reference": {
         "status": "keyword_rubric",
-        "n_items": 36,
+        "n_items": 48,
         "item_set": "datasets/exam4/items_v0.json",
-        "item_set_sha256": "30747ef03aae71c8eec3c8879670588d82e84f15560443643365a425ac6ca986",
+        "item_set_sha256": "48323ca8ea9d8277ed46f78b517afbcce2340e3ffff28c7064ea7fb7171d9006",
         "answer_source": "gold",
         "mean_coverage": 1.0,
-        "n_perfect": 36,
+        "n_perfect": 48,
         "n_zero": 0,
         "by_facet": {
           "counterfactual": {
-            "n": 2,
+            "n": 4,
             "mean_coverage": 1.0
           },
           "exams": {
-            "n": 3,
+            "n": 5,
             "mean_coverage": 1.0
           },
           "explain": {
-            "n": 1,
-            "mean_coverage": 1.0
-          },
-          "numerics": {
             "n": 3,
             "mean_coverage": 1.0
           },
+          "numerics": {
+            "n": 4,
+            "mean_coverage": 1.0
+          },
           "ood": {
-            "n": 8,
+            "n": 9,
             "mean_coverage": 1.0
           },
           "pde_terms": {
@@ -206,25 +204,25 @@
             "mean_coverage": 1.0
           },
           "physics": {
-            "n": 7,
+            "n": 8,
             "mean_coverage": 1.0
           },
           "trust": {
-            "n": 5,
+            "n": 8,
             "mean_coverage": 1.0
           }
         },
         "by_pde": {
           "burgers1d": {
-            "n": 12,
+            "n": 14,
             "mean_coverage": 1.0
           },
           "harness": {
-            "n": 12,
+            "n": 20,
             "mean_coverage": 1.0
           },
           "heat2d": {
-            "n": 12,
+            "n": 14,
             "mean_coverage": 1.0
           }
         },
@@ -767,6 +765,186 @@
             "coverage": 1.0,
             "status": "keyword_rubric",
             "answer_source": "gold"
+          },
+          {
+            "id": "e4_b13",
+            "pde": "burgers1d",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "l2",
+              "untrusted"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_b14",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "viscosity",
+              "dissipation",
+              "energy"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h13",
+            "pde": "heat2d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "counterfactual",
+              "diffusion",
+              "alpha"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_h14",
+            "pde": "heat2d",
+            "facet": "numerics",
+            "n_expected": 3,
+            "hits": [
+              "dirichlet",
+              "periodic",
+              "boundary"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x13",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [
+              "touchstone",
+              "gold",
+              "purity"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x14",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [
+              "keyword",
+              "rubric",
+              "llm"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x15",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "l2",
+              "tradeoff"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x16",
+            "pde": "harness",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "counterfactual",
+              "coefficient",
+              "trajectory"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x17",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "not_trained",
+              "fabricated",
+              "sota"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x18",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "time",
+              "channels",
+              "horizon"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x19",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "trusted",
+              "residual",
+              "understand"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
+          },
+          {
+            "id": "e4_x20",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "measured",
+              "not_trained",
+              "report"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "gold"
           }
         ],
         "note": "Keyword coverage vs expected law keywords. Not a trained judge and not an LLM score.",
@@ -814,7 +992,1624 @@
       "llm": {
         "status": "not_trained",
         "score": null,
-        "note": "LLM judge off (no VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores."
+        "note": "LLM judge off (no COTICULA_LLM_JUDGE / VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores."
+      },
+      "observations": {
+        "source": "report",
+        "fno_burgers_rel_l2": 0.15731430293430546,
+        "pino_burgers_rel_l2": 0.18801567340975292,
+        "fno_burgers_residual": 4.848761558153149,
+        "pino_burgers_residual": 1.7328502815031381,
+        "fno_heat_rel_l2": 0.32213354866110144,
+        "fno_heat_residual": 13.033851350070861,
+        "fno_heat_cf": 0.9553082255019414,
+        "fno_burgers_trust": "untrusted",
+        "pino_burgers_trust": "untrusted",
+        "fno_heat_trust": "untrusted",
+        "ood_n_scored": 30,
+        "note": "Copied from a measured report. Empty fields mean the checkpoint or section was absent \u2014 not a placeholder accuracy."
+      },
+      "rule_based": {
+        "status": "keyword_rubric_rule_based",
+        "n_items": 48,
+        "item_set": "datasets/exam4/items_v0.json",
+        "item_set_sha256": "48323ca8ea9d8277ed46f78b517afbcce2340e3ffff28c7064ea7fb7171d9006",
+        "answer_source": "rule_based",
+        "mean_coverage": 0.8784722222222222,
+        "n_perfect": 33,
+        "n_zero": 1,
+        "by_facet": {
+          "counterfactual": {
+            "n": 4,
+            "mean_coverage": 1.0
+          },
+          "exams": {
+            "n": 5,
+            "mean_coverage": 0.8666666666666666
+          },
+          "explain": {
+            "n": 3,
+            "mean_coverage": 0.6666666666666666
+          },
+          "numerics": {
+            "n": 4,
+            "mean_coverage": 0.7083333333333333
+          },
+          "ood": {
+            "n": 9,
+            "mean_coverage": 0.8888888888888888
+          },
+          "pde_terms": {
+            "n": 7,
+            "mean_coverage": 0.9047619047619048
+          },
+          "physics": {
+            "n": 8,
+            "mean_coverage": 0.9583333333333334
+          },
+          "trust": {
+            "n": 8,
+            "mean_coverage": 0.875
+          }
+        },
+        "by_pde": {
+          "burgers1d": {
+            "n": 14,
+            "mean_coverage": 0.8928571428571429
+          },
+          "harness": {
+            "n": 20,
+            "mean_coverage": 0.85
+          },
+          "heat2d": {
+            "n": 14,
+            "mean_coverage": 0.9047619047619048
+          }
+        },
+        "per_item": [
+          {
+            "id": "e4_b01",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "advection",
+              "viscosity",
+              "diffusion"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b02",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 4,
+            "hits": [
+              "viscosity",
+              "smooth",
+              "shock",
+              "diffusion"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b03",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "shock",
+              "viscosity",
+              "dissipation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b04",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "nonlinear",
+              "advection"
+            ],
+            "missing": [
+              "transport"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b05",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 4,
+            "hits": [
+              "energy",
+              "dissipation",
+              "viscosity",
+              "conservation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b06",
+            "pde": "burgers1d",
+            "facet": "numerics",
+            "n_expected": 2,
+            "hits": [
+              "periodic"
+            ],
+            "missing": [
+              "boundary"
+            ],
+            "coverage": 0.5,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b07",
+            "pde": "burgers1d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "viscosity",
+              "diffusion",
+              "counterfactual"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b08",
+            "pde": "burgers1d",
+            "facet": "numerics",
+            "n_expected": 3,
+            "hits": [
+              "stability",
+              "finite difference"
+            ],
+            "missing": [
+              "cfl"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b09",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "discretization",
+              "burgers"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b10",
+            "pde": "burgers1d",
+            "facet": "ood",
+            "n_expected": 2,
+            "hits": [
+              "fourier",
+              "periodic"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b11",
+            "pde": "burgers1d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "fourier"
+            ],
+            "missing": [
+              "gaussian"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b12",
+            "pde": "burgers1d",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "untrusted",
+              "l2"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h01",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "laplacian",
+              "heat"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h02",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "decay",
+              "smooth"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h03",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "laplacian",
+              "residual"
+            ],
+            "missing": [
+              "discretization"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h04",
+            "pde": "heat2d",
+            "facet": "numerics",
+            "n_expected": 2,
+            "hits": [
+              "dirichlet",
+              "boundary"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h05",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "energy",
+              "decay",
+              "dissipation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h06",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "decay",
+              "smooth"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h07",
+            "pde": "heat2d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "diffusion",
+              "counterfactual",
+              "alpha"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h08",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "gaussian",
+              "ic"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h09",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "resolution",
+              "ood",
+              "grid"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h10",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "energy",
+              "decay"
+            ],
+            "missing": [
+              "conservation"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h11",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "laplacian",
+              "heat"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h12",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "sinusoid",
+              "ood"
+            ],
+            "missing": [
+              "diffusion"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x01",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "l2",
+              "nmse",
+              "labels"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x02",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "energy",
+              "pde"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x03",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "classical",
+              "coefficient"
+            ],
+            "missing": [
+              "counterfactual"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x04",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "untrusted",
+              "residual"
+            ],
+            "missing": [
+              "threshold"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x05",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "support",
+              "residual"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x06",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "trusted",
+              "support",
+              "residual"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x07",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "heatmap",
+              "untrusted",
+              "ood"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x08",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "fno",
+              "resolution",
+              "spectral"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x09",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "time",
+              "channels",
+              "transfer"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x10",
+            "pde": "harness",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "pino",
+              "pde"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x11",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood",
+              "iid",
+              "transfer"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x12",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [
+              "keyword",
+              "rubric",
+              "explanation"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b13",
+            "pde": "burgers1d",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "l2",
+              "untrusted"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b14",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [
+              "viscosity",
+              "dissipation",
+              "energy"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h13",
+            "pde": "heat2d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "counterfactual",
+              "diffusion",
+              "alpha"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h14",
+            "pde": "heat2d",
+            "facet": "numerics",
+            "n_expected": 3,
+            "hits": [
+              "dirichlet",
+              "boundary"
+            ],
+            "missing": [
+              "periodic"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x13",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "touchstone",
+              "gold",
+              "purity"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x14",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [
+              "keyword",
+              "rubric",
+              "llm"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x15",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "residual",
+              "l2"
+            ],
+            "missing": [
+              "tradeoff"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x16",
+            "pde": "harness",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [
+              "counterfactual",
+              "coefficient",
+              "trajectory"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x17",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "not_trained",
+              "sota"
+            ],
+            "missing": [
+              "fabricated"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x18",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "time",
+              "channels"
+            ],
+            "missing": [
+              "horizon"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x19",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "trusted",
+              "residual"
+            ],
+            "missing": [
+              "understand"
+            ],
+            "coverage": 0.6666666666666666,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x20",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "measured",
+              "not_trained",
+              "report"
+            ],
+            "missing": [],
+            "coverage": 1.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          }
+        ],
+        "note": "Structured rule-based templates plus measured Exam 1\u20133 observations. Facet-level (not per-item) wording, so coverage is below the gold ceiling. Not an LLM score.",
+        "llm_judge": {
+          "status": "not_trained",
+          "note": "see llm_judge_exam4"
+        },
+        "observations_used": {
+          "fno_burgers_rel_l2": 0.15731430293430546,
+          "pino_burgers_rel_l2": 0.18801567340975292,
+          "fno_burgers_residual": 4.848761558153149,
+          "pino_burgers_residual": 1.7328502815031381,
+          "fno_heat_cf": 0.9553082255019414
+        }
+      },
+      "metric_dump": {
+        "status": "keyword_rubric_metric_dump",
+        "n_items": 48,
+        "item_set": "datasets/exam4/items_v0.json",
+        "item_set_sha256": "48323ca8ea9d8277ed46f78b517afbcce2340e3ffff28c7064ea7fb7171d9006",
+        "answer_source": "metric_dump",
+        "mean_coverage": 0.09027777777777778,
+        "n_perfect": 0,
+        "n_zero": 35,
+        "by_facet": {
+          "counterfactual": {
+            "n": 4,
+            "mean_coverage": 0.0
+          },
+          "exams": {
+            "n": 5,
+            "mean_coverage": 0.06666666666666667
+          },
+          "explain": {
+            "n": 3,
+            "mean_coverage": 0.0
+          },
+          "numerics": {
+            "n": 4,
+            "mean_coverage": 0.0
+          },
+          "ood": {
+            "n": 9,
+            "mean_coverage": 0.2222222222222222
+          },
+          "pde_terms": {
+            "n": 7,
+            "mean_coverage": 0.047619047619047616
+          },
+          "physics": {
+            "n": 8,
+            "mean_coverage": 0.0
+          },
+          "trust": {
+            "n": 8,
+            "mean_coverage": 0.20833333333333331
+          }
+        },
+        "by_pde": {
+          "burgers1d": {
+            "n": 14,
+            "mean_coverage": 0.07142857142857142
+          },
+          "harness": {
+            "n": 20,
+            "mean_coverage": 0.11666666666666665
+          },
+          "heat2d": {
+            "n": 14,
+            "mean_coverage": 0.07142857142857142
+          }
+        },
+        "per_item": [
+          {
+            "id": "e4_b01",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "advection",
+              "viscosity",
+              "diffusion"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b02",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 4,
+            "hits": [],
+            "missing": [
+              "viscosity",
+              "smooth",
+              "shock",
+              "diffusion"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b03",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "shock",
+              "viscosity",
+              "dissipation"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b04",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "nonlinear",
+              "advection",
+              "transport"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b05",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 4,
+            "hits": [],
+            "missing": [
+              "energy",
+              "dissipation",
+              "viscosity",
+              "conservation"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b06",
+            "pde": "burgers1d",
+            "facet": "numerics",
+            "n_expected": 2,
+            "hits": [],
+            "missing": [
+              "periodic",
+              "boundary"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b07",
+            "pde": "burgers1d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "viscosity",
+              "diffusion",
+              "counterfactual"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b08",
+            "pde": "burgers1d",
+            "facet": "numerics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "cfl",
+              "stability",
+              "finite difference"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b09",
+            "pde": "burgers1d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "residual",
+              "discretization",
+              "burgers"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b10",
+            "pde": "burgers1d",
+            "facet": "ood",
+            "n_expected": 2,
+            "hits": [],
+            "missing": [
+              "fourier",
+              "periodic"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b11",
+            "pde": "burgers1d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "gaussian",
+              "fourier"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b12",
+            "pde": "burgers1d",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "l2"
+            ],
+            "missing": [
+              "residual",
+              "untrusted"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h01",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "diffusion",
+              "laplacian",
+              "heat"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h02",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "diffusion",
+              "decay",
+              "smooth"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h03",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "laplacian",
+              "residual",
+              "discretization"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h04",
+            "pde": "heat2d",
+            "facet": "numerics",
+            "n_expected": 2,
+            "hits": [],
+            "missing": [
+              "dirichlet",
+              "boundary"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h05",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "energy",
+              "decay",
+              "dissipation"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h06",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "diffusion",
+              "decay",
+              "smooth"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h07",
+            "pde": "heat2d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "diffusion",
+              "counterfactual",
+              "alpha"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h08",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "gaussian",
+              "ic"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h09",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "resolution",
+              "grid"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h10",
+            "pde": "heat2d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "energy",
+              "decay",
+              "conservation"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h11",
+            "pde": "heat2d",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "residual",
+              "laplacian",
+              "heat"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h12",
+            "pde": "heat2d",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "sinusoid",
+              "diffusion"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x01",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [
+              "l2"
+            ],
+            "missing": [
+              "nmse",
+              "labels"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x02",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "residual",
+              "energy",
+              "pde"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x03",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "counterfactual",
+              "classical",
+              "coefficient"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x04",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "untrusted",
+              "residual",
+              "threshold"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x05",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "support",
+              "residual"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x06",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "trusted",
+              "support",
+              "residual"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x07",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "heatmap",
+              "untrusted"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x08",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "fno"
+            ],
+            "missing": [
+              "resolution",
+              "spectral"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x09",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "time",
+              "channels",
+              "transfer"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x10",
+            "pde": "harness",
+            "facet": "pde_terms",
+            "n_expected": 3,
+            "hits": [
+              "pino"
+            ],
+            "missing": [
+              "residual",
+              "pde"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x11",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [
+              "ood"
+            ],
+            "missing": [
+              "iid",
+              "transfer"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x12",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "keyword",
+              "rubric",
+              "explanation"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b13",
+            "pde": "burgers1d",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "l2"
+            ],
+            "missing": [
+              "residual",
+              "untrusted"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_b14",
+            "pde": "burgers1d",
+            "facet": "physics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "viscosity",
+              "dissipation",
+              "energy"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h13",
+            "pde": "heat2d",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "counterfactual",
+              "diffusion",
+              "alpha"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_h14",
+            "pde": "heat2d",
+            "facet": "numerics",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "dirichlet",
+              "periodic",
+              "boundary"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x13",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "touchstone",
+              "gold",
+              "purity"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x14",
+            "pde": "harness",
+            "facet": "explain",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "keyword",
+              "rubric",
+              "llm"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x15",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [
+              "l2"
+            ],
+            "missing": [
+              "residual",
+              "tradeoff"
+            ],
+            "coverage": 0.3333333333333333,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x16",
+            "pde": "harness",
+            "facet": "counterfactual",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "counterfactual",
+              "coefficient",
+              "trajectory"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x17",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "not_trained",
+              "fabricated",
+              "sota"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x18",
+            "pde": "harness",
+            "facet": "ood",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "time",
+              "channels",
+              "horizon"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x19",
+            "pde": "harness",
+            "facet": "trust",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "trusted",
+              "residual",
+              "understand"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          },
+          {
+            "id": "e4_x20",
+            "pde": "harness",
+            "facet": "exams",
+            "n_expected": 3,
+            "hits": [],
+            "missing": [
+              "measured",
+              "not_trained",
+              "report"
+            ],
+            "coverage": 0.0,
+            "status": "keyword_rubric",
+            "answer_source": "provided"
+          }
+        ],
+        "note": "Numbers-only dump of measured report fields. Included to show the keyword rubric is not a free lunch. Not an LLM score.",
+        "llm_judge": {
+          "status": "not_trained",
+          "note": "see llm_judge_exam4"
+        }
       }
     }
   },
@@ -2782,5 +4577,331 @@
       }
     ]
   },
-  "exam4_graded_at_utc": "2026-09-12T00:38:50.937661+00:00"
+  "exam4_graded_at_utc": "2026-09-12T00:38:50.937661+00:00",
+  "brand": "Coticula",
+  "formerly": "Vermithor / VU-Bench",
+  "version": "0.2.0",
+  "diagnostics": {
+    "description": "v0.2 diagnostics. Residual-vs-L2 scatter re-uses measured IID + OOD cells. Horizon split and CF sensitivity are fresh classical solves on stored labels. No fabricated SOTA.",
+    "residual_vs_l2": {
+      "status": "ok",
+      "n": 21,
+      "pearson_residual_vs_l2": 0.7411755514841815,
+      "spearman_residual_vs_l2": 0.34155844155844156,
+      "rel_l2_median": 0.26217477728954186,
+      "residual_median": 4.529278778747326,
+      "rel_l2_min": 0.13473832693136578,
+      "rel_l2_max": 1.1330011201186059,
+      "residual_min": 1.3115659370966148,
+      "residual_max": 43.26958343971169,
+      "n_untrusted": 21,
+      "n_ood": 0,
+      "points": [
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "iid",
+          "probe": "iid",
+          "rel_l2": 0.15731430293430546,
+          "residual": 4.848761558153149,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "iid",
+          "probe": "iid",
+          "rel_l2": 0.32213354866110144,
+          "residual": 13.033851350070861,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "iid",
+          "probe": "iid",
+          "rel_l2": 0.18801567340975292,
+          "residual": 1.7328502815031381,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_param_below",
+          "rel_l2": 0.26965448900632333,
+          "residual": 5.274466822421546,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_param_below",
+          "rel_l2": 0.2951887930795275,
+          "residual": 1.8902482916163748,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_param_above",
+          "rel_l2": 0.29355482254758225,
+          "residual": 4.826927526217415,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_param_above",
+          "rel_l2": 0.3022355519015442,
+          "residual": 1.9335490372786537,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "ood",
+          "probe": "heat2d_param_below",
+          "rel_l2": 0.5684832261152545,
+          "residual": 6.353075223006973,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "ood",
+          "probe": "heat2d_param_above",
+          "rel_l2": 1.1330011201186059,
+          "residual": 43.26958343971169,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_resolution_nx32",
+          "rel_l2": 0.13974438667310835,
+          "residual": 4.529278778747326,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_resolution_nx32",
+          "rel_l2": 0.17179911829239197,
+          "residual": 1.6118864265932444,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_resolution_nx128",
+          "rel_l2": 0.13473832693136578,
+          "residual": 3.87183888815745,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_resolution_nx128",
+          "rel_l2": 0.15822107797848622,
+          "residual": 1.3115659370966148,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "ood",
+          "probe": "heat2d_resolution_n16",
+          "rel_l2": 0.1867419454675383,
+          "residual": 6.570729583567446,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "ood",
+          "probe": "heat2d_resolution_n48",
+          "rel_l2": 0.1971336631898444,
+          "residual": 21.03298435298167,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_ic_gaussian_pulse",
+          "rel_l2": 0.5200208009816409,
+          "residual": 4.141924513606742,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_ic_gaussian_pulse",
+          "rel_l2": 0.56946368220597,
+          "residual": 2.2828671038875528,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_ic_tanh_front",
+          "rel_l2": 0.24461452544704304,
+          "residual": 4.3527190679722985,
+          "trust": "untrusted"
+        },
+        {
+          "model": "pino",
+          "pde": "burgers",
+          "split": "ood",
+          "probe": "burgers_ic_tanh_front",
+          "rel_l2": 0.26217477728954186,
+          "residual": 2.052330095301802,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "ood",
+          "probe": "heat2d_ic_two_bump",
+          "rel_l2": 0.24196043492248726,
+          "residual": 14.064617759339406,
+          "trust": "untrusted"
+        },
+        {
+          "model": "fno",
+          "pde": "heat2d",
+          "split": "ood",
+          "probe": "heat2d_ic_sinusoid",
+          "rel_l2": 0.8185936274815809,
+          "residual": 25.762928766131942,
+          "trust": "untrusted"
+        }
+      ],
+      "note": "Each point is a measured (Predict rel-L2, residual rel-L2) pair from IID baselines or OOD probes. Correlation is descriptive, not a causal claim."
+    },
+    "labels": {
+      "status": "ok",
+      "burgers": {
+        "horizon_residual": {
+          "status": "ok",
+          "pde": "burgers",
+          "n_time_steps": 80,
+          "split_step": 40,
+          "residual_early": 0.01869675992319352,
+          "residual_late": 0.007067590635947217,
+          "residual_full": 0.012882175279570368,
+          "late_minus_early": -0.011629169287246301,
+          "note": "Early/late split of the stored horizon. Not a claim of temporal resolution transfer."
+        },
+        "cf_sensitivity": {
+          "status": "ok",
+          "pde": "burgers",
+          "model": "classical_fd",
+          "learned": false,
+          "n_scales": 5,
+          "rows": [
+            {
+              "scale": 0.5,
+              "nu_orig": 0.03366327592946545,
+              "nu_cf": 0.016831637964732724,
+              "classical_traj_delta": 0.08863579926454324,
+              "classical_final_rel_l2": 0.12610662158422656
+            },
+            {
+              "scale": 1.0,
+              "nu_orig": 0.03366327592946545,
+              "nu_cf": 0.03366327592946545,
+              "classical_traj_delta": 0.0,
+              "classical_final_rel_l2": 0.0
+            },
+            {
+              "scale": 1.5,
+              "nu_orig": 0.03366327592946545,
+              "nu_cf": 0.050494913894198176,
+              "classical_traj_delta": 0.06600968651115983,
+              "classical_final_rel_l2": 0.09379592380491555
+            },
+            {
+              "scale": 2.0,
+              "nu_orig": 0.03366327592946545,
+              "nu_cf": 0.0673265518589309,
+              "classical_traj_delta": 0.1189839588021209,
+              "classical_final_rel_l2": 0.1677248791691741
+            },
+            {
+              "scale": 3.0,
+              "nu_orig": 0.03366327592946545,
+              "nu_cf": 0.10098982778839635,
+              "classical_traj_delta": 0.20033825912593498,
+              "classical_final_rel_l2": 0.27603021450573184
+            }
+          ],
+          "note": "Counterfactual sensitivity: trajectory \u0394 vs coefficient scale. Learned columns appear only when a predict_fn was supplied."
+        }
+      },
+      "heat2d": {
+        "horizon_residual": {
+          "status": "ok",
+          "pde": "heat2d",
+          "n_time_steps": 40,
+          "split_step": 20,
+          "residual_early": 0.029355209673588113,
+          "residual_late": 0.005381227709496508,
+          "residual_full": 0.01736821869154231,
+          "late_minus_early": -0.023973981964091604,
+          "note": "Early/late split of the stored horizon. Not a claim of temporal resolution transfer."
+        },
+        "cf_sensitivity": {
+          "status": "ok",
+          "pde": "heat2d",
+          "model": "classical_fd",
+          "learned": false,
+          "n_scales": 4,
+          "rows": [
+            {
+              "scale": 0.5,
+              "alpha_orig": 0.1267732437050385,
+              "alpha_cf": 0.06338662185251925,
+              "classical_traj_delta": 0.33036968605277817,
+              "classical_final_rel_l2": 0.8905140943161787
+            },
+            {
+              "scale": 1.0,
+              "alpha_orig": 0.1267732437050385,
+              "alpha_cf": 0.1267732437050385,
+              "classical_traj_delta": 0.0,
+              "classical_final_rel_l2": 0.0
+            },
+            {
+              "scale": 1.5,
+              "alpha_orig": 0.1267732437050385,
+              "alpha_cf": 0.19015986555755776,
+              "classical_traj_delta": 0.20807637858580913,
+              "classical_final_rel_l2": 0.46643357586682177
+            },
+            {
+              "scale": 2.0,
+              "alpha_orig": 0.1267732437050385,
+              "alpha_cf": 0.253546487410077,
+              "classical_traj_delta": 0.34948901074199723,
+              "classical_final_rel_l2": 0.7148796249608792
+            }
+          ],
+          "note": "Counterfactual sensitivity: trajectory \u0394 vs diffusivity scale. Learned columns appear only when a predict_fn was supplied."
+        }
+      }
+    }
+  },
+  "iid_ood_measured_at_utc": "2026-09-12T00:18:43.378079+00:00",
+  "refresh_note": "Exam 4 and diagnostics were re-measured on this revision. IID Exam 1\u20133 and OOD cells are copied from the prior measured run (see iid_ood_measured_at_utc). No FNO/PINO numbers were invented."
 }

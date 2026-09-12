@@ -19,5 +19,5 @@ weights (~20k–45k params), not a SOTA claim. Retrain anytime with
 `--smoke` writes `checkpoints/_smoke_{fno|pino}_{pde}.pt` (gitignored) so a
 CI / laptop smoke run does not overwrite the published eval weights.
 
-Format: `vu-bench-fno-v0` dict with `config`, `state_dict`, `training` (includes
+Format: `vu-bench-fno-v0` (historical checkpoint id; loaders still accept it) dict with `config`, `state_dict`, `training` (includes
 the PINO loss-term docstring), and `extra.split` so eval can reuse the holdout.
