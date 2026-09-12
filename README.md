@@ -1,32 +1,35 @@
-# Physics understanding bench
+# Coticula
 
-Repo: [github.com/shehbaz0101/vermithor](https://github.com/shehbaz0101/vermithor)
+**Coticula** (Latin *coticula*, touchstone): a stone used to test whether gold is pure.
+This repo is a touchstone for PDE surrogates.
 
-I built this as a small, reproducible way to test whether PDE surrogates actually
-understand the physics, not just fit training trajectories.
+Repo: [github.com/shehbaz0101/coticula](https://github.com/shehbaz0101/coticula)
+Brand site target: **coticula.ai** (register the domain when you are ready).
 
-The harness runs four exams on Burgers (1D) and the heat equation (2D):
+I built this as a small, reproducible way to test whether physics models actually
+understand the dynamics, not just fit training trajectories.
+
+Four exams on Burgers (1D) and the heat equation (2D):
 
 1. **Predict** field trajectories
-2. **Conserve** check PDE residuals / energy drift
+2. **Conserve** PDE residuals / energy drift
 3. **Counterfactual** response when a coefficient changes
-4. **Explain** short answers graded with a keyword rubric
+4. **Explain** short answers with a keyword rubric
 
-Baselines include classical finite differences, a tiny FNO, and a PINO-style
-physics loss. Reports only include measured numbers. Missing checkpoints stay
-`not_trained`. An optional LLM judge is env-gated and never invents scores.
+Baselines: classical finite differences, a tiny FNO, and a PINO-style physics loss.
+Reports only include measured numbers. Missing checkpoints stay `not_trained`.
 
 More detail: [docs/WRITEUP.md](docs/WRITEUP.md) · [docs/DESIGN.md](docs/DESIGN.md)
 
 ## Outcomes (v0.1.0)
 
-- Public harness with one-command eval and OOD probes
-- Fail-closed trust flags (`ood` / `untrusted`) so pretty heatmaps do not hide bad physics
+- Public understanding harness with one-command eval and OOD probes
+- Fail-closed trust flags (`ood` / `untrusted`)
 - Measured tradeoff: FNO can look better on L2 while residual stays worse than PINO
-- CI on GitHub Actions (pytest + CPU smoke trains)
-- Cite-ready packaging (`CITATION.cff`, changelog, release notes)
+- CI on GitHub Actions
+- Cite-ready packaging (`CITATION.cff`)
 
-Release: https://github.com/shehbaz0101/vermithor/releases/tag/v0.1.0
+Release: https://github.com/shehbaz0101/coticula/releases/tag/v0.1.0
 
 ## Quickstart
 
@@ -116,7 +119,7 @@ Full tables + failure analysis: [docs/WRITEUP.md](docs/WRITEUP.md).
 ## Layout
 
 ```
-vermithor/
+coticula/
   datasets/{burgers,heat2d,manifests,ood,exam4}/
   datasets/pins.py              # SHA helpers
   datasets/exam4/items_v0.json  # Exam 4 item set (36)
@@ -183,7 +186,7 @@ checkpoint is present. It does **not** invent metrics.
 
 **v0.1.0** packages Weeks 1-4 of this harness. Cite the software with
 [`CITATION.cff`](CITATION.cff) (author: Shehbaz Pathan; version 0.1.0;
-https://github.com/shehbaz0101/vermithor). GitHub’s “Cite this repository”
+https://github.com/shehbaz0101/coticula). GitHub’s “Cite this repository”
 button reads that file.
 
 A GitHub Release for annotated tag `v0.1.0` is intended **after** this
@@ -206,4 +209,4 @@ metrics.
 
 ## License
 
-Internal Vermithor research scaffold.
+Internal Coticula research scaffold.

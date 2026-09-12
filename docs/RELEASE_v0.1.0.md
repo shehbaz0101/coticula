@@ -1,7 +1,7 @@
-# Vermithor v0.1.0 — what’s in the tag
+# Coticula v0.1.0 — what’s in the tag
 
-**VU = Vermithor Understanding Bench.** This note describes the intended
-`v0.1.0` GitHub Release of [shehbaz0101/vermithor](https://github.com/shehbaz0101/vermithor).
+**VU = Coticula Understanding Bench.** This note describes the intended
+`v0.1.0` GitHub Release of [shehbaz0101/coticula](https://github.com/shehbaz0101/coticula).
 It does **not** invent metrics. Measured tables live in
 [WRITEUP.md](WRITEUP.md) (filled from `reports/latest.json`).
 
@@ -86,7 +86,7 @@ Exam 4 gold-reference coverage is the keyword rubric on authored gold texts
 ## Cite
 
 Software citation: [`CITATION.cff`](../CITATION.cff) (author: Shehbaz Pathan;
-version 0.1.0; url https://github.com/shehbaz0101/vermithor).
+version 0.1.0; url https://github.com/shehbaz0101/coticula).
 
 ## Parent: cut the tag after merge
 
@@ -94,7 +94,7 @@ This PR does not create `v0.1.0`. After merge to `main`:
 
 ```bash
 git checkout main && git pull
-git tag -a v0.1.0 -m "v0.1.0 — cite-ready VU-Bench (Weeks 1–4)"
+git tag -a v0.1.0 -m "v0.1.0 — cite-ready Coticula (Weeks 1–4)"
 git push origin v0.1.0
 gh release create v0.1.0 --title "v0.1.0" --notes-file RELEASE_NOTES.md
 ```

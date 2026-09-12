@@ -1,9 +1,9 @@
-# Vermithor VU-Bench v0 Design
+# Coticula v0 Design
 
-**VU = Vermithor Understanding Bench.** Project branding: **Vermithor**.
+**VU = Coticula Understanding Bench.** Project branding: **Coticula**.
 This harness is not related to the `uv` Python packager.
 
-Public repo: https://github.com/shehbaz0101/vermithor
+Public repo: https://github.com/shehbaz0101/coticula
 
 ## Four exams
 

@@ -1,8 +1,8 @@
-# Vermithor v0.1.0
+# Coticula v0.1.0
 
-Cite-ready packaging of **VU-Bench** (Vermithor Understanding Bench) after
+Cite-ready packaging of **Coticula** (Coticula Understanding Bench) after
 Weeks 1–4 on `main` (PRs #1–#3). Software citation: `CITATION.cff`
-(Shehbaz Pathan; v0.1.0; https://github.com/shehbaz0101/vermithor).
+(Shehbaz Pathan; v0.1.0; https://github.com/shehbaz0101/coticula).
 
 This release **does not invent metrics.** Measured IID / OOD / Exam 4 tables
 are in `docs/WRITEUP.md` and `reports/latest.md`, produced by
