@@ -15,8 +15,11 @@ if str(ROOT) not in sys.path:
 from datasets.pins import EXAM4_ITEMS_PATH, sha256_file
 from metrics.explain import (
     grade_exam4,
+    grade_metric_dump_exam4,
+    grade_rule_based_exam4,
     llm_judge_exam4,
     load_exam4,
+    observations_from_report,
     score_explanation,
     score_item,
 )
@@ -27,7 +30,9 @@ def test_exam4_item_set_is_real_and_sized():
     items = payload["items"]
     assert 15 <= len(items) <= 50
     assert payload["n_items"] == len(items)
+    assert payload["n_items"] >= 48
     assert payload["llm_judge"] == "not_wired"
+    assert payload.get("bench") == "Coticula"
     ids = [it["id"] for it in items]
     assert len(ids) == len(set(ids))
     for it in items:
@@ -78,7 +83,9 @@ def test_score_item_is_casefold():
 
 
 def test_llm_judge_never_invents_a_score(monkeypatch):
+    monkeypatch.delenv("COTICULA_LLM_JUDGE", raising=False)
     monkeypatch.delenv("VU_LLM_JUDGE", raising=False)
+    monkeypatch.delenv("COTICULA_LLM_API_KEY", raising=False)
     monkeypatch.delenv("VU_LLM_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     off = llm_judge_exam4()
@@ -98,6 +105,51 @@ def test_llm_judge_never_invents_a_score(monkeypatch):
     assert gated.get("n_items") in (None, 0)
     # Must not look like a measured LLM grade.
     assert "mean_coverage" not in gated
+
+
+def test_rule_based_below_gold_and_above_metric_dump():
+    obs = {
+        "fno_burgers_rel_l2": 0.157,
+        "pino_burgers_rel_l2": 0.188,
+        "fno_burgers_residual": 4.85,
+        "pino_burgers_residual": 1.73,
+        "fno_heat_cf": 0.955,
+        "fno_burgers_trust": "untrusted",
+        "pino_burgers_trust": "untrusted",
+    }
+    gold = grade_exam4(use_gold=True)
+    rb = grade_rule_based_exam4(obs)
+    dump = grade_metric_dump_exam4(obs)
+    assert gold["mean_coverage"] == pytest.approx(1.0, abs=1e-12)
+    assert rb["status"] == "keyword_rubric_rule_based"
+    assert dump["status"] == "keyword_rubric_metric_dump"
+    assert rb["mean_coverage"] < gold["mean_coverage"]
+    assert dump["mean_coverage"] < rb["mean_coverage"]
+    assert dump["mean_coverage"] < 0.35
+    assert rb["mean_coverage"] > 0.4
+    assert rb["llm_judge"]["status"] == "not_trained"
+    assert "llm" not in rb["answer_source"]
+
+
+def test_observations_from_report_copy_only():
+    report = {
+        "exams": {
+            "predict": {
+                "fno": {"status": "ok", "burgers": {"status": "ok", "rel_l2_mean": 0.16}}
+            },
+            "conserve": {
+                "fno": {"status": "ok", "burgers": {"status": "ok", "residual_rel_l2": 4.8}}
+            },
+            "counterfactual": {},
+        },
+        "baselines": {
+            "fno": {"burgers": {"trust": {"status": "untrusted"}}},
+        },
+    }
+    obs = observations_from_report(report)
+    assert obs["fno_burgers_rel_l2"] == pytest.approx(0.16)
+    assert obs["fno_burgers_residual"] == pytest.approx(4.8)
+    assert obs["pino_burgers_rel_l2"] is None
 
 
 def test_legacy_score_explanation_still_stub():
@@ -120,5 +172,8 @@ def test_run_eval_explain_schema_when_report_present():
         assert gold["n_items"] >= 15
         assert isinstance(gold["mean_coverage"], float)
         assert expl["llm"].get("score") is None
+        if "rule_based" in expl:
+            assert expl["rule_based"]["status"] == "keyword_rubric_rule_based"
+            assert expl["llm"].get("score") is None
     else:
         assert expl["classical_keyword_stub"]["status"] == "stub_keyword_rubric"

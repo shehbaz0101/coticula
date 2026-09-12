@@ -1,4 +1,4 @@
-"""OOD / transfer probes for Vermithor VU-Bench (distinct from IID exams).
+"""OOD / transfer probes for Coticula (distinct from IID exams).
 
 Usage:
     python -m scripts.run_ood
@@ -19,13 +19,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from baselines.fno.io import (
-    DEFAULT_BURGERS,
-    DEFAULT_HEAT,
-    DEFAULT_PINO_BURGERS,
-    DEFAULT_PINO_HEAT,
-    load_checkpoint,
-)
+CHECKPOINT_DIR = ROOT / "checkpoints"
+DEFAULT_BURGERS = CHECKPOINT_DIR / "fno_burgers.pt"
+DEFAULT_HEAT = CHECKPOINT_DIR / "fno_heat2d.pt"
+DEFAULT_PINO_BURGERS = CHECKPOINT_DIR / "pino_burgers.pt"
+DEFAULT_PINO_HEAT = CHECKPOINT_DIR / "pino_heat2d.pt"
 from metrics.ood import default_probe_plan, materialize_probe, score_burgers_surrogate, score_heat_surrogate
 from metrics.trust import (
     BURGERS_TRAIN_SUPPORT,
@@ -57,6 +55,7 @@ def _torch_device() -> str:
 def _load_learned(name: str, burgers_ckpt: Path, heat_ckpt: Path) -> dict:
     try:
         import torch  # noqa: F401
+        from baselines.fno.io import load_checkpoint
     except ImportError:
         return {
             "model": name,
@@ -366,9 +365,9 @@ def build_failure_analysis(
 def main() -> None:
     ood = evaluate_ood()
     out = {
-        "bench": "vu-bench-v0",
-        "project": "Vermithor",
-        "vu": "Vermithor Understanding Bench",
+        "bench": "coticula-v0",
+        "project": "Coticula",
+        "brand": "Coticula",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "ood": ood,
     }

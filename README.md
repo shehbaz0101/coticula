@@ -19,7 +19,17 @@ Four exams on Burgers (1D) and the heat equation (2D):
 Baselines: classical finite differences, a tiny FNO, and a PINO-style physics loss.
 Reports only include measured numbers. Missing checkpoints stay `not_trained`.
 
-More detail: [docs/WRITEUP.md](docs/WRITEUP.md) · [docs/DESIGN.md](docs/DESIGN.md)
+One-pager: [docs/ONEPAGER.md](docs/ONEPAGER.md) ·
+Writeup: [docs/WRITEUP.md](docs/WRITEUP.md) ·
+Design: [docs/DESIGN.md](docs/DESIGN.md)
+
+## Status (v0.2)
+
+Research increment on top of shipped **v0.1.0**. Exam 4 is a **48-item**
+pinned set with gold / rule-based / metric-dump keyword grades (no invented
+LLM scores). Diagnostics add a residual-vs-L2 scatter of measured IID+OOD
+points and a classical counterfactual sensitivity sweep. Reports still
+contain only measured numbers.
 
 ## Outcomes (v0.1.0)
 
@@ -67,15 +77,16 @@ plus the `--smoke` trains above on `ubuntu-latest`. Full `generate_labels` /
 `run_eval` is **not** in CI (NPZ labels are gitignored; a full train is heavier
 than a PR check).
 
-## Week 1-5 status
+## Week 1-5 + v0.2 status
 
 | Week | Status | What shipped |
 |------|--------|----------------|
 | 1 | done | Classical FD labels, exam APIs, eval harness, smoke tests |
 | 2 | done | Laptop-scale FNO + PINO residual; Exams 1-3 measured when a `*.pt` loads |
 | 3 | done | OOD probes (param / resolution / IC), fail-closed trust, [WRITEUP.md](docs/WRITEUP.md) |
-| 4 | done | GitHub Actions CI, Exam 4 **fixed item set** (36 law-keyword items), SHA pins for labels + OOD generators, README polish |
-| 5 | this | Cite-ready v0.1.0 packaging: `CITATION.cff`, changelog, release notes. **No new metrics.** |
+| 4 | done | GitHub Actions CI, Exam 4 fixed item set, SHA pins, README polish |
+| 5 | done | Cite-ready v0.1.0 packaging: `CITATION.cff`, changelog, release notes |
+| **v0.2** | **this** | Exam 4 → 48 items + rule-based/metric-dump grades; residual-vs-L2 + CF-sensitivity diagnostics; paper-style writeup; Coticula branding |
 
 ## How to read trust flags
 
@@ -98,8 +109,9 @@ live under `ood` in `reports/latest.json`.
 
 ## Latest measured results (this repo)
 
-Copied from [`reports/latest.md`](reports/latest.md) (Week 3 eval run
-`2026-09-12T00:18:43Z` on the shipped checkpoints). **Not invented.**
+Copied from [`reports/latest.md`](reports/latest.md). IID Exam 1–3 / OOD:
+Week 3 eval run `2026-09-12T00:18:43Z` on the shipped checkpoints. Exam 4
+and diagnostics: re-measured on this v0.2 revision. **Not invented.**
 ` - ` / `not_trained` means that checkpoint or judge was absent.
 
 | Baseline | Burgers rel-L2 | Heat2D rel-L2 | Burgers residual | Trust |
@@ -109,10 +121,10 @@ Copied from [`reports/latest.md`](reports/latest.md) (Week 3 eval run
 | PINO | 1.88e-1 |  -  | 1.73 | `untrusted` / `not_trained` |
 | LLM |  -  |  -  |  -  | `not_trained` |
 
-Exam 4 gold-reference keyword coverage is computed from the pinned item set
-(authored gold texts vs expected law keywords)  -  see the Exam 4 section of
-`reports/latest.md` after `run_eval`. That number is a rubric ceiling, **not**
-an LLM or FNO explanation score.
+Exam 4 (48 items, sha256 `48323ca8…`): gold coverage `1.000`; rule-based
+`0.8785`; metric-dump `0.0903`. None of those are LLM scores. Residual-vs-L2
+scatter ($n=21$ measured IID+OOD points) has Pearson $0.741$ / Spearman
+$0.342$; all 21 points are `untrusted`. See `reports/latest.md`.
 
 Full tables + failure analysis: [docs/WRITEUP.md](docs/WRITEUP.md).
 
@@ -122,16 +134,17 @@ Full tables + failure analysis: [docs/WRITEUP.md](docs/WRITEUP.md).
 coticula/
   datasets/{burgers,heat2d,manifests,ood,exam4}/
   datasets/pins.py              # SHA helpers
-  datasets/exam4/items_v0.json  # Exam 4 item set (36)
+  datasets/exam4/items_v0.json  # Exam 4 item set (48)
   datasets/ood/probe_plan_v0.json
-  metrics/{predict,conserve,counterfactual,explain,ood,trust}.py
+  metrics/{predict,conserve,counterfactual,explain,ood,trust,diagnostics}.py
   baselines/classical|fno|pino|llm/
   scripts/generate_labels.py    # IID labels + refresh pins
   scripts/pin_datasets.py       # refresh SHA manifests
   scripts/verify_manifests.py
   scripts/train_fno.py / train_pino.py
-  scripts/run_eval.py / run_ood.py
+  scripts/run_eval.py / run_ood.py / run_diagnostics.py
   .github/workflows/ci.yml
+  docs/ONEPAGER.md
   docs/DESIGN.md
   docs/WRITEUP.md
   docs/RELEASE_v0.1.0.md
@@ -139,6 +152,7 @@ coticula/
   CHANGELOG.md
   RELEASE_NOTES.md            # paste into gh release create after tag
   reports/latest.{json,md}
+  reports/diagnostics.json
 ```
 
 ## Dataset pins (regenerate path)
@@ -172,7 +186,7 @@ matches the pin.
 | 1 Predict | Rel-L2 and NMSE vs classical labels |
 | 2 Conserve | FD PDE residual + discrete energy drift of the predicted field |
 | 3 Counterfactual | Re-solve / re-predict at ν′ or α′; learned models graded vs the classical solver |
-| 4 Explain | **36-item** pinned set; keyword coverage vs expected law keywords. LLM hook stays `not_trained` |
+| 4 Explain | **48-item** pinned set; gold / rule-based / metric-dump keyword coverage. LLM hook stays `not_trained` |
 | Trust (W3) | Fail-closed `trusted` / `ood` / `untrusted` / `reference` |
 | OOD (W3) | Param shift, spatial resolution transfer, IC-family shift |
 
@@ -184,10 +198,10 @@ checkpoint is present. It does **not** invent metrics.
 
 ## Cite / Release
 
-**v0.1.0** packages Weeks 1-4 of this harness. Cite the software with
-[`CITATION.cff`](CITATION.cff) (author: Shehbaz Pathan; version 0.1.0;
-https://github.com/shehbaz0101/coticula). GitHub’s “Cite this repository”
-button reads that file.
+**v0.1.0** packaged Weeks 1-4. **v0.2** is this research increment (Exam 4,
+diagnostics, writeup). Cite the software with [`CITATION.cff`](CITATION.cff)
+(author: Shehbaz Pathan; https://github.com/shehbaz0101/coticula). GitHub’s
+“Cite this repository” button reads that file.
 
 A GitHub Release for annotated tag `v0.1.0` is intended **after** this
 packaging merges to `main`  -  this repo increment does not cut the tag.

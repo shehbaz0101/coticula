@@ -1,4 +1,4 @@
-"""VU-Bench metrics: predict, conserve, counterfactual, explain, OOD/trust."""
+"""Coticula metrics: predict, conserve, counterfactual, explain, OOD/trust."""
 from .conserve import audit_burgers, audit_heat
 from .counterfactual import (
     burgers_counterfactual,
@@ -9,8 +9,11 @@ from .counterfactual import (
 from .explain import (
     batch_score,
     grade_exam4,
+    grade_metric_dump_exam4,
+    grade_rule_based_exam4,
     llm_judge_exam4,
     load_exam4,
+    observations_from_report,
     score_explanation,
     score_item,
 )
@@ -52,6 +55,9 @@ __all__ = [
     "load_exam4",
     "score_item",
     "grade_exam4",
+    "grade_rule_based_exam4",
+    "grade_metric_dump_exam4",
+    "observations_from_report",
     "llm_judge_exam4",
     "decide_trust",
     "param_in_range",

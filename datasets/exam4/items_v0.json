@@ -1,10 +1,12 @@
 {
-  "version": "vu-bench-v0-exam4",
-  "bench": "Vermithor Understanding Bench",
-  "n_items": 36,
+  "version": "coticula-v0-exam4",
+  "bench": "Coticula",
+  "formerly": "Vermithor / VU-Bench",
+  "n_items": 48,
   "scoring": "keyword_coverage_vs_expected_law_keywords",
   "llm_judge": "not_wired",
-  "note": "Fixed explanation set. Grade is hit-rate of expected law keywords in a rationale. Not a trained judge; not an LLM score.",
+  "rule_based": "structured templates + measured exam observations; not an LLM score",
+  "note": "Fixed explanation set (v0.2: 48 items). Grade is hit-rate of expected law keywords in a rationale. Not a trained judge; not an LLM score. Optional rule-based answers are structured templates, clearly labeled.",
   "items": [
     {
       "id": "e4_b01",
@@ -106,7 +108,7 @@
       "id": "e4_h01",
       "pde": "heat2d",
       "facet": "pde_terms",
-      "prompt": "Write the 2D heat equation used in VU-Bench and name the spatial operator.",
+      "prompt": "Write the 2D heat equation used in Coticula and name the spatial operator.",
       "expected_keywords": ["diffusion", "laplacian", "heat"],
       "gold_rationale": "The heat equation is u_t = α Δu: diffusion through the Laplacian of the field."
     },
@@ -266,7 +268,7 @@
       "id": "e4_x09",
       "pde": "harness",
       "facet": "ood",
-      "prompt": "Does VU-Bench claim temporal resolution transfer for the v0 FNO?",
+      "prompt": "Does Coticula claim temporal resolution transfer for the v0 FNO?",
       "expected_keywords": ["time", "channels", "transfer"],
       "gold_rationale": "No temporal transfer is claimed: time is locked as output channels, so only spatial transfer is probed."
     },
@@ -293,6 +295,102 @@
       "prompt": "Does a high Exam 4 keyword score mean the model explained the physics?",
       "expected_keywords": ["keyword", "rubric", "explanation"],
       "gold_rationale": "No. Exam 4 is a keyword rubric over expected law terms, not a trained explanation judge and not an LLM score."
+    },
+    {
+      "id": "e4_b13",
+      "pde": "burgers1d",
+      "facet": "trust",
+      "prompt": "Can a Burgers FNO beat PINO on Predict L2 while losing on the residual?",
+      "expected_keywords": ["residual", "l2", "untrusted"],
+      "gold_rationale": "Yes: a lower Predict L2 can coexist with a larger residual, so the fail-closed flag stays untrusted."
+    },
+    {
+      "id": "e4_b14",
+      "pde": "burgers1d",
+      "facet": "physics",
+      "prompt": "What produces kinetic-energy decay in periodic viscous Burgers?",
+      "expected_keywords": ["viscosity", "dissipation", "energy"],
+      "gold_rationale": "Viscosity produces dissipation, so the discrete kinetic energy decays on a periodic domain."
+    },
+    {
+      "id": "e4_h13",
+      "pde": "heat2d",
+      "facet": "counterfactual",
+      "prompt": "What does a tiny model trajectory Δ versus a large classical Δ at α′ indicate?",
+      "expected_keywords": ["counterfactual", "diffusion", "alpha"],
+      "gold_rationale": "The surrogate is counterfactual-insensitive: diffusion at the new alpha barely moves the field while the classical solve changes."
+    },
+    {
+      "id": "e4_h14",
+      "pde": "heat2d",
+      "facet": "numerics",
+      "prompt": "Contrast the v0 heat boundary condition with Burgers.",
+      "expected_keywords": ["dirichlet", "periodic", "boundary"],
+      "gold_rationale": "Heat uses Dirichlet walls at zero; Burgers is periodic. Both are boundary choices of the v0 labelers."
+    },
+    {
+      "id": "e4_x13",
+      "pde": "harness",
+      "facet": "explain",
+      "prompt": "What does the name Coticula mean for this harness?",
+      "expected_keywords": ["touchstone", "gold", "purity"],
+      "gold_rationale": "Coticula is Latin for touchstone: a stone used to test the purity of gold."
+    },
+    {
+      "id": "e4_x14",
+      "pde": "harness",
+      "facet": "explain",
+      "prompt": "Are rule-based Exam 4 scores the same as an LLM judge?",
+      "expected_keywords": ["keyword", "rubric", "llm"],
+      "gold_rationale": "No. Rule-based coverage is a keyword rubric on structured templates, not an LLM score."
+    },
+    {
+      "id": "e4_x15",
+      "pde": "harness",
+      "facet": "trust",
+      "prompt": "Why report a residual-versus-L2 scatter instead of a single ranking?",
+      "expected_keywords": ["residual", "l2", "tradeoff"],
+      "gold_rationale": "A residual versus L2 scatter shows the tradeoff: a model can win L2 and still lose the residual."
+    },
+    {
+      "id": "e4_x16",
+      "pde": "harness",
+      "facet": "counterfactual",
+      "prompt": "What does a counterfactual sensitivity sweep measure?",
+      "expected_keywords": ["counterfactual", "coefficient", "trajectory"],
+      "gold_rationale": "A counterfactual sensitivity sweep records how the trajectory changes as the coefficient is scaled."
+    },
+    {
+      "id": "e4_x17",
+      "pde": "harness",
+      "facet": "exams",
+      "prompt": "May Coticula invent SOTA numbers when a checkpoint is missing?",
+      "expected_keywords": ["not_trained", "fabricated", "sota"],
+      "gold_rationale": "No. Missing checkpoints stay not_trained. The harness does not emit fabricated SOTA."
+    },
+    {
+      "id": "e4_x18",
+      "pde": "harness",
+      "facet": "ood",
+      "prompt": "Why is longer-horizon temporal transfer not claimed for the v0 FNO?",
+      "expected_keywords": ["time", "channels", "horizon"],
+      "gold_rationale": "Time is locked as output channels, so a longer horizon is not a well-posed transfer claim."
+    },
+    {
+      "id": "e4_x19",
+      "pde": "harness",
+      "facet": "trust",
+      "prompt": "Does a trusted flag mean the surrogate understands the PDE?",
+      "expected_keywords": ["trusted", "residual", "understand"],
+      "gold_rationale": "No. Trusted only means in-support residual and L2 sit below documented cuts — not that the model understands the PDE."
+    },
+    {
+      "id": "e4_x20",
+      "pde": "harness",
+      "facet": "exams",
+      "prompt": "What numbers are allowed in Coticula reports?",
+      "expected_keywords": ["measured", "not_trained", "report"],
+      "gold_rationale": "Reports may contain only measured numbers. Absent models stay not_trained."
     }
   ]
 }

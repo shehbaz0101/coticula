@@ -2,7 +2,7 @@
 
 Architecture follows Li et al., ICLR 2021: lift → stacked (spectral conv +
 pointwise skip) → project. Time is lifted as output channels so one forward
-pass yields a full trajectory on the fixed VU-Bench grids.
+pass yields a full trajectory on the fixed Coticula grids.
 
 The initial condition is copied onto t=0 of the output (the operator predicts
 the *evolution*; IC is given). Heat-2D Dirichlet boundaries are zeroed.

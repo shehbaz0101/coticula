@@ -1,1 +1,1 @@
-"""VU-Bench CLI scripts."""
+"""Coticula CLI scripts."""

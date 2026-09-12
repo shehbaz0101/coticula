@@ -7,7 +7,7 @@ Coticula tests whether a PDE surrogate actually understands the physics, not jus
 
 **Repo:** https://github.com/shehbaz0101/coticula  
 **Brand:** coticula.ai (domain TBD)  
-**Author:** Shehbaz Pathan · v0.1.0
+**Author:** Shehbaz Pathan · v0.2 (research) / v0.1.0 (shipped harness)
 
 ---
 
@@ -37,7 +37,7 @@ Four exams, scored separately:
 | **1. Predict** | Can you match the field trajectory? |
 | **2. Conserve** | Do residuals / energy drift stay honest? |
 | **3. Counterfactual** | If I change viscosity / diffusivity, do you respond? |
-| **4. Explain** | Can short answers cite the right law? (keyword rubric in v0.1) |
+| **4. Explain** | Can short answers cite the right law? (48-item keyword rubric; rule-based baseline in v0.2) |
 
 Fail-closed trust flags: `ood` / `untrusted`. Pretty plots are not allowed to hide bad physics.
 
@@ -97,7 +97,7 @@ pytest -q
 | Version | Focus |
 |---------|--------|
 | **v0.1** | Harness + FNO/PINO + OOD + trust flags (shipped) |
-| **v0.2** | Stronger Exam 4, tighter writeup, more rigorous eval story |
+| **v0.2** | Stronger Exam 4 (48 items + rule-based grade), residual-vs-L2 / CF-sensitivity diagnostics, paper-style writeup (this increment) |
 | **Later** | Optional domain wedge or paper submission |
 
 ---

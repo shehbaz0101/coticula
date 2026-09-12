@@ -1,27 +1,25 @@
-# Cite-ready software citation for Coticula / Coticula.
+# Cite-ready software citation for Coticula.
 # GitHub "Cite this repository" reads this file. No DOI is registered yet.
 cff-version: 1.2.0
-message: If you use Coticula or Coticula, please cite it using these metadata.
+message: If you use Coticula, please cite it using these metadata.
 type: software
 title: "Coticula: a touchstone harness for PDE understanding"
 abstract: >-
-  Coticula Understanding Bench (Coticula) is a small understanding harness
-  for PDE surrogates. Four exams (Predict, Conserve, Counterfactual, Explain)
-  score whether a model has grasped the dynamics of viscous Burgers (1D) and
-  heat (2D), not just interpolated training trajectories. v0.1.0 packages the
-  Week 1–4 scaffold: classical finite-difference labels, laptop-scale FNO and
-  PINO-style baselines, OOD probes, fail-closed trust flags, a pinned Exam 4
-  item set, and SHA dataset pins. Reports contain only measured numbers;
-  missing checkpoints stay not_trained.
+  Coticula is a small understanding harness for PDE surrogates. Four exams
+  (Predict, Conserve, Counterfactual, Explain) score whether a model has
+  grasped the dynamics of viscous Burgers (1D) and heat (2D), not just
+  interpolated training trajectories. v0.2 adds a 48-item Exam 4 set with
+  rule-based (non-LLM) grades, residual-vs-L2 and counterfactual-sensitivity
+  diagnostics, and a short paper-style writeup. Reports contain only
+  measured numbers; missing checkpoints stay not_trained.
 authors:
   - family-names: Pathan
     given-names: Shehbaz
-version: "0.1.0"
+version: "0.2.0"
 date-released: "2026-09-12"
 url: "https://github.com/shehbaz0101/coticula"
 repository-code: "https://github.com/shehbaz0101/coticula"
 keywords:
-  - Coticula
   - Coticula
   - PDE
   - surrogate
@@ -30,10 +28,10 @@ keywords:
   - understanding harness
 preferred-citation:
   type: software
-  title: Coticula (Coticula)
+  title: Coticula
   authors:
     - family-names: Pathan
       given-names: Shehbaz
-  version: "0.1.0"
+  version: "0.2.0"
   url: "https://github.com/shehbaz0101/coticula"
   year: 2026

@@ -1,4 +1,4 @@
-"""Smoke tests for VU-Bench metrics, solvers, stubs, and report shape."""
+"""Smoke tests for Coticula metrics, solvers, stubs, and report shape."""
 from __future__ import annotations
 
 import json
@@ -149,9 +149,10 @@ def test_report_exists_after_pipeline():
         assert gold["status"] == "keyword_rubric"
         assert gold["n_items"] >= 15
         assert data["exams"]["explain"]["llm"].get("score") is None
-    if "vu" in data:
-        assert data["vu"] == "Vermithor Understanding Bench"
-        assert data.get("project") == "Vermithor"
+    if "project" in data:
+        assert data["project"] == "Coticula"
+    if data.get("bench"):
+        assert "coticula" in str(data["bench"]).lower() or "vu-bench" in str(data["bench"])
     # Week 3: OOD is a distinct block, never mixed into Exam 1 IID tables.
     if data.get("ood"):
         assert "probes" in data["ood"]

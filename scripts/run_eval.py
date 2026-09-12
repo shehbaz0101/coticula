@@ -1,11 +1,12 @@
-"""Run VU-Bench exams: classical FD + trained FNO/PINO (if checkpoints exist).
+"""Run Coticula exams: classical FD + trained FNO/PINO (if checkpoints exist).
 
 Writes reports/latest.json and reports/latest.md with **only measured numbers**.
 Missing checkpoints stay `not_trained`. Exam 4 grades a pinned item set
-against expected law keywords. The LLM hook is env-gated and is not scored
-unless a real judge is wired (never fabricated).
+against expected law keywords and optional structured (non-LLM) baselines.
+The LLM hook is env-gated and is not scored unless a real judge is wired
+(never fabricated).
 
-Week 3: OOD / transfer probes (param, resolution, IC family) are a separate
+OOD / transfer probes (param, resolution, IC family) are a separate
 section from IID exams 1–3. Fail-closed trust flags (`ood` / `untrusted`)
 travel with the numbers. Use ``--skip-ood`` for IID-only.
 """
@@ -25,16 +26,22 @@ if str(ROOT) not in sys.path:
 from baselines import llm as llm_mod
 from baselines.classical.burgers1d import solve_burgers
 from baselines.classical.heat2d import solve_heat2d
-from baselines.fno.io import (
-    DEFAULT_BURGERS,
-    DEFAULT_HEAT,
-    DEFAULT_PINO_BURGERS,
-    DEFAULT_PINO_HEAT,
-    load_checkpoint,
-)
+CHECKPOINT_DIR = ROOT / "checkpoints"
+DEFAULT_BURGERS = CHECKPOINT_DIR / "fno_burgers.pt"
+DEFAULT_HEAT = CHECKPOINT_DIR / "fno_heat2d.pt"
+DEFAULT_PINO_BURGERS = CHECKPOINT_DIR / "pino_burgers.pt"
+DEFAULT_PINO_HEAT = CHECKPOINT_DIR / "pino_heat2d.pt"
 from metrics.conserve import audit_burgers, audit_heat
 from metrics.counterfactual import burgers_counterfactual, heat_counterfactual
-from metrics.explain import grade_exam4, llm_judge_exam4, score_explanation
+from metrics.diagnostics import build_diagnostics
+from metrics.explain import (
+    grade_exam4,
+    grade_metric_dump_exam4,
+    grade_rule_based_exam4,
+    llm_judge_exam4,
+    observations_from_report,
+    score_explanation,
+)
 from metrics.predict import batch_relative_l2
 from metrics.trust import (
     BURGERS_TRAIN_SUPPORT,
@@ -204,6 +211,7 @@ def _eval_learned(
         return _not_trained(name, "torch_not_installed")
 
     from baselines.fno.eval_exams import eval_burgers_operator, eval_heat_operator
+    from baselines.fno.io import load_checkpoint
 
     device = _torch_device()
     loaded_b = load_checkpoint(burgers_ckpt, device=device)
@@ -368,6 +376,7 @@ def build_report(
     pino_ex: dict,
     ood: dict | None = None,
     failure_analysis: dict | None = None,
+    diagnostics: dict | None = None,
 ) -> dict:
     rationale = (
         "The viscous Burgers equation balances nonlinear advection against "
@@ -378,13 +387,13 @@ def build_report(
     explain = score_explanation(rationale)
     exam4 = grade_exam4(use_gold=True)
     llm_block = llm_explain_section()
-
-    return {
-        "bench": "vu-bench-v0",
-        "project": "Vermithor",
-        "vu": "Vermithor Understanding Bench",
-        "repo": "https://github.com/shehbaz0101/vermithor",
-        "week": 4,
+    draft = {
+        "bench": "coticula-v0",
+        "project": "Coticula",
+        "brand": "Coticula",
+        "formerly": "Vermithor / VU-Bench",
+        "repo": "https://github.com/shehbaz0101/coticula",
+        "version": "0.2.0",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "trust_policy": TRUST_POLICY,
         "exams": {
@@ -413,7 +422,9 @@ def build_report(
             "explain": {
                 "description": (
                     "Exam 4: fixed item set graded by expected law-keyword coverage. "
-                    "LLM judge stays not_trained unless a real judge is wired."
+                    "Gold = authored ceiling. rule_based = facet templates + measured "
+                    "observations. metric_dump = numbers only. LLM stays not_trained "
+                    "unless a real judge is wired."
                 ),
                 "n_items": exam4["n_items"],
                 "item_set": exam4["item_set"],
@@ -431,7 +442,15 @@ def build_report(
         },
         "ood": ood,
         "failure_analysis": failure_analysis,
+        "diagnostics": diagnostics,
     }
+    obs = observations_from_report(draft)
+    draft["exams"]["explain"]["observations"] = obs
+    draft["exams"]["explain"]["rule_based"] = grade_rule_based_exam4(obs)
+    draft["exams"]["explain"]["metric_dump"] = grade_metric_dump_exam4(obs)
+    if diagnostics is None:
+        draft["diagnostics"] = build_diagnostics(draft)
+    return draft
 
 
 def _fmt_pred(block: dict | None, pde: str) -> str:
@@ -476,11 +495,32 @@ def _exam4_md_lines(explain: dict, stub: dict) -> list[str]:
         f"- Gold-reference keyword coverage: `{mean_s}` "
         f"(status: {gold.get('status', 'keyword_rubric')}) — authored gold texts vs expected law keywords, not a model score.",
         f"- Perfect / zero items: `{gold.get('n_perfect', '—')}` / `{gold.get('n_zero', '—')}`",
+    ]
+    rb = explain.get("rule_based") or {}
+    dump = explain.get("metric_dump") or {}
+    if rb:
+        rb_mean = rb.get("mean_coverage")
+        rb_s = f"{rb_mean:.4f}" if isinstance(rb_mean, (int, float)) else "—"
+        lines.append(
+            f"- Rule-based (facet templates + measured observations): `{rb_s}` "
+            f"(status: {rb.get('status')}; perfect/zero `{rb.get('n_perfect')}` / `{rb.get('n_zero')}`) "
+            "— not an LLM score."
+        )
+    if dump:
+        d_mean = dump.get("mean_coverage")
+        d_s = f"{d_mean:.4f}" if isinstance(d_mean, (int, float)) else "—"
+        lines.append(
+            f"- Metric-dump (numbers only): `{d_s}` "
+            f"(status: {dump.get('status')}) — rubric negative control."
+        )
+    lines.extend(
+        [
         f"- Legacy single-rationale stub overall: `{stub['overall']:.4f}` (status: {stub['status']})",
         f"- LLM: `{explain['llm']['status']}` — {explain['llm'].get('note', '')} "
         f"(score={explain['llm'].get('score')})",
         "",
-    ]
+        ]
+    )
     by_pde = gold.get("by_pde") or {}
     if by_pde:
         lines.append("| PDE / slice | n | mean keyword coverage |")
@@ -525,12 +565,21 @@ def render_md(report: dict) -> str:
         )
 
     lines = [
-        "# Vermithor VU-Bench v0 — latest eval (Week 4)",
+        "# Coticula v0.2 — latest eval",
         "",
         f"_Generated (UTC): {report['generated_at_utc']}_",
         "",
-        "**VU = Vermithor Understanding Bench** (not the `uv` Python packager).",
-        "Project: **Vermithor**. Repo: https://github.com/shehbaz0101/vermithor",
+        "**Coticula** (Latin *coticula*, touchstone). "
+        "Formerly Vermithor / VU-Bench. Repo: https://github.com/shehbaz0101/coticula",
+    ]
+    if report.get("iid_ood_measured_at_utc"):
+        lines.append(
+            f"_IID Exam 1–3 / OOD measured at: {report['iid_ood_measured_at_utc']}_"
+        )
+    if report.get("refresh_note"):
+        lines.append(f"_{report['refresh_note']}_")
+    lines.extend(
+        [
         "",
         "## Exam 1 — Predict",
         "",
@@ -583,9 +632,11 @@ def render_md(report: dict) -> str:
         "## Exam 4 — Explain",
         "",
         *_exam4_md_lines(ex["explain"], expl),
-    ]
+        ]
+    )
     lines.extend(_render_ood_md(report.get("ood")))
     lines.extend(_render_failure_md(report.get("failure_analysis")))
+    lines.extend(_render_diagnostics_md(report.get("diagnostics")))
     lines.extend(
         [
             "## Notes",
@@ -594,7 +645,8 @@ def render_md(report: dict) -> str:
             "- OOD numbers are a separate section: fresh classical solves outside train support.",
             "- FNO / PINO numbers appear only when a checkpoint loads; otherwise `not_trained`.",
             "- No fabricated SOTA. Exam 4 is a pinned keyword item set, not a trained judge.",
-            "- VU = Vermithor Understanding Bench. Non-goals: no chip cooling, no AU-scale FM.",
+            "- Rule-based Exam 4 is structured templates + measured observations, not an LLM.",
+            "- Coticula. Non-goals: no chip cooling, no AU-scale FM.",
             "",
         ]
     )
@@ -661,6 +713,91 @@ def _render_ood_md(ood: dict | None) -> list[str]:
     return lines
 
 
+def _render_diagnostics_md(diag: dict | None) -> list[str]:
+    if not diag:
+        return [
+            "## Diagnostics (v0.2)",
+            "",
+            "- skipped this run",
+            "",
+        ]
+    scatter = diag.get("residual_vs_l2") or {}
+    labels = diag.get("labels") or {}
+    lines = [
+        "## Diagnostics (v0.2)",
+        "",
+        diag.get("description", ""),
+        "",
+        "### Residual vs L2 scatter (measured IID + OOD points)",
+        "",
+        f"- n points: `{scatter.get('n', 0)}` (status: {scatter.get('status')})",
+        f"- Pearson residual vs L2: `{scatter.get('pearson_residual_vs_l2')}`",
+        f"- Spearman residual vs L2: `{scatter.get('spearman_residual_vs_l2')}`",
+        f"- residual median / max: `{scatter.get('residual_median')}` / `{scatter.get('residual_max')}`",
+        f"- Predict L2 median / max: `{scatter.get('rel_l2_median')}` / `{scatter.get('rel_l2_max')}`",
+        f"- untrusted / ood among points: `{scatter.get('n_untrusted')}` / `{scatter.get('n_ood')}`",
+        "",
+    ]
+    pts = scatter.get("points") or []
+    if pts:
+        lines.append("| model | split | probe | rel-L2 | residual | trust |")
+        lines.append("|---|---|---|---:|---:|---|")
+        for p in pts:
+            lines.append(
+                f"| {p.get('model')} | {p.get('split')} | {p.get('probe')} | "
+                f"{p['rel_l2']:.3e} | {p['residual']:.3e} | {p.get('trust') or '—'} |"
+            )
+        lines.append("")
+
+    def _cf_table(block: dict | None, title: str) -> list[str]:
+        if not block or block.get("status") != "ok":
+            return [f"- {title}: `not_trained` / skipped", ""]
+        out = [f"### {title}", ""]
+        out.append("| scale | θ′ | classical traj Δ | model traj Δ | model vs classical |")
+        out.append("|---:|---:|---:|---:|---:|")
+        for row in block.get("rows") or []:
+            theta = row.get("nu_cf", row.get("alpha_cf"))
+            m_delta = row.get("model_traj_delta")
+            m_vs = row.get("model_vs_classical_cf")
+            out.append(
+                f"| {row['scale']:.2f} | {theta:.4g} | "
+                f"{row['classical_traj_delta']:.3e} | "
+                f"{'—' if m_delta is None else f'{m_delta:.3e}'} | "
+                f"{'—' if m_vs is None else f'{m_vs:.3e}'} |"
+            )
+        out.append("")
+        return out
+
+    burgers = (labels.get("burgers") or {}) if isinstance(labels, dict) else {}
+    heat = (labels.get("heat2d") or {}) if isinstance(labels, dict) else {}
+    if labels.get("status") == "skipped":
+        lines.append(f"- Label diagnostics skipped: `{labels.get('reason')}`")
+        lines.append("")
+    else:
+        hz_b = burgers.get("horizon_residual") or {}
+        hz_h = heat.get("horizon_residual") or {}
+        if hz_b.get("status") == "ok":
+            lines.extend(
+                [
+                    "### Horizon residual split (classical labels)",
+                    "",
+                    f"- Burgers early / late / full: "
+                    f"`{hz_b['residual_early']:.3e}` / `{hz_b['residual_late']:.3e}` / "
+                    f"`{hz_b['residual_full']:.3e}` (late−early `{hz_b['late_minus_early']:.3e}`)",
+                ]
+            )
+        if hz_h.get("status") == "ok":
+            lines.append(
+                f"- Heat early / late / full: "
+                f"`{hz_h['residual_early']:.3e}` / `{hz_h['residual_late']:.3e}` / "
+                f"`{hz_h['residual_full']:.3e}` (late−early `{hz_h['late_minus_early']:.3e}`)"
+            )
+        lines.append("")
+        lines.extend(_cf_table(burgers.get("cf_sensitivity"), "Burgers CF sensitivity (classical)"))
+        lines.extend(_cf_table(heat.get("cf_sensitivity"), "Heat CF sensitivity (classical)"))
+    return lines
+
+
 def _render_failure_md(fa: dict | None) -> list[str]:
     if not fa or not fa.get("notes"):
         return [
@@ -703,7 +840,7 @@ def _json_default(obj):
 def main(argv: list[str] | None = None) -> None:
     import argparse
 
-    p = argparse.ArgumentParser(description="VU-Bench IID exams + optional OOD probes")
+    p = argparse.ArgumentParser(description="Coticula IID exams + optional OOD probes")
     p.add_argument(
         "--skip-ood",
         action="store_true",
@@ -742,6 +879,9 @@ def main(argv: list[str] | None = None) -> None:
         ood = evaluate_ood()
     fa = build_failure_analysis(b_ex, h_ex, fno_ex, pino_ex, ood)
     report = build_report(b_ex, h_ex, fno_ex, pino_ex, ood=ood, failure_analysis=fa)
+    report["diagnostics"] = build_diagnostics(
+        report, labels={"burgers": burgers, "heat": heat}
+    )
 
     out_dir = ROOT / "reports"
     out_dir.mkdir(parents=True, exist_ok=True)

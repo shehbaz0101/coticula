@@ -51,7 +51,7 @@ def dump_canonical(payload: dict) -> str:
 
 def write_manifest(entries: list[dict], out_path: Path, **extra) -> dict:
     payload = {
-        "version": "vu-bench-v0",
+        "version": "coticula-v0",
         "n_files": len(entries),
         "files": entries,
         **extra,
@@ -95,7 +95,7 @@ def ood_generator_contract() -> dict:
     from metrics.trust import BURGERS_TRAIN_SUPPORT, HEAT_TRAIN_SUPPORT
 
     return {
-        "version": "vu-bench-v0",
+        "version": "coticula-v0",
         "kind": "ood_generators",
         "note": (
             "OOD trajectories are generated on the fly from this recipe. "

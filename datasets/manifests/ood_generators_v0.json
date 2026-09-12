@@ -1,10 +1,10 @@
 {
-  "version": "vu-bench-v0",
+  "version": "coticula-v0",
   "n_files": 1,
   "files": [
     {
       "path": "datasets/ood/probe_plan_v0.json",
-      "sha256": "7a8e6df8ac8d76dc5192884f077b88d0eed0abd4edb28cf9e6f07eded5c4041a",
+      "sha256": "259138513a950b36a052807341f35ac2c3f3fcf1c5c817825468992d21592074",
       "bytes": 4319
     }
   ],

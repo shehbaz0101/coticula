@@ -19,7 +19,7 @@ from datasets.pins import pin_all
 
 
 def main(argv: list[str] | None = None) -> None:
-    p = argparse.ArgumentParser(description="Write SHA manifests for VU-Bench pins")
+    p = argparse.ArgumentParser(description="Write SHA manifests for Coticula pins")
     p.add_argument(
         "--require-labels",
         action="store_true",
