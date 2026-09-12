@@ -50,14 +50,15 @@ plus the `--smoke` trains above on `ubuntu-latest`. Full `generate_labels` /
 `run_eval` is **not** in CI (NPZ labels are gitignored; a full train is heavier
 than a PR check).
 
-## Week 1–4 status
+## Week 1–5 status
 
 | Week | Status | What shipped |
 |------|--------|----------------|
 | 1 | done | Classical FD labels, exam APIs, eval harness, smoke tests |
 | 2 | done | Laptop-scale FNO + PINO residual; Exams 1–3 measured when a `*.pt` loads |
 | 3 | done | OOD probes (param / resolution / IC), fail-closed trust, [WRITEUP.md](docs/WRITEUP.md) |
-| 4 | this | GitHub Actions CI, Exam 4 **fixed item set** (36 law-keyword items), SHA pins for labels + OOD generators, README polish |
+| 4 | done | GitHub Actions CI, Exam 4 **fixed item set** (36 law-keyword items), SHA pins for labels + OOD generators, README polish |
+| 5 | this | Cite-ready v0.1.0 packaging: `CITATION.cff`, changelog, release notes. **No new metrics.** |
 
 ## How to read trust flags
 
@@ -116,6 +117,10 @@ vermithor/
   .github/workflows/ci.yml
   docs/DESIGN.md
   docs/WRITEUP.md
+  docs/RELEASE_v0.1.0.md
+  CITATION.cff
+  CHANGELOG.md
+  RELEASE_NOTES.md            # paste into gh release create after tag
   reports/latest.{json,md}
 ```
 
@@ -159,6 +164,24 @@ Useful knobs (all have small defaults): `--epochs`, `--width`, `--modes`,
 
 `run_eval` always scores the classical solver. It loads FNO / PINO only when a
 checkpoint is present. It does **not** invent metrics.
+
+## Cite / Release
+
+**v0.1.0** packages Weeks 1–4 of this harness. Cite the software with
+[`CITATION.cff`](CITATION.cff) (author: Shehbaz Pathan; version 0.1.0;
+https://github.com/shehbaz0101/vermithor). GitHub’s “Cite this repository”
+button reads that file.
+
+A GitHub Release for annotated tag `v0.1.0` is intended **after** this
+packaging merges to `main` — this repo increment does not cut the tag.
+What’s in the tag, how to reproduce, and non-claims:
+[`docs/RELEASE_v0.1.0.md`](docs/RELEASE_v0.1.0.md).
+Changelog (no duplicated tables): [`CHANGELOG.md`](CHANGELOG.md).
+Pasteable release body for the parent: [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
+
+Measured numbers stay in [`docs/WRITEUP.md`](docs/WRITEUP.md) and
+[`reports/latest.md`](reports/latest.md). This packaging does **not** invent
+metrics.
 
 ## Non-goals (unchanged)
 
