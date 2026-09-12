@@ -358,11 +358,11 @@ def _exam_cf_block(section: dict) -> dict:
     return block
 
 
-def _trust_status(section: dict | None) -> str | None:
-    if not section:
-        return None
+def _trust_status(section: dict | None) -> str:
+    if not section or section.get("status") == "not_trained":
+        return "not_trained"
     trust = section.get("trust") or {}
-    return trust.get("status")
+    return str(trust.get("status") or section.get("status") or "not_trained")
 
 
 def build_report(
@@ -572,6 +572,15 @@ def render_md(report: dict) -> str:
     return "\n".join(lines)
 
 
+def _fmt_trust_summary(summary: dict | None) -> str:
+    if not summary:
+        return "—"
+    counts = summary.get("counts") or {}
+    n = summary.get("n_scored", 0)
+    parts = [f"{k}={v}" for k, v in counts.items() if v]
+    return f"n={n} ({', '.join(parts)})"
+
+
 def _ood_cell(block: dict | None) -> str:
     if not block:
         return "—"
@@ -597,7 +606,7 @@ def _render_ood_md(ood: dict | None) -> list[str]:
         ood.get("description", ""),
         "",
         f"- Resolution note: {ood.get('resolution_note', '')}",
-        f"- Trust rollup: `{ood.get('trust_summary')}`",
+        f"- Trust rollup: `{_fmt_trust_summary(ood.get('trust_summary'))}`",
         "",
         "| Probe | param / grid / IC | classical residual | FNO L2 / residual [trust] | PINO L2 / residual [trust] |",
         "|---|---|---:|---|---|",
