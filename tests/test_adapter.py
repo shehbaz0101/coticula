@@ -69,7 +69,10 @@ def test_reading_states_predict_pass_and_conserve_fail():
         "explain": {},
     }
     text = " ".join(reading_lines(card))
-    assert "inside the Predict cut" in text
-    assert "outside the Conserve cut" in text
+    assert "under the 0.5 cut" in text
+    assert "over the 1 cut" in text
     assert "untrusted" in text
+    assert "residual_too_high" in text
+    assert "passes" not in text.lower()
+    assert "fails" not in text.lower()
     assert "accurate" not in text.lower()

@@ -16,13 +16,20 @@ Interview-demo polish. No new measurements and no new checkpoints.
 
 ### Changed
 
-- Field plots wrap the trust warning so the full banner is visible at the
-  saved figure size. That covers `field_burgers_fno.png` and
-  `field_heat2d_fno.png`. The bar charts were checked for the same clipping.
+- Field-plot titles are a short measured caption (Predict, residual, flag)
+  wrapped so they fit the figure. `field_burgers_fno.png` and
+  `field_heat2d_fno.png` were checked, and so were the bar charts. The long
+  trust-module banner stays in the JSON and is not the plot headline.
 - `coticula demo` and `coticula grade` print an aligned scorecard. Color is
   used when stdout is a TTY, and plain text otherwise. Terminal numbers are
   short (`0.157`). JSON and Markdown keep full precision. Each model ends
-  with a plain-English verdict, and the trust flag still matches its reasons.
+  with the measured values and the flag, for example
+  `fno: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)`.
+- The residual flag is described as a roughness indicator. A noise probe,
+  `python -m scripts.probe_residual_noise`, measured residual rel-L2
+  1.134730e+00 after 1% white noise on one exact Burgers trajectory. The
+  trust rule is unchanged. The README leads with the reproduced
+  counterfactual comparison.
 - The terminal output and the README name the evaluation set. `demo` scores
   the checkpoint holdout (Burgers 12, heat 8). `grade` scores that holdout
   when a shipped checkpoint is loaded, and every trajectory otherwise

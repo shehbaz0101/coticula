@@ -549,16 +549,6 @@ def reading_lines(card: dict) -> list[str]:
                 f"Residual rel-L2 {res:.6e} is {res_side} the {res_cut:g} cut. "
                 f"Trust is {trust} ({reasons})."
             )
-            if (
-                row.get("role") != "labeler"
-                and pred <= pred_cut
-                and res > res_cut
-                and trust == "untrusted"
-            ):
-                lines.append(
-                    f"Fail-closed: {name} on {pde} is inside the Predict cut and outside "
-                    f"the Conserve cut, so the flag is untrusted."
-                )
             cf = row.get("counterfactual") or {}
             model_delta = cf.get("rel_l2_traj_delta_model")
             class_delta = cf.get("rel_l2_traj_delta_classical")

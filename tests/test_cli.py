@@ -31,6 +31,9 @@ def test_demo_smoke_writes_scorecard(tmp_path: Path):
     assert pngs, "expected at least one PNG plot"
     html = (tmp_path / "report.html").read_text(encoding="utf-8")
     assert "Fail-closed" in html
+    assert "Known limitation" in html
+    assert "1.134730e+00" in html
+    assert "silent pretty" not in html
     assert "persist_ic" in html
 
 
@@ -97,11 +100,14 @@ def test_shipped_fno_burgers_fails_closed_on_conserve():
     assert ood_row["trust"]["status"] == "untrusted"
     assert "param_shift" in ood_row["trust"]["reasons"]
     text = " ".join(card["reading"])
-    assert "inside the Predict cut" in text
+    assert "under the 0.5 cut" in text
     assert "accurate" not in text.lower()
     plain = terminal_scorecard(card, color=False)
-    assert "fno: passes Predict, fails Conserve, so untrusted" in plain
-    assert "persist_ic: passes Predict, passes Conserve, so trusted" in plain
+    assert "fno: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)" in plain
+    assert "persist_ic: Predict " in plain
+    assert "passes Predict" not in plain
+    assert "fails Conserve" not in plain
+    assert "violat" not in plain.lower()
     assert "\x1b" not in plain
     colored = terminal_scorecard(card, color=True)
     assert "\x1b[31m" in colored
@@ -117,7 +123,9 @@ def test_verdict_lines_match_the_trust_flag():
         "conserve": {"residual_rel_l2": 4.848762},
         "trust": {"status": "untrusted", "reasons": ["residual_too_high"]},
     }
-    assert verdict_line(fno) == "fno: passes Predict, fails Conserve, so untrusted"
+    assert verdict_line(fno) == (
+        "fno: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)"
+    )
     ood = {
         "name": "persist_ic",
         "status": "ok",
@@ -127,8 +135,7 @@ def test_verdict_lines_match_the_trust_flag():
         "trust": {"status": "ood", "reasons": ["resolution_shift"]},
     }
     assert verdict_line(ood) == (
-        "persist_ic: passes Predict, passes Conserve, "
-        "outside train support (resolution_shift), so ood"
+        "persist_ic: Predict 0.200, residual 0.400 (flag: ood, resolution_shift)"
     )
     both = {
         "name": "fno",
@@ -142,12 +149,12 @@ def test_verdict_lines_match_the_trust_flag():
         },
     }
     assert verdict_line(both) == (
-        "fno: fails Predict, fails Conserve, "
-        "also outside train support (param_shift), so untrusted"
+        "fno: Predict 0.570, residual 6.350 "
+        "(flag: untrusted, param_shift, residual_too_high, predict_l2_too_high)"
     )
     assert verdict_line(
         {"name": "pino", "status": "not_trained", "reason": "missing_checkpoint"}
-    ) == "pino: no checkpoint shipped, so not_trained"
+    ) == "pino: no checkpoint shipped (flag: not_trained)"
     assert verdict_line(
         {
             "name": "classical_fd",
@@ -157,7 +164,7 @@ def test_verdict_lines_match_the_trust_flag():
             "conserve": {"residual_rel_l2": 0.013},
             "trust": {"status": "reference", "reasons": []},
         }
-    ) == "classical_fd: reference labeler, not a learned trust score"
+    ) == "classical_fd: Predict 0.000, residual 0.013 (flag: reference)"
 
 
 def test_terminal_uses_short_numbers_and_markdown_keeps_full_precision():
@@ -205,7 +212,9 @@ def test_terminal_uses_short_numbers_and_markdown_keeps_full_precision():
     assert "0.157" in plain
     assert "4.849" in plain
     assert "1.573143e-01" not in plain
-    assert "fno: passes Predict, fails Conserve, so untrusted" in plain
+    assert "fno: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)" in plain
+    assert "passes" not in plain
+    assert "fails" not in plain
     assert "checkpoint holdout" in plain
     assert "\x1b" not in plain
     assert "\x1b" not in terminal_scorecard(card)
@@ -259,6 +268,7 @@ def test_published_split_sizes():
 
 def test_generated_plots_keep_text_inside_the_figure(tmp_path: Path):
     pytest.importorskip("matplotlib")
+    from coticula.report import _field_caption
     from metrics.trust import refuse_silent_heatmap
 
     banner = refuse_silent_heatmap(
@@ -281,6 +291,7 @@ def test_generated_plots_keep_text_inside_the_figure(tmp_path: Path):
                         "status": "ok",
                         "predict": {"rel_l2_mean": 0.157},
                         "conserve": {"residual_rel_l2": 4.849},
+                        "trust": {"status": "untrusted", "reasons": ["residual_too_high"]},
                     },
                     {
                         "name": "pino",
@@ -322,6 +333,10 @@ def test_generated_plots_keep_text_inside_the_figure(tmp_path: Path):
             "name": "fno",
         },
     }
+    caption = _field_caption("burgers", {"name": "fno", "banner": banner}, card["pdes"]["burgers"])
+    assert caption == "burgers fno: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)"
+    assert "pretty" not in caption.lower()
+    assert "silent" not in caption.lower()
     names = write_plots(card, arrays, tmp_path)
     assert "field_burgers_fno.png" in names
     assert "field_heat2d_fno.png" in names
