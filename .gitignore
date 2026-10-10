@@ -10,3 +10,7 @@ build/
 *.npz
 .ipynb_checkpoints/
 checkpoints/_smoke_*.pt
+reports/demo/
+reports/demo-ci/
+reports/grade/
+smoke_fno_burgers.pt
