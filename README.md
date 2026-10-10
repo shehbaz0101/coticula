@@ -1,225 +1,257 @@
 # Coticula
 
-**Coticula** (Latin *coticula*, touchstone): a stone used to test whether gold is pure.
-This repo is a touchstone for PDE surrogates.
+Coticula (Latin *coticula*, touchstone) is a small harness for PDE surrogates
+on 1D viscous Burgers and 2D heat. On the shipped FNO, the counterfactual
+exam is the result that holds up: the heat model barely moves when
+diffusivity changes, and the classical solver does not. Predict error and a
+strong-form residual are reported beside that. The residual flag is a
+roughness indicator, not evidence that the physics is violated (see Known
+limitation). Flags are `trusted`, `ood`, `untrusted`, or `reference`.
+Missing checkpoints stay `not_trained`.
 
-Repo: [github.com/shehbaz0101/coticula](https://github.com/shehbaz0101/coticula)
-Brand site target: **coticula.ai** (register the domain when you are ready).
-
-I built this as a small, reproducible way to test whether physics models actually
-understand the dynamics, not just fit training trajectories.
-
-Four exams on Burgers (1D) and the heat equation (2D):
-
-1. **Predict** field trajectories
-2. **Conserve** PDE residuals / energy drift
-3. **Counterfactual** response when a coefficient changes
-4. **Explain** short answers with a keyword rubric
-
-Baselines: classical finite differences, a tiny FNO, and a PINO-style physics loss.
-Reports only include measured numbers. Missing checkpoints stay `not_trained`.
-
-One-pager: [docs/ONEPAGER.md](docs/ONEPAGER.md) ·
-Writeup: [docs/WRITEUP.md](docs/WRITEUP.md) ·
-Design: [docs/DESIGN.md](docs/DESIGN.md)
-
-## Status (v0.2)
-
-Research increment on top of shipped **v0.1.0**. Exam 4 is a **48-item**
-pinned set with gold / rule-based / metric-dump keyword grades (no invented
-LLM scores). Diagnostics add a residual-vs-L2 scatter of measured IID+OOD
-points and a classical counterfactual sensitivity sweep. Reports still
-contain only measured numbers.
-
-## Outcomes (v0.1.0)
-
-- Public understanding harness with one-command eval and OOD probes
-- Fail-closed trust flags (`ood` / `untrusted`)
-- Measured tradeoff: FNO can look better on L2 while residual stays worse than PINO
-- CI on GitHub Actions
-- Cite-ready packaging (`CITATION.cff`)
-
-Release: https://github.com/shehbaz0101/coticula/releases/tag/v0.1.0
+Repo: https://github.com/shehbaz0101/coticula
 
 ## Quickstart
 
-Python 3.11+ and NumPy / SciPy. Torch is optional for classical-only eval
-and is required to train or score FNO / PINO.
+Python 3.11+, NumPy, SciPy. PyTorch is required to score the shipped FNO and
+PINO checkpoints. Matplotlib writes the PNG plots (`pip install -e ".[dev]"`
+or `".[plot]"`).
 
 ```bash
-pip install -e ".[dev]"          # classical + pytest
-pip install -e ".[dev,torch]"    # + PyTorch (CPU is enough)
+pip install -e ".[dev]"
+pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-python -m scripts.generate_labels   # IID NPZ + refresh SHA pins
-python -m scripts.verify_manifests  # Exam 4 + OOD recipe; skip missing NPZ
+coticula demo --out reports/demo
+# same entry point: python -m coticula demo --out reports/demo
+```
 
-# Tiny FNO / PINO (laptop / single-GPU friendly)
+That command grades the shipped checkpoints on the checkpoint holdout, plus
+the toy adapter in `examples/persist_ic.py`. It prints a scorecard and writes
+`scorecard.json`, `scorecard.md`, `report.html`, and PNG plots under
+`reports/demo/`. Open `report.html` in a browser. CPU, about a few seconds.
+If the label NPZ files are missing, the demo builds them in memory with the
+same recipe as `python -m scripts.generate_labels` (Burgers seed 0, heat seed 1).
+
+`coticula demo` scores the checkpoint holdout stored on the shipped FNO
+weights: 12 Burgers trajectories (indices 36-47 of 48) and 8 heat
+trajectories (indices 24-31 of 32). The terminal scorecard names that set.
+Numbers there are short (`0.157`). `scorecard.json` and `scorecard.md` keep
+the full precision.
+
+`coticula grade` does not always use that holdout. `--model fno` or
+`--model pino` loads the checkpoint and scores the same indices as demo.
+`--adapter`, or `--model persist_ic` with no checkpoint, scores every
+trajectory (Burgers 48, heat 32). That is why a `persist_ic` number from
+`grade` can differ from the demo table. `--split holdout` forces the demo
+indices. Exam 4 rule-based and metric-dump can still differ on that shared
+holdout, because those scores append the FNO and PINO rows on the card.
+`grade` includes one model. See Results.
+
+```bash
+coticula grade --model fno --pde burgers --out reports/grade
+coticula grade --model pino --pde burgers
+coticula grade --adapter examples/persist_ic.py:PersistIC --pde burgers --split holdout
+```
+
+The older scripts still work:
+
+```bash
+python -m scripts.generate_labels
+python -m scripts.run_eval
+python -m scripts.run_ood
 python -m scripts.train_fno --pde burgers
-python -m scripts.train_fno --pde heat2d
-python -m scripts.train_pino --pde burgers
-
-python -m scripts.run_eval          # IID exams 1-4 + OOD + trust flags
-python -m scripts.run_ood           # OOD only → reports/ood.json
-python -m scripts.run_eval --skip-ood
 pytest -q
 ```
 
-CPU CI / smoke (no labels needed; this is what GitHub Actions runs):
+`coticula demo --smoke` trains a 1-epoch FNO on a 16-point Burgers grid. That
+path is for a tiny check. It is not the shipped checkpoint. CI runs the real
+`coticula demo` plus `pytest` and the existing `--smoke` trainers.
+
+## Results
+
+Two commands, both run on 2026-10-10. Learned cells match across them.
+Classical residuals do not, because the commands do not use the same slice.
+`scripts.run_eval` re-solves the first trajectories. `coticula demo` re-solves
+the checkpoint holdout (Burgers indices 36-47, 12 trajectories; heat indices
+24-31, 8 trajectories). `coticula grade --model fno` or `--model pino` uses
+that same holdout. `coticula grade` of an adapter, with no shipped checkpoint
+loaded, scores every trajectory (Burgers 48, heat 32) unless you pass
+`--split holdout`.
+
+Harness table, stdout of `python -m scripts.render_results_table` after
+`python -m scripts.run_eval` (generated 2026-10-10T04:03:32Z). The PINO
+heat2d cell is annotated; the script prints `not_trained`.
+
+| model | pde | Predict rel-L2 | residual rel-L2 | trust |
+|---|---|---:|---:|---|
+| classical_fd | burgers | 0.000000e+00 | 1.438256e-02 | reference |
+| classical_fd | heat2d | 0.000000e+00 | 3.033189e-02 | reference |
+| fno | burgers | 1.573143e-01 | 4.848762e+00 | untrusted |
+| fno | heat2d | 3.221335e-01 | 1.303385e+01 | untrusted |
+| pino | burgers | 1.880157e-01 | 1.732850e+00 | untrusted |
+| pino | heat2d | - | - | not_trained (no checkpoint shipped, to keep the repo small) |
+
+Exam 4 n=48 sha256=48323ca8ea9d8277 gold=1.000000 rule-based=0.878472 metric-dump=0.090278 llm=not_trained
+
+Residual-vs-L2 points n=21 pearson=0.7411755514841815 spearman=0.34155844155844156 untrusted=21 ood_flag=0
+
+PINO heat2d is `not_trained`: no checkpoint shipped, to keep the repo small.
+All 21 learned IID and OOD points in the scatter carry `untrusted`, because
+the residual is also over the cut, and that flag wins over `ood`. That
+residual flag is the roughness indicator in Known limitation, not a separate
+physics verdict.
+
+Demo holdout, copied from `reports/demo/scorecard.md` written by
+`coticula demo --out reports/demo` at 2026-10-10T04:04:17Z. FNO and PINO
+Predict and residual cells match the harness table.
+
+| model | pde | Predict rel-L2 | residual rel-L2 | trust |
+|---|---|---:|---:|---|
+| classical_fd | burgers | 0.000000e+00 | 1.319436e-02 | reference |
+| fno | burgers | 1.573143e-01 | 4.848762e+00 | untrusted |
+| pino | burgers | 1.880157e-01 | 1.732850e+00 | untrusted |
+| persist_ic | burgers | 3.771952e-01 | 8.091685e-01 | trusted |
+| classical_fd | heat2d | 0.000000e+00 | 2.983392e-02 | reference |
+| fno | heat2d | 3.221335e-01 | 1.303385e+01 | untrusted |
+| pino | heat2d | - | - | not_trained (no checkpoint shipped, to keep the repo small) |
+| persist_ic | heat2d | 1.424304e+00 | 1.280133e+01 | untrusted |
+
+One OOD probe per equation (viscosity or diffusivity below the train range,
+n=4). Full probe list remains `python -m scripts.run_ood`.
+
+| model | probe | Predict rel-L2 | residual rel-L2 | trust |
+|---|---|---:|---:|---|
+| fno | burgers_param_below | 2.696545e-01 | 5.274467e+00 | untrusted |
+| pino | burgers_param_below | 2.951888e-01 | 1.890248e+00 | untrusted |
+| persist_ic | burgers_param_below | 4.691619e-01 | 8.935663e-01 | ood |
+| fno | heat2d_param_below | 5.684832e-01 | 6.353075e+00 | untrusted |
+| persist_ic | heat2d_param_below | 2.483906e-01 | 1.060790e+00 | untrusted |
+
+Cuts, fixed in `metrics/trust.py` before these scores: Predict rel-L2 above
+0.5, or residual rel-L2 above 1.0, is `untrusted`. Leaving the declared train
+support is `ood` only when both cuts pass. `trusted` is not a claim that the
+model understands the PDE.
+
+What this demo run measured, from `coticula demo --out reports/demo`
+(reproduced 2026-10-10; counterfactual cells below match that scorecard):
+
+- FNO heat barely moves when diffusivity is scaled by 1.5. Model trajectory
+  change 1.703234e-02, classical change 2.338120e-01, model vs the classical
+  solve at the new diffusivity 9.553082e-01.
+- FNO Burgers barely moves when viscosity is doubled. Model trajectory change
+  3.954555e-03, classical change 1.473826e-01, model vs the classical solve
+  at the new viscosity 1.793023e-01.
+- `persist_ic` does not move on either equation (trajectory change 0). The
+  trust flag does not look at this exam.
+- On Burgers, FNO Predict rel-L2 is 1.573143e-01 and the residual rel-L2 is
+  4.848762e+00, so the flag is `untrusted` with reason `residual_too_high`.
+  PINO Predict rel-L2 is 1.880157e-01 and the residual rel-L2 is 1.732850e+00,
+  flag `untrusted`, same reason. These are the measured flag values. They are
+  not a claim that either model violates the PDE.
+- `persist_ic` on the Burgers holdout has Predict rel-L2 3.771952e-01 and
+  residual rel-L2 8.091685e-01, flag `trusted`. On the Burgers param-shift
+  probe the flag is `ood` (`param_shift` only).
+
+Exam 4 on this demo matched the harness numbers above: gold 1.000000,
+rule-based 0.878472, metric-dump 0.090278, llm `not_trained`. Gold is the
+authored answer key and does not use the model rows. Rule-based text is
+templates plus observations copied from the FNO and PINO rows on that card.
+Metric-dump is those observations as numbers only. None of those is an LLM
+score.
+
+`coticula demo` on both equations fills five of those cells: Burgers FNO
+Predict and residual, Burgers PINO Predict and residual, and the FNO heat
+counterfactual. PINO heat2d has no checkpoint shipped, so it fills nothing.
+`coticula grade` scores one model and one equation. `--split holdout` uses
+the same trajectories and still omits the models that were not requested.
+An empty cell is written `not_trained` in the metric-dump string. That token
+is an expected keyword on two of the 48 items, so a one-model grade scores
+metric-dump 0.104167.
+
+The rule-based sentence starts with "Measured" when both Burgers models are
+on the card, or when the FNO heat counterfactual is on the card. That word
+is an expected keyword on item `e4_x20`. `coticula grade --model fno --pde
+burgers` and `coticula grade --model pino --pde burgers` have neither, including
+on holdout indices 36-47, so rule-based is 0.871528. `coticula grade --model
+fno --pde heat2d` still has the heat counterfactual sentence, so rule-based
+stays 0.878472 and metric-dump is 0.104167. The CLI scorecard ends with the
+same explanation.
+
+Longer tables and the failure notes live in `reports/latest.md` and
+`docs/WRITEUP.md`.
+
+## Grade your own model
+
+Implement `name` and `predict`. The harness always passes a batch.
+`n_steps` is the number of time intervals. Return shape is
+`(batch, n_steps + 1, ...)`, including the initial condition at time 0.
+Burgers: `u0` is `(batch, nx)` and `coeff` is viscosity.
+Heat: `u0` is `(batch, n, n)` and `coeff` is diffusivity.
+
+`examples/persist_ic.py` is a complete file. It repeats the initial condition
+and ignores the coefficient. It is an adapter example, not a baseline I am
+claiming as a solver.
 
 ```bash
-python -m scripts.train_fno --smoke
-python -m scripts.train_pino --smoke --pde burgers
-python -m scripts.verify_manifests
+coticula grade --adapter examples/persist_ic.py:PersistIC --pde burgers
 ```
 
-CI workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)  -  `pytest -q`
-plus the `--smoke` trains above on `ubuntu-latest`. Full `generate_labels` /
-`run_eval` is **not** in CI (NPZ labels are gitignored; a full train is heavier
-than a PR check).
+A class with those two attributes is enough. You do not have to subclass
+anything. The shipped FNO and PINO weights go through the same `predict`
+call (`coticula.adapter.TorchOperatorAdapter`).
 
-## Week 1-5 + v0.2 status
+## Known limitation
 
-| Week | Status | What shipped |
-|------|--------|----------------|
-| 1 | done | Classical FD labels, exam APIs, eval harness, smoke tests |
-| 2 | done | Laptop-scale FNO + PINO residual; Exams 1-3 measured when a `*.pt` loads |
-| 3 | done | OOD probes (param / resolution / IC), fail-closed trust, [WRITEUP.md](docs/WRITEUP.md) |
-| 4 | done | GitHub Actions CI, Exam 4 fixed item set, SHA pins, README polish |
-| 5 | done | Cite-ready v0.1.0 packaging: `CITATION.cff`, changelog, release notes |
-| **v0.2** | **this** | Exam 4 → 48 items + rule-based/metric-dump grades; residual-vs-L2 + CF-sensitivity diagnostics; paper-style writeup; Coticula branding |
+The strong-form finite-difference residual amplifies high-frequency error, so
+a noisy exact solution can cross the residual cut. `python -m scripts.probe_residual_noise`
+(run 2026-10-10) takes one exact Burgers
+trajectory from the label recipe (nx=64, nt=80, seed 0). The clean residual
+rel-L2 is 1.597894e-02. Adding 1% white noise, with standard deviation
+`0.01 * std(u)` and noise seed 0, raises it to 1.134730e+00, which is over
+the residual cut of 1. Treat the residual flag as a roughness indicator for
+now. A weak-form, noise-calibrated residual is planned. The trust rule itself
+is unchanged in this release.
 
-## How to read trust flags
+## Limitations
 
-Fail-closed layer: `metrics/trust.py`. A pretty field is never a silent success.
+- The shipped checkpoints are the laptop-scale weights already in `checkpoints/`. This is not a SOTA claim.
+- The residual flag is a roughness indicator. See Known limitation. On Burgers,
+  a model that never moves can land `trusted` while a lower Predict error
+  lands `untrusted`. Read the counterfactual exam next to the flag.
+- `trusted` does not mean the model understands the PDE.
+- PINO heat2d is `not_trained`: no checkpoint shipped, to keep the repo small. PINO Burgers is the shipped checkpoint.
+- Exam 4 is keyword coverage on a pinned 48-item set. The LLM judge is off
+  unless a real client is wired, and this repo does not invent that score.
+- OOD trajectories are generated from `datasets/ood/probe_plan_v0.json`.
+  They are not stored as NPZ. Label NPZ files are gitignored.
+- No chip-cooling demo, and no astronomical-unit or cosmology workloads.
 
-| Flag | Meaning |
-|------|---------|
-| `trusted` | In declared train support **and** residual rel-L2 ≤ 1.0 **and** Predict rel-L2 ≤ 0.5 |
-| `ood` | Left train support (param / resolution / IC family); residual and L2 still below those cuts |
-| `untrusted` | Residual or Predict L2 exceeds a cut (wins over `ood` if both apply) |
-| `reference` | Classical FD labeler row  -  not a learned-transfer claim |
-| `not_trained` | Checkpoint, torch, or LLM judge absent  -  **not** a placeholder accuracy |
+## Citation
 
-OOD / untrusted fields must carry `metrics.trust.refuse_silent_heatmap()`.
-Thresholds are documented defaults, not tuned after seeing scores.
-`trusted` is **not** a claim that the model understands the PDE.
+Software citation is `CITATION.cff` (Shehbaz Pathan, version 0.3.2).
 
-IID Exam 1-3 tables and the OOD section are **not mixed**. Transfer scores
-live under `ood` in `reports/latest.json`.
-
-## Latest measured results (this repo)
-
-Copied from [`reports/latest.md`](reports/latest.md). IID Exam 1–3 / OOD:
-Week 3 eval run `2026-09-12T00:18:43Z` on the shipped checkpoints. Exam 4
-and diagnostics: re-measured on this v0.2 revision. **Not invented.**
-` - ` / `not_trained` means that checkpoint or judge was absent.
-
-| Baseline | Burgers rel-L2 | Heat2D rel-L2 | Burgers residual | Trust |
-|----------|---------------:|--------------:|-----------------:|-------|
-| classical_fd | 0 | 0 | 1.44e-2 | `reference` |
-| FNO | 1.57e-1 | 3.22e-1 | 4.85 | `untrusted` |
-| PINO | 1.88e-1 |  -  | 1.73 | `untrusted` / `not_trained` |
-| LLM |  -  |  -  |  -  | `not_trained` |
-
-Exam 4 (48 items, sha256 `48323ca8…`): gold coverage `1.000`; rule-based
-`0.8785`; metric-dump `0.0903`. None of those are LLM scores. Residual-vs-L2
-scatter ($n=21$ measured IID+OOD points) has Pearson $0.741$ / Spearman
-$0.342$; all 21 points are `untrusted`. See `reports/latest.md`.
-
-Full tables + failure analysis: [docs/WRITEUP.md](docs/WRITEUP.md).
+```bibtex
+@software{pathan_coticula_2026,
+  author = {Pathan, Shehbaz},
+  title = {Coticula},
+  year = {2026},
+  version = {0.3.2},
+  url = {https://github.com/shehbaz0101/coticula}
+}
+```
 
 ## Layout
 
 ```
-coticula/
-  datasets/{burgers,heat2d,manifests,ood,exam4}/
-  datasets/pins.py              # SHA helpers
-  datasets/exam4/items_v0.json  # Exam 4 item set (48)
-  datasets/ood/probe_plan_v0.json
-  metrics/{predict,conserve,counterfactual,explain,ood,trust,diagnostics}.py
-  baselines/classical|fno|pino|llm/
-  scripts/generate_labels.py    # IID labels + refresh pins
-  scripts/pin_datasets.py       # refresh SHA manifests
-  scripts/verify_manifests.py
-  scripts/train_fno.py / train_pino.py
-  scripts/run_eval.py / run_ood.py / run_diagnostics.py
-  .github/workflows/ci.yml
-  docs/ONEPAGER.md
-  docs/DESIGN.md
-  docs/WRITEUP.md
-  docs/RELEASE_v0.1.0.md
-  CITATION.cff
-  CHANGELOG.md
-  RELEASE_NOTES.md            # paste into gh release create after tag
-  reports/latest.{json,md}
-  reports/diagnostics.json
+coticula/          CLI, adapter, scorecard writers
+examples/persist_ic.py
+metrics/           predict, conserve, counterfactual, explain, ood, trust
+baselines/         classical FD, FNO, PINO loss, LLM stub
+checkpoints/       shipped fno_burgers, fno_heat2d, pino_burgers; PINO heat2d has no checkpoint shipped
+scripts/           generate_labels, run_eval, run_ood, train_*, render_results_table, probe_residual_noise
+datasets/exam4/    48 pinned Exam 4 items
+reports/           latest.json from run_eval; demo/ is generated and gitignored
 ```
-
-## Dataset pins (regenerate path)
-
-SHA manifests live in `datasets/manifests/`:
-
-| Manifest | Pins |
-|----------|------|
-| `labels_v0.json` | `burgers_v0.npz` + meta, `heat2d_v0.npz` + meta |
-| `ood_generators_v0.json` | `datasets/ood/probe_plan_v0.json` (knobs, seeds, `default_probe_plan()`) |
-| `exam4_v0.json` | `datasets/exam4/items_v0.json` |
-
-OOD trajectories are **generated on the fly** from the pinned recipe  -  they
-are not stored as NPZ. `*.npz` is gitignored; after a fresh clone:
-
-```bash
-python -m scripts.generate_labels      # rewrite IID NPZ + all three manifests
-python -m scripts.pin_datasets         # refresh OOD + Exam 4 (+ label SHAs if NPZ exist)
-python -m scripts.verify_manifests     # CI default: skip missing label NPZ
-python -m scripts.verify_manifests --require-labels
-```
-
-If `default_probe_plan()` or Exam 4 items change, re-run `pin_datasets` and
-commit the updated plan + manifests. Tests check that the live probe plan
-matches the pin.
-
-## Exams
-
-| Exam | What is measured |
-|------|------------------|
-| 1 Predict | Rel-L2 and NMSE vs classical labels |
-| 2 Conserve | FD PDE residual + discrete energy drift of the predicted field |
-| 3 Counterfactual | Re-solve / re-predict at ν′ or α′; learned models graded vs the classical solver |
-| 4 Explain | **48-item** pinned set; gold / rule-based / metric-dump keyword coverage. LLM hook stays `not_trained` |
-| Trust (W3) | Fail-closed `trusted` / `ood` / `untrusted` / `reference` |
-| OOD (W3) | Param shift, spatial resolution transfer, IC-family shift |
-
-Useful knobs (all have small defaults): `--epochs`, `--width`, `--modes`,
-`--n-layers`, `--batch-size`, `--lambda-pde`, `--out`.
-
-`run_eval` always scores the classical solver. It loads FNO / PINO only when a
-checkpoint is present. It does **not** invent metrics.
-
-## Cite / Release
-
-**v0.1.0** packaged Weeks 1-4. **v0.2** is this research increment (Exam 4,
-diagnostics, writeup). Cite the software with [`CITATION.cff`](CITATION.cff)
-(author: Shehbaz Pathan; https://github.com/shehbaz0101/coticula). GitHub’s
-“Cite this repository” button reads that file.
-
-A GitHub Release for annotated tag `v0.1.0` is intended **after** this
-packaging merges to `main`  -  this repo increment does not cut the tag.
-What’s in the tag, how to reproduce, and non-claims:
-[`docs/RELEASE_v0.1.0.md`](docs/RELEASE_v0.1.0.md).
-Changelog (no duplicated tables): [`CHANGELOG.md`](CHANGELOG.md).
-Pasteable release body for the parent: [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
-
-Measured numbers stay in [`docs/WRITEUP.md`](docs/WRITEUP.md) and
-[`reports/latest.md`](reports/latest.md). This packaging does **not** invent
-metrics.
-
-## Non-goals (unchanged)
-
-- No chip-cooling / industrial multiphysics demos
-- No AU-scale (astronomical-unit) or cosmology workloads
-- No fabricated SOTA numbers for FNO / PINO / LLM
-- No claim that keyword rubrics equal true explanation quality
 
 ## License
 

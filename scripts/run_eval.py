@@ -378,6 +378,10 @@ def build_report(
     failure_analysis: dict | None = None,
     diagnostics: dict | None = None,
 ) -> dict:
+    try:
+        from coticula import __version__ as coticula_version
+    except ImportError:
+        coticula_version = "0.3.0"
     rationale = (
         "The viscous Burgers equation balances nonlinear advection against "
         "viscosity-driven diffusion; energy dissipates and shocks smooth under "
@@ -393,7 +397,7 @@ def build_report(
         "brand": "Coticula",
         "formerly": "Vermithor / VU-Bench",
         "repo": "https://github.com/shehbaz0101/coticula",
-        "version": "0.2.0",
+        "version": coticula_version,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "trust_policy": TRUST_POLICY,
         "exams": {
@@ -565,7 +569,7 @@ def render_md(report: dict) -> str:
         )
 
     lines = [
-        "# Coticula v0.2 — latest eval",
+        f"# Coticula v{report.get('version', '0.3.0')} latest eval",
         "",
         f"_Generated (UTC): {report['generated_at_utc']}_",
         "",

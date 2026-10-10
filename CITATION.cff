@@ -5,18 +5,19 @@ message: If you use Coticula, please cite it using these metadata.
 type: software
 title: "Coticula: a touchstone harness for PDE understanding"
 abstract: >-
-  Coticula is a small understanding harness for PDE surrogates. Four exams
-  (Predict, Conserve, Counterfactual, Explain) score whether a model has
-  grasped the dynamics of viscous Burgers (1D) and heat (2D), not just
-  interpolated training trajectories. v0.2 adds a 48-item Exam 4 set with
-  rule-based (non-LLM) grades, residual-vs-L2 and counterfactual-sensitivity
-  diagnostics, and a short paper-style writeup. Reports contain only
-  measured numbers; missing checkpoints stay not_trained.
+  Coticula is a small harness for PDE surrogates. Four exams (Predict,
+  Conserve, Counterfactual, Explain) score viscous Burgers (1D) and heat (2D).
+  v0.2 added a 48-item Exam 4 set with rule-based (non-LLM) grades and
+  residual-vs-L2 diagnostics. v0.3.0 adds a command-line scorecard and a
+  small adapter interface for a user model. v0.3.1 polishes that scorecard.
+  v0.3.2 puts the counterfactual table on the scorecard and states why Exam 4
+  rule-based and metric-dump differ between grade and demo.
+  Reports contain only measured numbers; missing checkpoints stay not_trained.
 authors:
   - family-names: Pathan
     given-names: Shehbaz
-version: "0.2.0"
-date-released: "2026-09-12"
+version: "0.3.2"
+date-released: "2026-10-10"
 url: "https://github.com/shehbaz0101/coticula"
 repository-code: "https://github.com/shehbaz0101/coticula"
 keywords:
@@ -32,6 +33,6 @@ preferred-citation:
   authors:
     - family-names: Pathan
       given-names: Shehbaz
-  version: "0.2.0"
+  version: "0.3.2"
   url: "https://github.com/shehbaz0101/coticula"
   year: 2026

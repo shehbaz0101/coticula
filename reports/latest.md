@@ -1,10 +1,8 @@
-# Coticula v0.2 — latest eval
+# Coticula v0.3.0 latest eval
 
-_Generated (UTC): 2026-09-12T20:04:10.654852+00:00_
+_Generated (UTC): 2026-10-10T04:03:32.424651+00:00_
 
 **Coticula** (Latin *coticula*, touchstone). Formerly Vermithor / VU-Bench. Repo: https://github.com/shehbaz0101/coticula
-_IID Exam 1–3 / OOD measured at: 2026-09-12T00:18:43.378079+00:00_
-_Exam 4 and diagnostics were re-measured on this revision. IID Exam 1–3 and OOD cells are copied from the prior measured run (see iid_ood_measured_at_utc). No FNO/PINO numbers were invented._
 
 ## Exam 1 — Predict
 

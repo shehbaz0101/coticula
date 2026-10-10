@@ -39,3 +39,6 @@ jobs:
         run: |
           python -m scripts.train_fno --smoke
           python -m scripts.train_pino --smoke --pde burgers
+
+      - name: CLI demo (shipped checkpoints, CPU)
+        run: coticula demo --out reports/demo-ci

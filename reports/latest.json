@@ -1,8 +1,11 @@
 {
   "bench": "coticula-v0",
   "project": "Coticula",
+  "brand": "Coticula",
+  "formerly": "Vermithor / VU-Bench",
   "repo": "https://github.com/shehbaz0101/coticula",
-  "generated_at_utc": "2026-09-12T20:04:10.654852+00:00",
+  "version": "0.3.0",
+  "generated_at_utc": "2026-10-10T04:03:32.424651+00:00",
   "trust_policy": {
     "name": "coticula-v0-fail-closed",
     "residual_untrusted": 1.0,
@@ -992,7 +995,8 @@
       "llm": {
         "status": "not_trained",
         "score": null,
-        "note": "LLM judge off (no COTICULA_LLM_JUDGE / VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores."
+        "note": "LLM judge off (no COTICULA_LLM_JUDGE / VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores.",
+        "baseline_status": "not_trained"
       },
       "observations": {
         "source": "report",
@@ -2955,7 +2959,8 @@
     "llm": {
       "status": "not_trained",
       "score": null,
-      "note": "LLM judge off (no VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores."
+      "note": "LLM judge off (no COTICULA_LLM_JUDGE / VU_LLM_JUDGE / API key). Keyword rubric only. No fabricated LLM scores.",
+      "baseline_status": "not_trained"
     }
   },
   "ood": {
@@ -2991,7 +2996,7 @@
       }
     },
     "trust_policy": {
-      "name": "vu-bench-v0-fail-closed",
+      "name": "coticula-v0-fail-closed",
       "residual_untrusted": 1.0,
       "predict_untrusted": 0.5,
       "statuses": [
@@ -4577,10 +4582,6 @@
       }
     ]
   },
-  "exam4_graded_at_utc": "2026-09-12T00:38:50.937661+00:00",
-  "brand": "Coticula",
-  "formerly": "Vermithor / VU-Bench",
-  "version": "0.2.0",
   "diagnostics": {
     "description": "v0.2 diagnostics. Residual-vs-L2 scatter re-uses measured IID + OOD cells. Horizon split and CF sensitivity are fresh classical solves on stored labels. No fabricated SOTA.",
     "residual_vs_l2": {
@@ -4901,7 +4902,5 @@
         }
       }
     }
-  },
-  "iid_ood_measured_at_utc": "2026-09-12T00:18:43.378079+00:00",
-  "refresh_note": "Exam 4 and diagnostics were re-measured on this revision. IID Exam 1\u20133 and OOD cells are copied from the prior measured run (see iid_ood_measured_at_utc). No FNO/PINO numbers were invented."
+  }
 }
