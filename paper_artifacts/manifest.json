@@ -1,0 +1,74 @@
+{
+  "protocol_sha256": "8b9110746356564fb3cf1ac6e8cd1b6cd223c4b022b366e99c93c85c5520d477",
+  "script": "scripts/reproduce_paper.py",
+  "artifacts": [
+    {
+      "path": "paper_artifacts/protocol.json",
+      "source": "frozen protocol, copied byte-for-byte"
+    },
+    {
+      "path": "paper_artifacts/summary.json",
+      "source": "full run payload"
+    },
+    {
+      "path": "paper_artifacts/tables/noise_injection.csv",
+      "source": "noise injection on the paper datasets"
+    },
+    {
+      "path": "paper_artifacts/tables/resolution_sweep.csv",
+      "source": "resolution and dt sweep"
+    },
+    {
+      "path": "paper_artifacts/tables/symbol_heat_cases.csv",
+      "source": "heat white second-moment formula"
+    },
+    {
+      "path": "paper_artifacts/tables/models.csv",
+      "source": "five-seed model study and trivial baselines"
+    },
+    {
+      "path": "paper_artifacts/tables/coefficient_mismatch.csv",
+      "source": "labels scored at scaled coefficients"
+    },
+    {
+      "path": "paper_artifacts/tables/shipped_rescore.csv",
+      "source": "shipped FNO and PINO checkpoints"
+    },
+    {
+      "path": "paper_artifacts/tables/inverse.csv",
+      "source": "Burgers viscosity probe"
+    },
+    {
+      "path": "paper_artifacts/tables/kphi_ablation.csv",
+      "source": "test-function bandwidth"
+    },
+    {
+      "path": "paper_artifacts/tables/paired_tests.csv",
+      "source": "paired permutation tests"
+    },
+    {
+      "path": "paper_artifacts/tables/hypotheses.csv",
+      "source": "pre-registered checks"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_noise_strong_vs_weak.png",
+      "source": "noise curves"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_resolution_sweep.png",
+      "source": "resolution sweep"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_symbol_fit.png",
+      "source": "formula comparison"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_error_spectra.png",
+      "source": "one Burgers spectrum example"
+    },
+    {
+      "path": "docs/research/weak_form_study.md",
+      "source": "same prose as paper_artifacts/weak_form_study.md"
+    }
+  ]
+}

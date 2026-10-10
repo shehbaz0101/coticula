@@ -18,12 +18,12 @@ Homepage = "https://github.com/shehbaz0101/coticula"
 Repository = "https://github.com/shehbaz0101/coticula"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.4"]
+dev = ["pytest>=7.4", "matplotlib>=3.8"]
 torch = ["torch>=2.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["metrics*", "baselines*", "scripts*", "datasets*"]
+include = ["metrics*", "baselines*", "scripts*", "datasets*", "research*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

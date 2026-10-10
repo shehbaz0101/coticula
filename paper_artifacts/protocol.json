@@ -1,0 +1,206 @@
+{
+  "name": "small-errors-large-residuals",
+  "version": "1",
+  "device": "cpu",
+  "torch_threads": 4,
+  "description": "Frozen before test scoring. Do not edit after protocol.sha256 is written.",
+  "weak_form": {
+    "family": "time_polynomial_bump_times_spatial_eigenmode",
+    "p_bump": 8,
+    "k_phi": 3,
+    "time_centers_frac": [0.3, 0.7],
+    "time_radius_frac": 0.2,
+    "burgers_spatial": "real Fourier modes k = 0..K_phi (cosine and sine for k > 0), periodic interval",
+    "heat_spatial": "Dirichlet sine modes sin(p pi x/L) sin(q pi y/L), 1 <= p,q <= K_phi",
+    "heat_boundary": "homogeneous Dirichlet, unchanged from the shipped solver",
+    "normalization": "sqrt(sum_m r_m^2) / (||u_ref||_2 * sqrt(tr G))",
+    "gram": "G_mn = <psi_m, psi_n> with the same quadrature as r_m",
+    "burgers_psi": "-d_t phi - nu d_xx phi (linear adjoint; the residual still includes the convective term)",
+    "heat_psi": "-d_t phi - alpha Delta phi",
+    "reference_norm": "space-time quadrature L2 of the reference field, not of the prediction",
+    "citation": "Messenger and Bortz, arXiv:2007.02848, for the polynomial bump; spatial factors are eigenmodes so the Dirichlet boundary term vanishes"
+  },
+  "noise": {
+    "levels": [0.001, 0.01, 0.05, 0.1, 0.2, 0.5],
+    "seeds": [0, 1, 2, 3, 4],
+    "k_smooth": 4,
+    "n_time_modes": 2,
+    "smooth_time": "time_varying",
+    "smooth_time_detail": "Each spatial coefficient is an independent trigonometric polynomial of degree n_time_modes on [0, T], including the constant mode m = 0. The error is not frozen in time.",
+    "white": "i.i.d. Gaussian at every node and time. Heat noise is then set to zero on the Dirichlet boundary and rescaled so the relative L2 is exact.",
+    "primary_level_for_tests": 0.01
+  },
+  "zero_field_rule": {
+    "statement": "The zero field satisfies both homogeneous PDEs exactly, so its strong and weak residuals are zero. It is reported, and it is excluded from the best-trivial-baseline anchor M_0 for residual metrics.",
+    "excluded_from_residual_anchor": ["zeros"]
+  },
+  "scaled_score": {
+    "formula": "S(M) = 100 * (M_0 - M) / (M_0 - M_ref)",
+    "clipped": false,
+    "lower_is_better": true,
+    "M_ref_rel_l2": 0,
+    "M_ref_residual": "residual of the reference solver trajectory",
+    "undefined_when": "M_0 <= M_ref"
+  },
+  "verdict": {
+    "legacy_threshold": 1.0,
+    "legacy_source": "metrics.trust.RESIDUAL_UNTRUSTED",
+    "rule": "The legacy untrusted flag (strong residual > 1) survives the weak form only if the weak residual is strictly greater than the mean white-noise weak residual interpolated, in log-log coordinates, to the field's relative L2. If the relative L2 is below the smallest calibrated level, survival is not called."
+  },
+  "statistics": {
+    "n_perm": 2000,
+    "n_boot": 2000,
+    "seed": 12345,
+    "ddof": 1,
+    "alpha": 0.05,
+    "paired_test": "two-sided sign-flip permutation test on the mean paired difference"
+  },
+  "datasets": {
+    "burgers": {
+      "n_traj": 20,
+      "nx": 32,
+      "nt": 16,
+      "L": 6.283185307179586,
+      "T": 1.0,
+      "nu_range": [0.005, 0.05],
+      "seed": 0,
+      "n_train": 12,
+      "n_val": 4,
+      "n_test": 4,
+      "boundary": "periodic"
+    },
+    "heat": {
+      "n_traj": 16,
+      "n": 16,
+      "nt": 12,
+      "L": 1.0,
+      "T": 0.5,
+      "alpha_range": [0.05, 0.2],
+      "seed": 1,
+      "n_train": 8,
+      "n_val": 4,
+      "n_test": 4,
+      "boundary": "dirichlet_zero"
+    }
+  },
+  "training": {
+    "epochs_hpo": 40,
+    "epochs_final": 120,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 4,
+    "optimizer": "Adam",
+    "hpo_seed": 7,
+    "final_seeds": [0, 1, 2, 3, 4],
+    "trials_per_architecture": 2,
+    "selection": "lowest validation relative L2; ties keep the earlier trial",
+    "loss": "data MSE only; test split is not read during training or selection",
+    "architectures": ["fno", "unet", "deeponet"],
+    "fno_note": "existing BurgersFNO / HeatFNO, time as output channels",
+    "unet_note": "one-level U-Net, circular padding on Burgers, zero padding on heat, Dirichlet walls reset",
+    "deeponet_note": "branch MLP on the initial condition; trunk MLP on time, a fixed coefficient scale (nu/0.05 or alpha/0.2), and fixed Fourier features (Burgers k=1..4, heat sine p=1..3). Not tuned on the test set.",
+    "architectures_config": {
+      "fno": {
+        "trials": [
+          {"modes": 4, "width": 8, "n_layers": 2, "fc_dim": 32},
+          {"modes": 8, "width": 16, "n_layers": 3, "fc_dim": 64}
+        ]
+      },
+      "unet": {
+        "trials": [
+          {"width": 8},
+          {"width": 16}
+        ]
+      },
+      "deeponet": {
+        "trials": [
+          {"rank": 16, "hidden": 32},
+          {"rank": 32, "hidden": 64}
+        ]
+      }
+    }
+  },
+  "coefficient_response": {"gamma": 1.5},
+  "coefficient_mismatch_scales": [0, 0.5, 1, 2],
+  "resolution_sweep": {
+    "epsilon": 0.01,
+    "seeds": [0, 1, 2],
+    "n_traj": 4,
+    "data_seed_burgers": 1000,
+    "data_seed_heat": 1100,
+    "burgers": {
+      "spatial": [
+        {"nx": 32, "nt": 20},
+        {"nx": 64, "nt": 20},
+        {"nx": 128, "nt": 20}
+      ],
+      "temporal": [
+        {"nx": 64, "nt": 10},
+        {"nx": 64, "nt": 20},
+        {"nx": 64, "nt": 40}
+      ]
+    },
+    "heat": {
+      "spatial": [
+        {"n": 16, "nt": 12},
+        {"n": 32, "nt": 12},
+        {"n": 48, "nt": 12}
+      ],
+      "temporal": [
+        {"n": 32, "nt": 8},
+        {"n": 32, "nt": 12},
+        {"n": 32, "nt": 24}
+      ]
+    }
+  },
+  "symbol_check": {
+    "formula": "E|R|^2 = s^2 (2/dt^2 + d(2d+1) alpha^2/h^4) for the midpoint heat scheme, d=2",
+    "synthetic_reps": 8,
+    "synthetic_shape": [48, 32, 32],
+    "burgers_s2": 0.0001,
+    "static_seed": 11,
+    "heat_cases": [
+      [0.05, 0.05, 0.1],
+      [0.02, 0.025, 0.1],
+      [0.01, 0.025, 0.12],
+      [0.03125, 0.0416667, 0.08]
+    ]
+  },
+  "kphi_ablation": {
+    "values": [1, 2, 3, 4],
+    "epsilon": 0.01,
+    "seeds": [0, 1, 2]
+  },
+  "shipped": {
+    "legacy_threshold": 1.0,
+    "noise_seeds": [0, 1, 2],
+    "burgers": {"n_traj": 48, "nx": 64, "nt": 80, "seed": 0},
+    "heat": {"n_traj": 32, "n": 32, "nt": 40, "seed": 1},
+    "checkpoints": ["fno_burgers.pt", "pino_burgers.pt", "fno_heat2d.pt", "pino_heat2d.pt"]
+  },
+  "inverse": {
+    "nx": 64,
+    "nt": 16,
+    "n_sensors": 32,
+    "sensor_layout": "evenly_spaced",
+    "observation_noise": 0.0,
+    "search_min": 0.005,
+    "search_max": 0.08,
+    "search_points": 11,
+    "failure_rel_err": 0.5,
+    "L": 6.283185307179586,
+    "T": 1.0,
+    "fno_conditioned": "not_run",
+    "id": {"n_traj": 6, "nu_range": [0.02, 0.05], "seed": 200},
+    "hard_ood": {"n_traj": 6, "nu_range": [0.006, 0.012], "seed": 201}
+  },
+  "figures": {"traj": 0, "seed": 0, "epsilon": 0.01, "pde": "burgers"},
+  "hypotheses": [
+    "H1: at epsilon 0.01, strong white residual exceeds strong smooth residual (paired, both PDEs)",
+    "H2: heat i.i.d. second moment matches the formula within 10 percent",
+    "H3: Burgers i.i.d. second moment matches the formula within 10 percent",
+    "H4: strong white residual grows from the coarsest to the finest spatial grid",
+    "H5: weak white residual grows by a smaller factor than the strong residual across that grid",
+    "H6: weak residual at coefficient scale 0 exceeds the weak residual at scale 1"
+  ]
+}

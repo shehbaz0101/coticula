@@ -1,0 +1,9 @@
+split,method,status,rel_err_mean,rel_err_std,n_fail
+id,strong_form_ls,ok,0.5108969096113537,0.10945105104175808,4
+id,weak_form_ls,ok,0.1549901555829061,0.11079061294961928,0
+id,solver_in_the_loop,ok,0.062149436997276424,0.017898596063770773,0
+id,fno_conditioned,not_run,,,
+hard_ood,strong_form_ls,ok,0.6679377056594874,0.5860676520933475,2
+hard_ood,weak_form_ls,ok,0.6225001506007235,0.7691276117556068,1
+hard_ood,solver_in_the_loop,ok,0.28644496770958255,0.13059462960008086,0
+hard_ood,fno_conditioned,not_run,,,

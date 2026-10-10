@@ -1,0 +1,11 @@
+id,supported,statistic,mean_diff,p_value
+H1_burgers_strong_white_gt_smooth,True,0.1341035359415209,0.1341035359415209,0.0004997501249375312
+H1_heat_strong_white_gt_smooth,True,1.097258477233084,1.097258477233084,0.0004997501249375312
+H2_heat_second_moment,True,1.001106847407549,,
+H3_burgers_second_moment,True,0.9923162396927255,,
+H4_burgers_strong_grows_with_resolution,True,1.61652219044027,,
+H5_burgers_weak_grows_less_than_strong,True,0.3181485223273909,,
+H4_heat_strong_grows_with_resolution,True,16.490314249062752,,
+H5_heat_weak_grows_less_than_strong,True,0.0454682275438629,,
+H6_burgers_weak_detects_zero_coefficient,True,3.0179740876368277,,
+H6_heat_weak_detects_zero_coefficient,True,27.21415536923867,,
