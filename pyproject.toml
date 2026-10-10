@@ -27,7 +27,7 @@ plot = ["matplotlib>=3.8"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["metrics*", "baselines*", "scripts*", "datasets*", "coticula*"]
+include = ["metrics*", "baselines*", "scripts*", "datasets*", "coticula*", "research*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,82 @@
+{
+  "name": "small-errors-large-residuals-amendment",
+  "version": "2",
+  "amends": "research/protocols/protocol.json",
+  "amends_sha256": "8b9110746356564fb3cf1ac6e8cd1b6cd223c4b022b366e99c93c85c5520d477",
+  "device": "cpu",
+  "torch_threads": 4,
+  "description": "Amendment frozen before v2 scoring. Does not replace protocol.json. v1 artifacts stay as scored.",
+  "changes": [
+    {
+      "what": "Scaled score S is reported only for relative L2. Residual metrics no longer use S.",
+      "why": "The zero field and other low-content fields nearly satisfy both PDEs, so the best trivial residual was the training-mean field and S(rho_w) went largely negative. A residual by itself is not an accuracy score."
+    },
+    {
+      "what": "Residuals are reported as the calibrated ratio C(M) = rho(M) / rho_smooth(relL2(M)). rho_smooth(r) is the median residual of a time-varying smooth low-mode error at relative L2 r. A 5% to 95% band is interpolated on the same grid.",
+      "why": "C compares a field with a generic smooth error of the same size. C > 1 means less PDE-consistent than that smooth error. C < 1 means more physics-like."
+    },
+    {
+      "what": "Weak-form survival uses the smooth band, not the white-noise envelope. The legacy untrusted flag survives only when the weak residual is strictly above the 95% smooth band at the field's own relative L2.",
+      "why": "The white-noise weak residual shrinks like 1/sqrt(N), so clearing it is nearly vacuous."
+    },
+    {
+      "what": "One matched-rel-L2 table and figure place white noise, smooth noise, and coefficient-mismatch errors side by side.",
+      "why": "That is the comparison the paper needs: strong form should rank by roughness, weak form by physics consistency."
+    },
+    {
+      "what": "Architecture comparisons are Wilcoxon signed-rank tests on paired (seed, trajectory) differences, with the mean difference and Cohen's dz.",
+      "why": "v1 paired tests averaged seeds first, leaving four trajectories and no effect size."
+    }
+  ],
+  "inherits": {
+    "datasets": "v1 datasets, splits, boundaries, weak-form family, noise levels, smooth time-varying definition, training budget, and selected hyperparameters",
+    "selected_hyperparameters": "paper_artifacts/summary.json models.hpo selected_config. Not re-tuned.",
+    "weak_form": "unchanged from v1",
+    "smooth_error": "unchanged from v1: time-varying trigonometric polynomial, degree n_time_modes, spatial modes 1..k_smooth"
+  },
+  "calibrated_ratio": {
+    "formula": "C(M) = rho(M) / median_smooth(relL2(M))",
+    "median_smooth": "median over trajectories and draws of the residual of exact labels plus a time-varying smooth error rescaled to relative L2 r",
+    "band": [0.05, 0.95],
+    "interpolation": "log-log linear interpolation of the median and of each band edge on the v1 noise levels",
+    "outside_grid": "clip to the nearest grid endpoint, set extrapolated=true, and do not call survival",
+    "undefined_when": "relative L2 is non-positive, the smooth median is non-positive, or the residual is non-finite",
+    "applies_to": ["strong", "weak"],
+    "paper_draws": 16,
+    "shipped_draws": 8,
+    "draw_seeds_paper": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    "draw_seeds_shipped": [0, 1, 2, 3, 4, 5, 6, 7],
+    "rng_salt_paper": 200,
+    "rng_salt_shipped": 201
+  },
+  "scaled_score_v2": {
+    "applies_to": "rel_l2 only",
+    "formula": "S = 100 * (M_0 - M) / (M_0 - M_ref), M_ref = 0, M_0 = best of zeros, training_mean, frozen_initial",
+    "residual_metrics": "not scored with S"
+  },
+  "verdict_v2": {
+    "legacy_threshold": 1.0,
+    "legacy_source": "metrics.trust.RESIDUAL_UNTRUSTED",
+    "rule": "The legacy untrusted flag survives the weak form only when the weak residual is strictly greater than the 95th percentile of time-varying smooth errors interpolated to the field's relative L2, and that relative L2 lies inside the noise grid. Equivalently, weak C is above the 95% band."
+  },
+  "mismatch": {
+    "scales": [0, 0.5, 2],
+    "field": "classical solution at scale times the trajectory coefficient, same initial condition, same grid",
+    "residual_coefficient": "the original coefficient, not the scaled one",
+    "rel_l2_reference": "the original-coefficient solution",
+    "matched_direction_scale": 2.0,
+    "matched_grid": "the error u(scale*c) - u(c) is rescaled so its relative L2 equals each noise level, then added to u(c)"
+  },
+  "paired_tests": {
+    "test": "wilcoxon_signed_rank",
+    "alternative": "two-sided",
+    "unit": "one pair per (seed, test trajectory)",
+    "effect_size": "mean paired difference and Cohen dz = mean(diff) / sample_std(diff)",
+    "metrics": ["rel_l2", "strong", "weak", "C_strong", "C_weak"],
+    "zero_method": "wilcox"
+  },
+  "statistics": {
+    "seed": 12345,
+    "ddof": 1
+  }
+}

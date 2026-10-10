@@ -1,0 +1,107 @@
+{
+  "protocol_sha256": "8b9110746356564fb3cf1ac6e8cd1b6cd223c4b022b366e99c93c85c5520d477",
+  "script": "scripts/reproduce_paper.py",
+  "artifacts": [
+    {
+      "path": "paper_artifacts/protocol.json",
+      "source": "frozen protocol, copied byte-for-byte"
+    },
+    {
+      "path": "paper_artifacts/summary.json",
+      "source": "full run payload"
+    },
+    {
+      "path": "paper_artifacts/tables/noise_injection.csv",
+      "source": "noise injection on the paper datasets"
+    },
+    {
+      "path": "paper_artifacts/tables/resolution_sweep.csv",
+      "source": "resolution and dt sweep"
+    },
+    {
+      "path": "paper_artifacts/tables/symbol_heat_cases.csv",
+      "source": "heat white second-moment formula"
+    },
+    {
+      "path": "paper_artifacts/tables/models.csv",
+      "source": "five-seed model study and trivial baselines"
+    },
+    {
+      "path": "paper_artifacts/tables/coefficient_mismatch.csv",
+      "source": "labels scored at scaled coefficients"
+    },
+    {
+      "path": "paper_artifacts/tables/shipped_rescore.csv",
+      "source": "shipped FNO and PINO checkpoints"
+    },
+    {
+      "path": "paper_artifacts/tables/inverse.csv",
+      "source": "Burgers viscosity probe"
+    },
+    {
+      "path": "paper_artifacts/tables/kphi_ablation.csv",
+      "source": "test-function bandwidth"
+    },
+    {
+      "path": "paper_artifacts/tables/paired_tests.csv",
+      "source": "paired permutation tests"
+    },
+    {
+      "path": "paper_artifacts/tables/hypotheses.csv",
+      "source": "pre-registered checks"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_noise_strong_vs_weak.png",
+      "source": "noise curves"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_resolution_sweep.png",
+      "source": "resolution sweep"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_symbol_fit.png",
+      "source": "formula comparison"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_error_spectra.png",
+      "source": "one Burgers spectrum example"
+    },
+    {
+      "path": "docs/research/weak_form_study.md",
+      "source": "same prose as paper_artifacts/weak_form_study.md"
+    },
+    {
+      "path": "paper_artifacts/protocol_v2.json",
+      "source": "v2 amendment, copied byte-for-byte"
+    },
+    {
+      "path": "paper_artifacts/protocol_v2.sha256",
+      "source": "SHA-256 of protocol_v2.json"
+    },
+    {
+      "path": "paper_artifacts/v2_summary.json",
+      "source": "amendment run payload"
+    },
+    {
+      "path": "paper_artifacts/tables/v2_matched_ladder.csv",
+      "source": "white, smooth, and mismatch at matched rel-L2"
+    },
+    {
+      "path": "paper_artifacts/tables/v2_calibrated_ratios.csv",
+      "source": "S for rel-L2 and C for residuals"
+    },
+    {
+      "path": "paper_artifacts/tables/v2_paired_tests.csv",
+      "source": "Wilcoxon tests over seeds x trajectories"
+    },
+    {
+      "path": "paper_artifacts/tables/v2_shipped_survival.csv",
+      "source": "shipped models against the smooth band"
+    },
+    {
+      "path": "paper_artifacts/figures/fig_matched_ladder.png",
+      "source": "matched residual ladder"
+    }
+  ],
+  "protocol_v2_sha256": "6457f447ab555e30803068fd92d7d36738d293d09616a9b4174bd0300c990549"
+}
