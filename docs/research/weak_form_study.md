@@ -346,13 +346,13 @@ Survival means the weak residual is strictly above the 95% smooth band at the fi
 
 burgers: strong white/smooth median ratio spans 1.068 to 2.86504; weak white/smooth spans 0.706997 to 0.9987. Amplitude-matched scale-2 mismatch over smooth spans 0.204549 to 0.965727 (strong) and 0.151844 to 0.940321 (weak).
 burgers strong form ranks white above smooth at every noise level on this grid.
-burgers strong white/smooth stays below 10. On this coarse grid the midpoint time term dominates the spatial roughness term, so white noise is not orders of magnitude above smooth noise.
+burgers strong white/smooth stays below 10. On Burgers the midpoint time term dominates the spatial term: the paper-grid mesh ratio r = ν dt / h² runs from 0.0081 to 0.081, so the second-moment space/time factor (3/2) r² is at most 0.0099.
 burgers strong mismatch is below the smooth median at every matched level.
 burgers weak mismatch C is below 1 at every matched level: the coefficient-shift shape is more PDE-consistent than a generic smooth error of the same size.
 burgers does not support smooth ≈ mismatch in the strong form. For ε ≥ 0.01, strong mismatch/smooth spans 0.204549 to 0.43357.
 heat: strong white/smooth median ratio spans 1.8256 to 4.16633; weak white/smooth spans 0.383728 to 0.989787. Amplitude-matched scale-2 mismatch over smooth spans 0.193292 to 0.875372 (strong) and 0.29665 to 1.00416 (weak).
 heat strong form ranks white above smooth at every noise level on this grid.
-heat strong white/smooth stays below 10. On this coarse grid the midpoint time term dominates the spatial roughness term, so white noise is not orders of magnitude above smooth noise.
+heat strong white/smooth stays below 10. On heat the space term dominates: resolution_sweep.csv has space/time 3.4 at n=16 and 734 at n=48. The paper-grid mesh ratio r = α dt / h² runs from 0.47 to 1.9, so the second-moment space/time factor 5 r² runs from 1.1 to 18.
 heat strong mismatch is below the smooth median at every matched level.
 heat weak mismatch C stays below 1 except for a single level at 1.00416, next to the discretization floor.
 heat does not support smooth ≈ mismatch in the strong form. For ε ≥ 0.01, strong mismatch/smooth spans 0.193292 to 0.736333.

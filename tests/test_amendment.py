@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from research.amendment import calibrate
+from research.amendment_report import _story_lines
 from research.protocol import verify_amendment
 from research.statsutil import paired_wilcoxon
 
@@ -47,6 +48,24 @@ def test_calibrated_ratio_uses_smooth_median_and_band():
     missing = calibrate(0.2, 0.0, levels, median, p05, p95)
     assert missing["C"] is None
     assert missing["above_p95"] is None
+
+
+def test_story_states_which_term_dominates():
+    note = {
+        "strong_white_over_smooth": [2.0, 4.0],
+        "weak_white_over_smooth": [0.5],
+        "strong_mismatch_over_smooth": [0.3, 0.2],
+        "weak_mismatch_over_smooth": [0.4],
+    }
+    lines = _story_lines({"story": {"burgers": note, "heat": dict(note)}})
+    burgers = next(line for line in lines if line.startswith("burgers strong white/smooth stays"))
+    heat = next(line for line in lines if line.startswith("heat strong white/smooth stays"))
+    assert "time term dominates" in burgers
+    assert "0.0081" in burgers and "0.081" in burgers
+    assert "space term dominates" in heat
+    assert "3.4" in heat and "734" in heat
+    assert "0.47" in heat and "1.9" in heat
+    assert "time term dominates" not in heat
 
 
 def test_wilcoxon_reports_effect_size():

@@ -213,6 +213,62 @@ def _figures(result: dict, fig_dir: Path) -> None:
     plt.close(fig)
 
 
+def _paper_mesh_ratio_span(pde: str) -> tuple[float, float]:
+    """Endpoint mesh ratios r = coefficient * dt / h^2 on the frozen paper grid."""
+    from research.protocol import load_protocol
+
+    ds = load_protocol()["datasets"][pde]
+    if pde == "burgers":
+        h = float(ds["L"]) / int(ds["nx"])
+        coef = ds["nu_range"]
+    else:
+        h = float(ds["L"]) / (int(ds["n"]) - 1)
+        coef = ds["alpha_range"]
+    dt = float(ds["T"]) / int(ds["nt"])
+    return tuple(float(c) * dt / h**2 for c in coef)
+
+
+def _fmt_mesh_r(value: float) -> str:
+    return f"{value:.2g}"
+
+
+def _heat_resolution_space_time() -> tuple[float, float]:
+    """Space/time weights from the committed resolution sweep, heat spatial rows."""
+    path = Path(__file__).resolve().parents[1] / "paper_artifacts" / "tables" / "resolution_sweep.csv"
+    found = {}
+    with path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if row["pde"] == "heat" and row["sweep"] == "spatial" and row["n"] in {"16", "48"}:
+                found[int(row["n"])] = float(row["space_term"]) / float(row["time_term"])
+    return found[16], found[48]
+
+
+def _fmt_space_time(value: float) -> str:
+    if value >= 100:
+        return str(int(round(value)))
+    return f"{value:.1f}"
+
+
+def _white_smooth_bound_line(pde: str) -> str:
+    lo, hi = _paper_mesh_ratio_span(pde)
+    if pde == "burgers":
+        factor = 1.5 * hi**2
+        return (
+            "burgers strong white/smooth stays below 10. On Burgers the midpoint time term dominates "
+            f"the spatial term: the paper-grid mesh ratio r = ν dt / h² runs from {_fmt_mesh_r(lo)} to {_fmt_mesh_r(hi)}, "
+            f"so the second-moment space/time factor (3/2) r² is at most {_fmt_mesh_r(factor)}."
+        )
+    ratio_16, ratio_48 = _heat_resolution_space_time()
+    factor_lo = 5.0 * lo**2
+    factor_hi = 5.0 * hi**2
+    return (
+        "heat strong white/smooth stays below 10. On heat the space term dominates: "
+        f"resolution_sweep.csv has space/time {_fmt_space_time(ratio_16)} at n=16 and {_fmt_space_time(ratio_48)} at n=48. "
+        f"The paper-grid mesh ratio r = α dt / h² runs from {_fmt_mesh_r(lo)} to {_fmt_mesh_r(hi)}, "
+        f"so the second-moment space/time factor 5 r² runs from {_fmt_mesh_r(factor_lo)} to {_fmt_mesh_r(factor_hi)}."
+    )
+
+
 def _story_lines(result: dict) -> list[str]:
     lines = []
     for pde, note in result["story"].items():
@@ -229,10 +285,7 @@ def _story_lines(result: dict) -> list[str]:
         if s_lo > 1:
             lines.append(f"{pde} strong form ranks white above smooth at every noise level on this grid.")
         if s_hi < 10:
-            lines.append(
-                f"{pde} strong white/smooth stays below 10. On this coarse grid the midpoint time term "
-                "dominates the spatial roughness term, so white noise is not orders of magnitude above smooth noise."
-            )
+            lines.append(_white_smooth_bound_line(pde))
         if 0.5 <= m_lo and m_hi <= 2:
             lines.append(f"{pde} strong mismatch stays within a factor of two of smooth noise at matched relative L2.")
         elif m_hi < 1:
