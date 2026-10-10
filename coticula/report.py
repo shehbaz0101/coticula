@@ -2,12 +2,24 @@
 from __future__ import annotations
 
 import json
+import sys
+import textwrap
 from html import escape
 from pathlib import Path
 
 import numpy as np
 
-from coticula.grading import reading_lines
+from coticula.grading import eval_set_note, reading_lines
+from metrics.trust import PREDICT_UNTRUSTED, RESIDUAL_UNTRUSTED
+
+_STATUS_COLOR = {
+    "trusted": "32",
+    "untrusted": "31",
+    "ood": "33",
+    "reference": "36",
+    "not_trained": "2",
+    "error": "31",
+}
 
 
 def json_default(obj):
@@ -31,8 +43,79 @@ def fmt(value, spec: str = ".6e") -> str:
         return str(value)
 
 
+def fmt_short(value) -> str:
+    """Three decimal places for the terminal table. JSON and Markdown stay full."""
+    if value is None:
+        return "-"
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if not np.isfinite(number):
+        return str(value)
+    return f"{number:.3f}"
+
+
+def _paint(text: str, status: str, *, color: bool) -> str:
+    if not color:
+        return text
+    code = _STATUS_COLOR.get(str(status))
+    if not code:
+        return text
+    return f"\033[{code}m{text}\033[0m"
+
+
 def _rows(section: dict) -> list[dict]:
     return list(section.get("models") or [])
+
+
+def _reason_text(row: dict) -> str:
+    reasons = ",".join((row.get("trust") or {}).get("reasons") or [])
+    if row.get("status") != "ok":
+        reasons = str(row.get("reason") or reasons)
+    return reasons
+
+
+def verdict_line(row: dict, *, pde: str | None = None) -> str:
+    """One plain-English line. The status at the end is the trust flag."""
+    name = str(row.get("name"))
+    prefix = f"{name} {pde}" if pde else name
+    status = row.get("status")
+    if status != "ok":
+        if status == "not_trained" and row.get("reason") in {None, "", "missing_checkpoint"}:
+            return f"{prefix}: no checkpoint shipped, so not_trained"
+        reason = row.get("reason") or "no metrics"
+        return f"{prefix}: {status} ({reason})"
+    trust = (row.get("trust") or {}).get("status") or status
+    if row.get("role") == "labeler" or trust == "reference":
+        return f"{prefix}: reference labeler, not a learned trust score"
+    pred = float((row.get("predict") or {})["rel_l2_mean"])
+    res = float((row.get("conserve") or {})["residual_rel_l2"])
+    pred_ok = pred <= float(PREDICT_UNTRUSTED)
+    res_ok = res <= float(RESIDUAL_UNTRUSTED)
+    bits = [
+        "passes Predict" if pred_ok else "fails Predict",
+        "passes Conserve" if res_ok else "fails Conserve",
+    ]
+    reasons = list((row.get("trust") or {}).get("reasons") or [])
+    implied: set[str] = set()
+    if not pred_ok:
+        implied.add("predict_l2_too_high")
+    if not res_ok:
+        implied.add("residual_too_high")
+    extra = [reason for reason in reasons if reason not in implied]
+    support_names = {"param_shift", "resolution_shift", "ic_family_shift"}
+    support = [reason for reason in extra if reason in support_names]
+    other = [reason for reason in extra if reason not in support_names]
+    if support:
+        joined = ", ".join(support)
+        if trust == "ood":
+            bits.append(f"outside train support ({joined})")
+        else:
+            bits.append(f"also outside train support ({joined})")
+    if other:
+        bits.append("reasons " + ", ".join(other))
+    return f"{prefix}: {', '.join(bits)}, so {trust}"
 
 
 def markdown_table(card: dict) -> str:
@@ -44,6 +127,10 @@ def markdown_table(card: dict) -> str:
         f"Generated (UTC): {card.get('generated_at_utc')}",
         "",
     ]
+    note = card.get("eval_set") or eval_set_note(card)
+    if note:
+        lines.append(note)
+        lines.append("")
     if card.get("smoke"):
         lines.append("Smoke run. Not the shipped checkpoint.")
         lines.append("")
@@ -59,13 +146,26 @@ def markdown_table(card: dict) -> str:
         lines.append("")
         lines.append(f"Labels: {section.get('label_source')}")
         lines.append("")
-        lines.append(f"Holdout n={section.get('n_eval')} idx={section.get('eval_idx')}")
-        lines.append("")
+        n_total = section.get("n_total")
+        total = f" of {n_total}" if n_total is not None else ""
         lines.append(
-            "Learned rows and classical_fd share this holdout. "
-            "`scripts.run_eval` scores classical_fd on the first trajectories instead, "
-            "so that classical residual can differ."
+            f"Split: {section.get('split_label') or 'eval'} "
+            f"n_eval={section.get('n_eval')}{total} idx={section.get('eval_idx')}"
         )
+        lines.append("")
+        if section.get("split") == "holdout":
+            lines.append(
+                "Learned rows and classical_fd share this checkpoint holdout. "
+                "`scripts.run_eval` scores classical_fd on the first trajectories instead, "
+                "so that classical residual can differ. "
+                "`coticula grade` without a shipped checkpoint scores every trajectory instead."
+            )
+        else:
+            lines.append(
+                "Learned rows and classical_fd share this split. "
+                "`coticula demo` scores the checkpoint holdout "
+                "(Burgers 12 trajectories, heat 8), so a toy adapter can differ there."
+            )
         lines.append("")
         lines.append("| model | Predict rel-L2 | residual rel-L2 | trust | reasons |")
         lines.append("|---|---:|---:|---|---|")
@@ -132,46 +232,83 @@ def markdown_table(card: dict) -> str:
     return "\n".join(lines)
 
 
-def terminal_scorecard(card: dict) -> str:
+def _table_row(name: str, pred, res, trust, reasons: str, *, color: bool) -> str:
+    trust_s = "-" if trust in {None, ""} else str(trust)
+    reason_s = reasons or "-"
+    trust_cell = f"{trust_s:<12}"
+    return (
+        f"{name:<16} {fmt_short(pred):>8} {fmt_short(res):>8}  "
+        f"{_paint(trust_cell, trust_s, color=color)} {reason_s}"
+    )
+
+
+def _table_header() -> list[str]:
+    return [
+        f"{'model':<16} {'predict':>8} {'residual':>8}  {'trust':<12} reasons",
+        f"{'-' * 16} {'-' * 8} {'-' * 8}  {'-' * 12} -------",
+    ]
+
+
+def terminal_scorecard(card: dict, *, color: bool | None = None) -> str:
+    """Aligned scorecard. Color when ``color`` is true, or when stdout is a TTY."""
+    if color is None:
+        color = sys.stdout.isatty()
     lines = [
         f"Coticula {card.get('version')} scorecard",
         f"command: {card.get('command')}",
+        card.get("eval_set") or eval_set_note(card),
     ]
     if card.get("smoke"):
         lines.append("smoke: tiny grid, not the shipped checkpoint")
-    for pde, section in (card.get("pdes") or {}).items():
+    pdes = card.get("pdes") or {}
+    multi = len(pdes) > 1
+    for pde, section in pdes.items():
+        n_total = section.get("n_total")
+        total = f" of {n_total}" if n_total is not None else ""
+        idx = [int(i) for i in (section.get("eval_idx") or [])]
+        span = ""
+        if idx and idx == list(range(idx[0], idx[-1] + 1)):
+            span = f"  indices {idx[0]}-{idx[-1]}"
         lines.append("")
         lines.append(
-            f"{pde}  n_eval={section.get('n_eval')}  labels={section.get('label_source')}"
+            f"{pde}  {section.get('split_label') or 'eval'}  "
+            f"n={section.get('n_eval')}{total}{span}"
         )
-        lines.append(
-            f"{'model':<16} {'predict rel-L2':>14} {'residual':>14} {'trust':<12} reasons"
-        )
+        lines.extend(_table_header())
         for row in _rows(section):
-            pred = (row.get("predict") or {}).get("rel_l2_mean")
-            res = (row.get("conserve") or {}).get("residual_rel_l2")
             trust = (row.get("trust") or {}).get("status") or row.get("status")
-            reasons = ",".join((row.get("trust") or {}).get("reasons") or [])
-            if row.get("status") != "ok":
-                reasons = str(row.get("reason") or "")
+            pred = (row.get("predict") or {}).get("rel_l2_mean") if row.get("predict") else None
+            res = (row.get("conserve") or {}).get("residual_rel_l2") if row.get("conserve") else None
             lines.append(
-                f"{str(row.get('name')):<16} {fmt(pred):>14} {fmt(res):>14} {str(trust):<12} {reasons}"
+                _table_row(
+                    str(row.get("name")),
+                    pred,
+                    res,
+                    trust,
+                    _reason_text(row),
+                    color=color,
+                )
             )
         for probe in section.get("ood") or []:
             lines.append(
-                f"OOD {probe.get('id')} param={probe.get('param')} n={probe.get('n')}"
+                f"OOD {probe.get('id')}  param={probe.get('param')}  n={probe.get('n')}"
             )
+            lines.extend(_table_header())
             for row in probe.get("models") or []:
                 if row.get("role") == "labeler":
                     continue
-                pred = (row.get("predict") or {}).get("rel_l2_mean")
-                res = (row.get("conserve") or {}).get("residual_rel_l2")
                 trust = (row.get("trust") or {}).get("status") or row.get("status")
-                reasons = ",".join((row.get("trust") or {}).get("reasons") or [])
-                if row.get("status") != "ok":
-                    reasons = str(row.get("reason") or "")
+                pred = (row.get("predict") or {}).get("rel_l2_mean") if row.get("predict") else None
+                res = (row.get("conserve") or {}).get("residual_rel_l2") if row.get("conserve") else None
                 lines.append(
-                    f"  {str(row.get('name')):<14} {fmt(pred):>14} {fmt(res):>14} {str(trust):<12} {reasons}"
+                    _table_row(
+                        str(row.get("name")),
+                        pred,
+                        res,
+                        trust,
+                        _reason_text(row),
+                        color=color,
+                    )
                 )
     explain = card.get("explain") or {}
     gold = (explain.get("gold") or {}).get("mean_coverage")
@@ -180,12 +317,17 @@ def terminal_scorecard(card: dict) -> str:
     llm = (explain.get("llm") or {}).get("status")
     lines.append("")
     lines.append(
-        f"Exam 4 n={explain.get('n_items')} gold={fmt(gold, '.6f')} "
-        f"rule-based={fmt(rule, '.6f')} metric-dump={fmt(dump, '.6f')} llm={llm}"
+        f"Exam 4  n={explain.get('n_items')}  gold={fmt_short(gold)}  "
+        f"rule-based={fmt_short(rule)}  metric-dump={fmt_short(dump)}  llm={llm}"
     )
     lines.append("")
-    for sentence in card.get("reading") or []:
-        lines.append(sentence)
+    for pde, section in pdes.items():
+        for row in _rows(section):
+            line = verdict_line(row, pde=pde if multi else None)
+            status = (row.get("trust") or {}).get("status") or row.get("status")
+            if color and line.endswith(str(status)):
+                line = line[: -len(str(status))] + _paint(str(status), str(status), color=True)
+            lines.append(line)
     return "\n".join(lines)
 
 
@@ -207,6 +349,9 @@ def html_report(card: dict, plot_names: list[str]) -> str:
         f"<p>Command: <code>{escape(str(card.get('command')))}</code><br>",
         f"Generated (UTC): {escape(str(card.get('generated_at_utc')))}</p>",
     ]
+    note = card.get("eval_set") or ""
+    if note:
+        parts.append(f"<p>{escape(note)}</p>")
     if card.get("smoke"):
         parts.append("<p>Smoke run. Not the shipped checkpoint.</p>")
     policy = card.get("trust_policy") or {}
@@ -218,9 +363,12 @@ def html_report(card: dict, plot_names: list[str]) -> str:
     )
     for pde, section in (card.get("pdes") or {}).items():
         parts.append(f"<h2>{escape(pde)}</h2>")
+        n_total = section.get("n_total")
+        total = f" of {n_total}" if n_total is not None else ""
         parts.append(
             f"<p>Labels: {escape(str(section.get('label_source')))}. "
-            f"Holdout n={escape(str(section.get('n_eval')))}.</p>"
+            f"Split: {escape(str(section.get('split_label') or 'eval'))}, "
+            f"n={escape(str(section.get('n_eval')))}{escape(total)}.</p>"
         )
         parts.append(_html_model_table(section.get("models") or []))
         for probe in section.get("ood") or []:
@@ -281,6 +429,66 @@ def _html_model_table(rows: list[dict]) -> str:
     return "".join(body)
 
 
+def _wrap_to_width(text: str, max_chars: int) -> str:
+    """Wrap a banner into balanced lines that fit the figure width."""
+    clean = " ".join(str(text).split())
+    if not clean or len(clean) <= max_chars:
+        return clean
+    n_lines = max(2, (len(clean) + max_chars - 1) // max_chars)
+    target = min(max_chars, max(28, (len(clean) // n_lines) + 6))
+    lines = textwrap.wrap(clean, width=target)
+    if any(len(line) > max_chars for line in lines):
+        lines = textwrap.wrap(clean, width=max_chars)
+    return "\n".join(lines)
+
+
+def _max_title_chars(fig, fontsize: float = 9.0) -> int:
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    probe = fig.text(0, 0, "n", fontsize=fontsize, alpha=0)
+    fig.canvas.draw()
+    char_w = max(probe.get_window_extent(renderer).width, 1.0)
+    probe.remove()
+    return max(24, int((fig.bbox.width - 24) / char_w))
+
+
+def _texts_outside(fig, tol: float = 1.0) -> list[str]:
+    from matplotlib.text import Text
+
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    width, height = fig.bbox.width, fig.bbox.height
+    bad: list[str] = []
+    for text in fig.findobj(lambda artist: isinstance(artist, Text)):
+        value = text.get_text()
+        if not value or not str(value).strip() or not text.get_visible():
+            continue
+        box = text.get_window_extent(renderer=renderer)
+        if box.width <= 0 or box.height <= 0:
+            continue
+        if box.x0 < -tol or box.y0 < -tol or box.x1 > width + tol or box.y1 > height + tol:
+            bad.append(" ".join(str(value).split()))
+    return bad
+
+
+def _place_title(fig, text: str) -> None:
+    wrapped = _wrap_to_width(text, _max_title_chars(fig))
+    fig.suptitle(wrapped or text, fontsize=9)
+    fig.canvas.draw()
+    outside = _texts_outside(fig)
+    if outside:
+        raise RuntimeError("plot text extends past the figure: " + " | ".join(outside))
+
+
+def _style_field_axis(ax) -> None:
+    from matplotlib.ticker import MaxNLocator
+
+    locator = MaxNLocator(nbins=4, integer=True, prune="both")
+    ax.xaxis.set_major_locator(locator)
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=4, integer=True, prune="both"))
+    ax.tick_params(labelsize=8)
+
+
 def write_plots(card: dict, arrays: dict, out_dir: Path) -> list[str]:
     """Write PNG files. Returns filenames. Empty if matplotlib is missing."""
     try:
@@ -302,7 +510,7 @@ def write_plots(card: dict, arrays: dict, out_dir: Path) -> list[str]:
         labels = [str(row["name"]) for row in ok]
         preds = [float(row["predict"]["rel_l2_mean"]) for row in ok]
         ress = [float(row["conserve"]["residual_rel_l2"]) for row in ok]
-        fig, axes = plt.subplots(1, 2, figsize=(8.2, 3.4))
+        fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6), layout="constrained")
         axes[0].bar(labels, preds, color="#3d5a80")
         axes[0].axhline(pred_cut, color="#9b2226", linestyle="--", linewidth=1)
         axes[0].set_title("Predict rel-L2")
@@ -312,13 +520,16 @@ def write_plots(card: dict, arrays: dict, out_dir: Path) -> list[str]:
         axes[1].set_title("Conserve residual rel-L2")
         for ax, values in ((axes[0], preds), (axes[1], ress)):
             top = max(values) if values else 1.0
-            ax.set_ylim(0, top * 1.18 + 1e-6)
+            hi = top * 1.28 + 1e-6
+            ax.set_ylim(0, hi)
+            ticks = [tick for tick in ax.get_yticks() if 0 <= tick <= hi]
+            if ticks:
+                ax.set_yticks(ticks)
             for i, val in enumerate(values):
                 ax.text(i, val, f"{val:.2f}", ha="center", va="bottom", fontsize=8)
         for ax in axes:
-            ax.tick_params(axis="x", labelrotation=20)
-        fig.suptitle(f"{pde}: dashed line is the fail-closed cut")
-        fig.tight_layout()
+            ax.tick_params(axis="x", labelrotation=15, labelsize=8)
+        _place_title(fig, f"{pde}: dashed line is the fail-closed cut")
         filename = f"bars_{pde}.png"
         fig.savefig(out_dir / filename, dpi=120)
         plt.close(fig)
@@ -329,25 +540,25 @@ def write_plots(card: dict, arrays: dict, out_dir: Path) -> list[str]:
             continue
         truth = np.asarray(sample["truth"])
         pred = np.asarray(sample["pred"])
-        fig, axes = plt.subplots(1, 3, figsize=(9.2, 3.2))
+        fig, axes = plt.subplots(1, 3, figsize=(9.4, 3.8), layout="constrained")
         if truth.ndim == 2:
             panels = (truth, pred, np.abs(pred - truth))
             titles = ("truth", sample["name"], "|error|")
-            for ax, img, title in zip(axes, panels, titles):
-                im = ax.imshow(img, aspect="auto", origin="lower", cmap="viridis")
-                ax.set_title(title)
-                fig.colorbar(im, ax=ax, fraction=0.046)
         else:
             mid = truth.shape[0] // 2
             panels = (truth[mid], pred[mid], np.abs(pred[mid] - truth[mid]))
             titles = (f"truth t={mid}", sample["name"], "|error|")
-            for ax, img, title in zip(axes, panels, titles):
-                im = ax.imshow(img, origin="lower", cmap="viridis")
-                ax.set_title(title)
-                fig.colorbar(im, ax=ax, fraction=0.046)
-        banner = str(sample.get("banner") or "")
-        fig.suptitle(banner[:180] if banner else sample["name"])
-        fig.tight_layout()
+        for ax, img, title in zip(axes, panels, titles):
+            kwargs = {"origin": "lower", "cmap": "viridis"}
+            if truth.ndim == 2:
+                kwargs["aspect"] = "auto"
+            im = ax.imshow(img, **kwargs)
+            ax.set_title(title, fontsize=10)
+            _style_field_axis(ax)
+            colorbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
+            colorbar.ax.tick_params(labelsize=7)
+        banner = str(sample.get("banner") or sample["name"])
+        _place_title(fig, banner)
         filename = f"field_{pde}_{sample['name']}.png"
         fig.savefig(out_dir / filename, dpi=120)
         plt.close(fig)

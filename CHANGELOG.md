@@ -7,8 +7,28 @@ and the README, and were produced by `python -m scripts.run_eval`,
 This file does not invent metrics.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-The package version in `pyproject.toml` is `0.3.0`. This entry prepares that
-release. It does not create the tag.
+The package version in `pyproject.toml` is `0.3.1`. The 0.3.1 entry does not
+create a tag.
+
+## [0.3.1] - 2026-10-10
+
+Interview-demo polish. No new measurements and no new checkpoints.
+
+### Changed
+
+- Field plots wrap the trust warning so the full banner is visible at the
+  saved figure size. That covers `field_burgers_fno.png` and
+  `field_heat2d_fno.png`. The bar charts were checked for the same clipping.
+- `coticula demo` and `coticula grade` print an aligned scorecard. Color is
+  used when stdout is a TTY, and plain text otherwise. Terminal numbers are
+  short (`0.157`). JSON and Markdown keep full precision. Each model ends
+  with a plain-English verdict, and the trust flag still matches its reasons.
+- The terminal output and the README name the evaluation set. `demo` scores
+  the checkpoint holdout (Burgers 12, heat 8). `grade` scores that holdout
+  when a shipped checkpoint is loaded, and every trajectory otherwise
+  (Burgers 48, heat 32). `grade --split holdout` matches `demo`.
+- The README labels the PINO heat2d `not_trained` row: no checkpoint shipped,
+  to keep the repo small.
 
 ## [0.3.0] - 2026-10-10
 

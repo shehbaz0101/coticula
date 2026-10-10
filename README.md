@@ -31,11 +31,23 @@ the toy adapter in `examples/persist_ic.py`. It prints a scorecard and writes
 If the label NPZ files are missing, the demo builds them in memory with the
 same recipe as `python -m scripts.generate_labels` (Burgers seed 0, heat seed 1).
 
-Grade one shipped model:
+`coticula demo` scores the checkpoint holdout stored on the shipped FNO
+weights: 12 Burgers trajectories (indices 36-47 of 48) and 8 heat
+trajectories (indices 24-31 of 32). The terminal scorecard names that set.
+Numbers there are short (`0.157`). `scorecard.json` and `scorecard.md` keep
+the full precision.
+
+`coticula grade` does not always use that holdout. `--model fno` or
+`--model pino` loads the checkpoint and scores the same indices as demo.
+`--adapter`, or `--model persist_ic` with no checkpoint, scores every
+trajectory (Burgers 48, heat 32). That is why a `persist_ic` number from
+`grade` can differ from the demo table. `--split holdout` forces the demo
+indices.
 
 ```bash
 coticula grade --model fno --pde burgers --out reports/grade
 coticula grade --model pino --pde burgers
+coticula grade --adapter examples/persist_ic.py:PersistIC --pde burgers --split holdout
 ```
 
 The older scripts still work:
@@ -57,10 +69,15 @@ path is for a tiny check. It is not the shipped checkpoint. CI runs the real
 Two commands, both run on 2026-10-10. Learned cells match across them.
 Classical residuals do not, because the commands do not use the same slice.
 `scripts.run_eval` re-solves the first trajectories. `coticula demo` re-solves
-the checkpoint holdout (Burgers indices 36-47, heat indices 24-31).
+the checkpoint holdout (Burgers indices 36-47, 12 trajectories; heat indices
+24-31, 8 trajectories). `coticula grade --model fno` or `--model pino` uses
+that same holdout. `coticula grade` of an adapter, with no shipped checkpoint
+loaded, scores every trajectory (Burgers 48, heat 32) unless you pass
+`--split holdout`.
 
 Harness table, stdout of `python -m scripts.render_results_table` after
-`python -m scripts.run_eval` (generated 2026-10-10T04:03:32Z):
+`python -m scripts.run_eval` (generated 2026-10-10T04:03:32Z). The PINO
+heat2d cell is annotated; the script prints `not_trained`.
 
 | model | pde | Predict rel-L2 | residual rel-L2 | trust |
 |---|---|---:|---:|---|
@@ -69,13 +86,13 @@ Harness table, stdout of `python -m scripts.render_results_table` after
 | fno | burgers | 1.573143e-01 | 4.848762e+00 | untrusted |
 | fno | heat2d | 3.221335e-01 | 1.303385e+01 | untrusted |
 | pino | burgers | 1.880157e-01 | 1.732850e+00 | untrusted |
-| pino | heat2d | - | - | not_trained |
+| pino | heat2d | - | - | not_trained (no checkpoint shipped, to keep the repo small) |
 
 Exam 4 n=48 sha256=48323ca8ea9d8277 gold=1.000000 rule-based=0.878472 metric-dump=0.090278 llm=not_trained
 
 Residual-vs-L2 points n=21 pearson=0.7411755514841815 spearman=0.34155844155844156 untrusted=21 ood_flag=0
 
-There is no PINO heat checkpoint in the repo. That cell is `not_trained`.
+PINO heat2d is `not_trained`: no checkpoint shipped, to keep the repo small.
 All 21 learned IID and OOD points in the scatter are `untrusted`. None of
 them is status `ood`, because the residual cut failed as well, and
 `untrusted` wins.
@@ -92,7 +109,7 @@ Predict and residual cells match the harness table.
 | persist_ic | burgers | 3.771952e-01 | 8.091685e-01 | trusted |
 | classical_fd | heat2d | 0.000000e+00 | 2.983392e-02 | reference |
 | fno | heat2d | 3.221335e-01 | 1.303385e+01 | untrusted |
-| pino | heat2d | - | - | not_trained |
+| pino | heat2d | - | - | not_trained (no checkpoint shipped, to keep the repo small) |
 | persist_ic | heat2d | 1.424304e+00 | 1.280133e+01 | untrusted |
 
 One OOD probe per equation (viscosity or diffusivity below the train range,
@@ -168,7 +185,7 @@ call (`coticula.adapter.TorchOperatorAdapter`).
   `trusted` while a lower Predict error lands `untrusted`. Read Exam 2 and
   Exam 3 next to the flag.
 - `trusted` does not mean the model understands the PDE.
-- PINO is trained on Burgers only. Heat PINO is `not_trained`.
+- PINO heat2d is `not_trained`: no checkpoint shipped, to keep the repo small. PINO Burgers is the shipped checkpoint.
 - Exam 4 is keyword coverage on a pinned 48-item set. The LLM judge is off
   unless a real client is wired, and this repo does not invent that score.
 - OOD trajectories are generated from `datasets/ood/probe_plan_v0.json`.
@@ -177,14 +194,14 @@ call (`coticula.adapter.TorchOperatorAdapter`).
 
 ## Citation
 
-Software citation is `CITATION.cff` (Shehbaz Pathan, version 0.3.0).
+Software citation is `CITATION.cff` (Shehbaz Pathan, version 0.3.1).
 
 ```bibtex
 @software{pathan_coticula_2026,
   author = {Pathan, Shehbaz},
   title = {Coticula},
   year = {2026},
-  version = {0.3.0},
+  version = {0.3.1},
   url = {https://github.com/shehbaz0101/coticula}
 }
 ```
