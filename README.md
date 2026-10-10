@@ -43,7 +43,9 @@ the full precision.
 `--adapter`, or `--model persist_ic` with no checkpoint, scores every
 trajectory (Burgers 48, heat 32). That is why a `persist_ic` number from
 `grade` can differ from the demo table. `--split holdout` forces the demo
-indices.
+indices. Exam 4 rule-based and metric-dump can still differ on that shared
+holdout, because those scores append the FNO and PINO rows on the card.
+`grade` includes one model. See Results.
 
 ```bash
 coticula grade --model fno --pde burgers --out reports/grade
@@ -152,8 +154,28 @@ What this demo run measured, from `coticula demo --out reports/demo`
 
 Exam 4 on this demo matched the harness numbers above: gold 1.000000,
 rule-based 0.878472, metric-dump 0.090278, llm `not_trained`. Gold is the
-authored answer key. Rule-based text is templates plus the measured
-observations. Metric-dump is numbers only. None of those is an LLM score.
+authored answer key and does not use the model rows. Rule-based text is
+templates plus observations copied from the FNO and PINO rows on that card.
+Metric-dump is those observations as numbers only. None of those is an LLM
+score.
+
+`coticula demo` on both equations fills five of those cells: Burgers FNO
+Predict and residual, Burgers PINO Predict and residual, and the FNO heat
+counterfactual. PINO heat2d has no checkpoint shipped, so it fills nothing.
+`coticula grade` scores one model and one equation. `--split holdout` uses
+the same trajectories and still omits the models that were not requested.
+An empty cell is written `not_trained` in the metric-dump string. That token
+is an expected keyword on two of the 48 items, so a one-model grade scores
+metric-dump 0.104167.
+
+The rule-based sentence starts with "Measured" when both Burgers models are
+on the card, or when the FNO heat counterfactual is on the card. That word
+is an expected keyword on item `e4_x20`. `coticula grade --model fno --pde
+burgers` and `coticula grade --model pino --pde burgers` have neither, including
+on holdout indices 36-47, so rule-based is 0.871528. `coticula grade --model
+fno --pde heat2d` still has the heat counterfactual sentence, so rule-based
+stays 0.878472 and metric-dump is 0.104167. The CLI scorecard ends with the
+same explanation.
 
 Longer tables and the failure notes live in `reports/latest.md` and
 `docs/WRITEUP.md`.
@@ -206,14 +228,14 @@ is unchanged in this release.
 
 ## Citation
 
-Software citation is `CITATION.cff` (Shehbaz Pathan, version 0.3.1).
+Software citation is `CITATION.cff` (Shehbaz Pathan, version 0.3.2).
 
 ```bibtex
 @software{pathan_coticula_2026,
   author = {Pathan, Shehbaz},
   title = {Coticula},
   year = {2026},
-  version = {0.3.1},
+  version = {0.3.2},
   url = {https://github.com/shehbaz0101/coticula}
 }
 ```
@@ -225,7 +247,7 @@ coticula/          CLI, adapter, scorecard writers
 examples/persist_ic.py
 metrics/           predict, conserve, counterfactual, explain, ood, trust
 baselines/         classical FD, FNO, PINO loss, LLM stub
-checkpoints/       shipped fno_burgers, fno_heat2d, pino_burgers
+checkpoints/       shipped fno_burgers, fno_heat2d, pino_burgers; PINO heat2d has no checkpoint shipped
 scripts/           generate_labels, run_eval, run_ood, train_*, render_results_table, probe_residual_noise
 datasets/exam4/    48 pinned Exam 4 items
 reports/           latest.json from run_eval; demo/ is generated and gitignored
