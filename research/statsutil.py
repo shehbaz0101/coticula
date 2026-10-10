@@ -91,6 +91,53 @@ def linear_fit(x: np.ndarray, y: np.ndarray) -> dict:
     }
 
 
+def paired_wilcoxon(diff: np.ndarray) -> dict:
+    """Two-sided Wilcoxon signed-rank test on paired differences.
+
+    Effect size is the mean difference and Cohen's dz (mean / sample std).
+    """
+    from scipy.stats import wilcoxon
+
+    diff = np.asarray(diff, dtype=np.float64)
+    diff = diff[np.isfinite(diff)]
+    if diff.size == 0:
+        return {
+            "test": "wilcoxon_signed_rank",
+            "mean_diff": None,
+            "std_diff": None,
+            "cohen_dz": None,
+            "statistic": None,
+            "p_value": None,
+            "n": 0,
+        }
+    mean = float(diff.mean())
+    std = float(diff.std(ddof=1)) if diff.size > 1 else 0.0
+    dz = float(mean / std) if std > 0 else None
+    usable = diff[np.abs(diff) > 0]
+    if usable.size < 5:
+        return {
+            "test": "wilcoxon_signed_rank",
+            "mean_diff": mean,
+            "std_diff": std,
+            "cohen_dz": dz,
+            "statistic": None,
+            "p_value": None,
+            "n": int(diff.size),
+            "n_nonzero": int(usable.size),
+        }
+    result = wilcoxon(usable, alternative="two-sided", zero_method="wilcox")
+    return {
+        "test": "wilcoxon_signed_rank",
+        "mean_diff": mean,
+        "std_diff": std,
+        "cohen_dz": dz,
+        "statistic": float(result.statistic),
+        "p_value": float(result.pvalue),
+        "n": int(diff.size),
+        "n_nonzero": int(usable.size),
+    }
+
+
 def log_interp(levels: np.ndarray, values: np.ndarray, epsilon: float) -> dict:
     """Log-log linear interpolation. Clips to the covered range and flags it."""
     levels = np.asarray(levels, dtype=np.float64)

@@ -222,3 +222,148 @@ Burgers viscosity from evenly spaced sensors. The FNO-conditioned inverse was no
 - The inverse probe interpolates sparse sensors before the strong and weak least-squares fits. Solver-in-the-loop sees only the sensors. No learned inverse was trained.
 - Shipped FNO/PINO checkpoints were trained under the original one-seed recipe. They are a rescore, not part of the five-seed budget.
 
+
+## Protocol v2 amendment
+
+Protocol v2 SHA-256: `6457f447ab555e30803068fd92d7d36738d293d09616a9b4174bd0300c990549`
+
+This section amends the frozen v1 protocol. v1 tables above are unchanged. S is used only for relative L2. Residual columns are the calibrated ratio C = rho / median smooth residual at the same relative L2. The smooth error is the v1 time-varying low-mode error. The band is the 5th to 95th percentile, log-log interpolated on the noise grid. C is omitted from the reported mean when the relative L2 falls outside that grid.
+
+### What changed
+
+- Scaled score S is reported only for relative L2. Residual metrics no longer use S. The zero field and other low-content fields nearly satisfy both PDEs, so the best trivial residual was the training-mean field and S(rho_w) went largely negative. A residual by itself is not an accuracy score.
+- Residuals are reported as the calibrated ratio C(M) = rho(M) / rho_smooth(relL2(M)). rho_smooth(r) is the median residual of a time-varying smooth low-mode error at relative L2 r. A 5% to 95% band is interpolated on the same grid. C compares a field with a generic smooth error of the same size. C > 1 means less PDE-consistent than that smooth error. C < 1 means more physics-like.
+- Weak-form survival uses the smooth band, not the white-noise envelope. The legacy untrusted flag survives only when the weak residual is strictly above the 95% smooth band at the field's own relative L2. The white-noise weak residual shrinks like 1/sqrt(N), so clearing it is nearly vacuous.
+- One matched-rel-L2 table and figure place white noise, smooth noise, and coefficient-mismatch errors side by side. That is the comparison the paper needs: strong form should rank by roughness, weak form by physics consistency.
+- Architecture comparisons are Wilcoxon signed-rank tests on paired (seed, trajectory) differences, with the mean difference and Cohen's dz. v1 paired tests averaged seeds first, leaving four trajectories and no effect size.
+
+### Matched relative L2: white, smooth, and a scale-2 coefficient shift
+
+Mismatch on this grid is the error u(2c) − u(c), rescaled to the row's relative L2 and added to u(c). Residuals use the original coefficient. Entries are medians.
+
+| PDE | ε | white ρ_s | smooth ρ_s | mismatch ρ_s | white C_s | mismatch C_s | white ρ_w | smooth ρ_w | mismatch ρ_w | white C_w | mismatch C_w |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| burgers | 0.001 | 0.0607175 | 0.0568517 | 0.0549032 | 1.068 | 0.965727 | 0.000258451 | 0.000258788 | 0.000243343 | 0.9987 | 0.940321 |
+| burgers | 0.01 | 0.233484 | 0.0981399 | 0.0425505 | 2.37909 | 0.43357 | 0.000496776 | 0.000638989 | 0.000178567 | 0.77744 | 0.279452 |
+| burgers | 0.05 | 1.13102 | 0.401319 | 0.0820892 | 2.81826 | 0.204549 | 0.00214157 | 0.00294873 | 0.000447747 | 0.72627 | 0.151844 |
+| burgers | 0.1 | 2.25617 | 0.794205 | 0.186539 | 2.8408 | 0.234875 | 0.00431285 | 0.00588183 | 0.000998815 | 0.73325 | 0.169814 |
+| burgers | 0.2 | 4.46654 | 1.57001 | 0.427105 | 2.84491 | 0.27204 | 0.00848856 | 0.0120065 | 0.00211993 | 0.706997 | 0.176565 |
+| burgers | 0.5 | 10.6582 | 3.72008 | 1.3197 | 2.86504 | 0.354751 | 0.0215012 | 0.0298857 | 0.00540113 | 0.719449 | 0.180726 |
+| heat | 0.001 | 0.171497 | 0.0939402 | 0.0822326 | 1.8256 | 0.875372 | 0.000459945 | 0.000464691 | 0.000466626 | 0.989787 | 1.00416 |
+| heat | 0.01 | 1.32738 | 0.366868 | 0.120249 | 3.61814 | 0.327772 | 0.000502062 | 0.000726861 | 0.00055392 | 0.690726 | 0.762071 |
+| heat | 0.05 | 6.59156 | 1.72217 | 0.334964 | 3.82746 | 0.1945 | 0.00116412 | 0.00276636 | 0.00109097 | 0.420813 | 0.394372 |
+| heat | 0.1 | 13.0825 | 3.34688 | 0.646926 | 3.90885 | 0.193292 | 0.00216192 | 0.00551343 | 0.00186176 | 0.392119 | 0.337677 |
+| heat | 0.2 | 25.7603 | 6.49221 | 1.42282 | 3.96789 | 0.219158 | 0.00435125 | 0.0107272 | 0.00344917 | 0.405628 | 0.321535 |
+| heat | 0.5 | 56.7642 | 13.6245 | 10.0322 | 4.16633 | 0.736333 | 0.0107101 | 0.0279106 | 0.00827967 | 0.383728 | 0.29665 |
+
+### Natural coefficient scales
+
+The field is the classical solution at scale × coefficient, same initial condition. White and smooth columns are the noise medians interpolated to that field's mean relative L2. C is the mean of per-trajectory ratios inside the noise grid.
+
+| PDE | scale | rel-L2 | clipped | white ρ_s | smooth ρ_s | mismatch ρ_s | C_s | white ρ_w | smooth ρ_w | mismatch ρ_w | C_w |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| burgers | 0 | 0.11434 | no | 2.57462 | 0.906049 | 0.332406 | 0.424811 | 0.00491605 | 0.00675189 | 0.00121398 | 0.232634 |
+| burgers | 0.5 | 0.0495958 | no | 1.12206 | 0.398479 | 0.172019 | 0.509028 | 0.00212585 | 0.00292608 | 0.000732359 | 0.314617 |
+| burgers | 2 | 0.0740571 | no | 1.67274 | 0.590863 | 0.142466 | 0.246961 | 0.00318442 | 0.00436092 | 0.000668019 | 0.171254 |
+| heat | 0 | 1.41174 | yes | outside grid | outside grid | 10.7123 | — | outside grid | outside grid | 0.0515661 | — |
+| heat | 0.5 | 0.35347 | no | 42.0925 | 10.2914 | 2.29602 | 0.229619 | 0.00761611 | 0.0194351 | 0.00997105 | 0.503445 |
+| heat | 2 | 0.327793 | no | 39.4424 | 9.68224 | 3.05988 | 0.32207 | 0.00707191 | 0.0179641 | 0.00556731 | 0.306686 |
+
+### Models
+
+Five seeds were retrained from the v1 selected hyperparameters. Max absolute difference versus the v1 per-seed relative L2 is burgers 0.00917, heat 0.02. The v1 model table is not replaced.
+
+| PDE | model | rel-L2 | S(rel-L2) | ρ_s | C_s | ρ_w | C_w |
+|---|---|---|---|---|---|---|---|
+| burgers | zeros | 1 | -169.43 | 0 | — | 0 | — |
+| burgers | training_mean | 0.996807 | -168.57 | 1.01465 | — | 0.000842696 | — |
+| burgers | frozen_initial | 0.371154 | 0 | 0.747975 | 0.265625 | 0.00484133 | 0.220339 |
+| burgers | reference | 0 | 100 | 0.0539355 | — | 0.000278801 | — |
+| burgers | fno | 0.0743501 ± 0.00218 | 79.9678 | 0.450478 | 0.768815 | 0.00166844 | 0.379426 |
+| burgers | unet | 0.108072 ± 0.0056 | 70.8822 | 1.03208 | 1.19885 | 0.00366479 | 0.570564 |
+| burgers | deeponet | 0.376795 ± 0.011 | -1.51993 | 0.90638 | 0.341441 | 0.00245946 | 0.137216 |
+| heat | zeros | 1 | -100.345 | 0 | — | 0 | — |
+| heat | training_mean | 0.499138 | 0 | 0.961087 | 0.0857161 | 0.00273929 | 0.120623 |
+| heat | frozen_initial | 1.38554 | -177.586 | 11.5265 | — | 0.051183 | — |
+| heat | reference | 0 | 100 | 0.0940405 | — | 0.000470282 | — |
+| heat | fno | 0.182567 ± 0.00213 | 63.4236 | 4.89461 | 0.836927 | 0.00557064 | 0.551815 |
+| heat | unet | 0.138457 ± 0.00737 | 72.2608 | 4.61493 | 1.05454 | 0.00544704 | 0.717803 |
+| heat | deeponet | 0.307565 ± 0.0229 | 38.3808 | 8.14587 | 0.877751 | 0.00811164 | 0.47824 |
+
+### Paired tests
+
+Wilcoxon signed-rank test on paired differences over seeds × test trajectories. Cohen's dz is the mean difference divided by the sample standard deviation of the differences.
+
+| PDE | contrast | metric | mean diff | Cohen dz | p | n |
+|---|---|---|---|---|---|---|
+| burgers | fno - unet | rel_l2 | -0.0337218 | -2.45225 | 1.90735e-06 | 20 |
+| burgers | fno - unet | strong | -0.581605 | -3.11432 | 1.90735e-06 | 20 |
+| burgers | fno - unet | weak | -0.00199634 | -1.22959 | 9.53674e-06 | 20 |
+| burgers | fno - unet | C_strong | -0.430036 | -2.51827 | 1.90735e-06 | 20 |
+| burgers | fno - unet | C_weak | -0.191138 | -0.824171 | 0.00168991 | 20 |
+| burgers | fno - deeponet | rel_l2 | -0.302445 | -2.58978 | 1.90735e-06 | 20 |
+| burgers | fno - deeponet | strong | -0.455902 | -3.55375 | 1.90735e-06 | 20 |
+| burgers | fno - deeponet | weak | -0.000791015 | -1.06562 | 0.000261307 | 20 |
+| burgers | fno - deeponet | C_strong | 0.431287 | 2.38904 | 1.90735e-06 | 20 |
+| burgers | fno - deeponet | C_weak | 0.248144 | 2.49656 | 1.90735e-06 | 20 |
+| burgers | unet - deeponet | rel_l2 | -0.268723 | -2.52389 | 1.90735e-06 | 20 |
+| burgers | unet - deeponet | strong | 0.125703 | 0.608056 | 0.0136166 | 20 |
+| burgers | unet - deeponet | weak | 0.00120533 | 0.732589 | 0.00198555 | 20 |
+| burgers | unet - deeponet | C_strong | 0.861323 | 4.4419 | 1.90735e-06 | 20 |
+| burgers | unet - deeponet | C_weak | 0.439282 | 2.04237 | 1.90735e-06 | 20 |
+| heat | fno - unet | rel_l2 | 0.0441096 | 3.37129 | 1.90735e-06 | 20 |
+| heat | fno - unet | strong | 0.27968 | 0.447664 | 0.08255 | 20 |
+| heat | fno - unet | weak | 0.000123609 | 0.133347 | 0.430433 | 20 |
+| heat | fno - unet | C_strong | -0.217618 | -1.26497 | 2.67029e-05 | 20 |
+| heat | fno - unet | C_weak | -0.165988 | -1.31486 | 1.90735e-05 | 20 |
+| heat | fno - deeponet | rel_l2 | -0.124998 | -2.36365 | 1.90735e-06 | 20 |
+| heat | fno - deeponet | strong | -3.25126 | -1.14076 | 1.90735e-06 | 20 |
+| heat | fno - deeponet | weak | -0.002541 | -1.06825 | 1.90735e-05 | 20 |
+| heat | fno - deeponet | C_strong | -0.0408234 | -0.107326 | 0.898317 | 20 |
+| heat | fno - deeponet | C_weak | 0.0735751 | 0.374115 | 0.142906 | 20 |
+| heat | unet - deeponet | rel_l2 | -0.169108 | -3.23192 | 1.90735e-06 | 20 |
+| heat | unet - deeponet | strong | -3.53094 | -1.0983 | 1.90735e-06 | 20 |
+| heat | unet - deeponet | weak | -0.00266461 | -1.12028 | 1.90735e-06 | 20 |
+| heat | unet - deeponet | C_strong | 0.176794 | 0.371504 | 0.08255 | 20 |
+| heat | unet - deeponet | C_weak | 0.239564 | 1.06549 | 0.000585556 | 20 |
+
+### Shipped checkpoints under the smooth band
+
+Survival means the weak residual is strictly above the 95% smooth band at the field's relative L2. The band is built on that checkpoint's evaluation trajectories, not on the paper grid. Outside the noise grid, survival is not called.
+
+| PDE | model | status | rel-L2 | ρ_s | C_s | ρ_w | C_w | legacy untrusted | weak survival |
+|---|---|---|---|---|---|---|---|---|---|
+| burgers | fno | ok | 0.157314 | 4.84876 | 3.84598 | 0.00373441 | 0.410268 | true | false |
+| burgers | frozen_initial | ok | 0.377195 | 0.809169 | 0.279911 | 0.00526196 | 0.234965 | false | false |
+| burgers | reference | ok | 0 | 0.0131944 | — | 5.46756e-05 | — | false | — |
+| burgers | pino | ok | 0.188016 | 1.73285 | 1.15185 | 0.00482244 | 0.442894 | true | false |
+| heat | fno | ok | 0.322134 | 13.0339 | 1.37399 | 0.00897895 | 0.483588 | true | false |
+| heat | frozen_initial | ok | 1.4243 | 12.8013 | — | 0.0621702 | — | true | — |
+| heat | reference | ok | 0 | 0.0298339 | — | 2.27398e-05 | — | false | — |
+| heat | pino | not_trained | — | — | — | — | — | — | — |
+
+### Reading against the expected ranking
+
+burgers: strong white/smooth median ratio spans 1.068 to 2.86504; weak white/smooth spans 0.706997 to 0.9987. Amplitude-matched scale-2 mismatch over smooth spans 0.204549 to 0.965727 (strong) and 0.151844 to 0.940321 (weak).
+burgers strong form ranks white above smooth at every noise level on this grid.
+burgers strong white/smooth stays below 10. On this coarse grid the midpoint time term dominates the spatial roughness term, so white noise is not orders of magnitude above smooth noise.
+burgers strong mismatch is below the smooth median at every matched level.
+burgers weak mismatch C is below 1 at every matched level: the coefficient-shift shape is more PDE-consistent than a generic smooth error of the same size.
+burgers does not support smooth ≈ mismatch in the strong form. For ε ≥ 0.01, strong mismatch/smooth spans 0.204549 to 0.43357.
+heat: strong white/smooth median ratio spans 1.8256 to 4.16633; weak white/smooth spans 0.383728 to 0.989787. Amplitude-matched scale-2 mismatch over smooth spans 0.193292 to 0.875372 (strong) and 0.29665 to 1.00416 (weak).
+heat strong form ranks white above smooth at every noise level on this grid.
+heat strong white/smooth stays below 10. On this coarse grid the midpoint time term dominates the spatial roughness term, so white noise is not orders of magnitude above smooth noise.
+heat strong mismatch is below the smooth median at every matched level.
+heat weak mismatch C stays below 1 except for a single level at 1.00416, next to the discretization floor.
+heat does not support smooth ≈ mismatch in the strong form. For ε ≥ 0.01, strong mismatch/smooth spans 0.193292 to 0.736333.
+
+### Wall clock (seconds)
+
+| stage | seconds |
+|---|---|
+| noise_bands | 2.391 |
+| mismatch | 0.313 |
+| models | 29.286 |
+| shipped | 6.098 |
+| total | 38.123 |
+
