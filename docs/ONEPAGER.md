@@ -7,7 +7,9 @@ Coticula tests whether a PDE surrogate actually understands the physics, not jus
 
 **Repo:** https://github.com/shehbaz0101/coticula  
 **Brand:** coticula.ai (domain TBD)  
-**Author:** Shehbaz Pathan · v0.2 (research) / v0.1.0 (shipped harness)
+**Author:** Shehbaz Pathan · v0.3.0
+
+Try: `coticula demo --out reports/demo` (see the README for the measured scorecard).
 
 ---
 
