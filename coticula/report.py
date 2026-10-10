@@ -106,6 +106,116 @@ def _flag_text(row: dict) -> str:
     return str(status)
 
 
+def counterfactual_plain(name: str, pde: str, model_delta: float, class_delta: float) -> str:
+    """Neutral one-liner. Three decimals, same values as the Exam 3 cells."""
+    return (
+        f"{name} {pde}: moves {fmt_short(model_delta)} when the coefficient changes; "
+        f"the solver moves {fmt_short(class_delta)}"
+    )
+
+
+def counterfactual_entries(card: dict) -> list[dict]:
+    """Rows that already carry model change, solver change, and model-vs-solver."""
+    entries: list[dict] = []
+    for pde, section in (card.get("pdes") or {}).items():
+        for row in _rows(section):
+            if row.get("role") == "labeler":
+                continue
+            cf = row.get("counterfactual") or {}
+            model_delta = cf.get("rel_l2_traj_delta_model")
+            class_delta = cf.get("rel_l2_traj_delta_classical")
+            vs = cf.get("rel_l2_vs_classical_cf")
+            if model_delta is None or class_delta is None or vs is None:
+                continue
+            name = str(row.get("name"))
+            model_delta_f = float(model_delta)
+            class_delta_f = float(class_delta)
+            entries.append(
+                {
+                    "name": name,
+                    "pde": str(pde),
+                    "model_delta": model_delta_f,
+                    "class_delta": class_delta_f,
+                    "vs": float(vs),
+                    "plain": counterfactual_plain(name, str(pde), model_delta_f, class_delta_f),
+                }
+            )
+    return entries
+
+
+def counterfactual_terminal_lines(card: dict) -> list[str]:
+    entries = counterfactual_entries(card)
+    if not entries:
+        return []
+    header = (
+        f"{'model':<14} {'PDE':<8} {'model change':>12} {'classical change':>16} "
+        f"{'vs classical':>12}  plain English"
+    )
+    lines = ["Counterfactual", header, "-" * len(header)]
+    for entry in entries:
+        lines.append(
+            f"{entry['name']:<14} {entry['pde']:<8} {fmt_short(entry['model_delta']):>12} "
+            f"{fmt_short(entry['class_delta']):>16} {fmt_short(entry['vs']):>12}  {entry['plain']}"
+        )
+    return lines
+
+
+def counterfactual_markdown_lines(card: dict) -> list[str]:
+    entries = counterfactual_entries(card)
+    if not entries:
+        return []
+    lines = [
+        "## Counterfactual",
+        "",
+        "| model | PDE | model trajectory change | classical trajectory change | "
+        "model vs classical at the new coefficient | plain English |",
+        "|---|---|---:|---:|---:|---|",
+    ]
+    for entry in entries:
+        lines.append(
+            f"| {entry['name']} | {entry['pde']} | {fmt(entry['model_delta'])} | "
+            f"{fmt(entry['class_delta'])} | {fmt(entry['vs'])} | {entry['plain']} |"
+        )
+    lines.append("")
+    return lines
+
+
+def exam4_cli_footer() -> str:
+    """Why rule-based and metric-dump differ between demo and grade.
+
+    The keyword rubric appends observations copied only from the FNO and PINO
+    rows on that card. The holdout indices can match and the scores still move,
+    because ``grade`` leaves the models it did not run as empty cells, and an
+    empty cell is written ``not_trained`` into the Exam 4 text.
+    """
+    return (
+        "Exam 4 rule-based and metric-dump append observations copied only from "
+        "the FNO and PINO rows on that card. demo (both equations) fills Burgers "
+        "FNO, Burgers PINO, and the FNO heat counterfactual, so rule-based is "
+        "0.878472 and metric-dump is 0.090278. grade scores one model and one "
+        "equation. The same holdout still leaves the other learned cells empty, "
+        "and an empty cell is written not_trained. That token is an expected "
+        "keyword on two items, so metric-dump on a one-model grade is 0.104167. "
+        "Rule-based includes the word measured when the card has both Burgers "
+        "models or the FNO heat counterfactual. grade --model fno --pde burgers "
+        "and grade --model pino --pde burgers have neither, including on holdout "
+        "indices 36-47, so rule-based is 0.871528. grade --model fno --pde heat2d "
+        "keeps rule-based at 0.878472 and metric-dump at 0.104167. PINO heat2d "
+        "has no checkpoint shipped, so it never fills a cell."
+    )
+
+
+def terminal_verdict_lines(card: dict) -> list[str]:
+    """Short flag lines printed at the bottom of the terminal scorecard."""
+    pdes = card.get("pdes") or {}
+    multi = len(pdes) > 1
+    lines: list[str] = []
+    for pde, section in pdes.items():
+        for row in _rows(section):
+            lines.append(verdict_line(row, pde=pde if multi else None))
+    return lines
+
+
 def verdict_line(row: dict, *, pde: str | None = None) -> str:
     """Measured Predict, residual, and flag. No pass/fail claim about the PDE."""
     name = str(row.get("name"))
@@ -128,11 +238,16 @@ def markdown_table(card: dict) -> str:
     lines = [
         f"# Coticula {card.get('version')} scorecard",
         "",
-        f"Command: `{card.get('command')}`",
-        "",
-        f"Generated (UTC): {card.get('generated_at_utc')}",
-        "",
     ]
+    lines.extend(counterfactual_markdown_lines(card))
+    lines.extend(
+        [
+            f"Command: `{card.get('command')}`",
+            "",
+            f"Generated (UTC): {card.get('generated_at_utc')}",
+            "",
+        ]
+    )
     note = card.get("eval_set") or eval_set_note(card)
     if note:
         lines.append(note)
@@ -263,11 +378,16 @@ def terminal_scorecard(card: dict, *, color: bool | None = None) -> str:
     """Aligned scorecard. Color when ``color`` is true, or when stdout is a TTY."""
     if color is None:
         color = sys.stdout.isatty()
-    lines = [
-        f"Coticula {card.get('version')} scorecard",
-        f"command: {card.get('command')}",
-        card.get("eval_set") or eval_set_note(card),
-    ]
+    lines = counterfactual_terminal_lines(card)
+    if lines:
+        lines.append("")
+    lines.extend(
+        [
+            f"Coticula {card.get('version')} scorecard",
+            f"command: {card.get('command')}",
+            card.get("eval_set") or eval_set_note(card),
+        ]
+    )
     if card.get("smoke"):
         lines.append("smoke: tiny grid, not the shipped checkpoint")
     pdes = card.get("pdes") or {}
@@ -344,6 +464,8 @@ def terminal_scorecard(card: dict, *, color: bool | None = None) -> str:
                     1,
                 )
             lines.append(line)
+    lines.append("")
+    lines.append(exam4_cli_footer())
     return "\n".join(lines)
 
 
@@ -353,18 +475,24 @@ def html_report(card: dict, plot_names: list[str]) -> str:
         "<html lang='en'><head><meta charset='utf-8'>",
         f"<title>Coticula {escape(str(card.get('version')))} scorecard</title>",
         "<style>",
-        "body{font-family:Georgia,serif;max-width:880px;margin:2rem auto;padding:0 1rem;color:#1c1c1c;}",
+        "body{font-family:Georgia,serif;max-width:1080px;margin:2rem auto;padding:0 1rem;color:#1c1c1c;}",
         "table{border-collapse:collapse;width:100%;margin:0.5rem 0 1.25rem;}",
-        "th,td{border-bottom:1px solid #ddd;padding:0.35rem 0.5rem;text-align:left;}",
-        "td.num{text-align:right;font-family:ui-monospace,monospace;}",
+        "th,td{border-bottom:1px solid #ddd;padding:0.35rem 0.5rem;text-align:left;vertical-align:top;}",
+        "td.num{text-align:right;font-family:ui-monospace,monospace;white-space:nowrap;}",
         ".reading{background:#f6f4ef;padding:0.75rem 1rem;}",
         "img{max-width:100%;height:auto;margin:0.5rem 0 1rem;}",
         "code{font-family:ui-monospace,monospace;}",
+        "table.counterfactual{table-layout:fixed;}",
+        "table.counterfactual th{font-size:0.92rem;}",
+        "table.counterfactual td.plain{font-size:0.95rem;overflow-wrap:anywhere;}",
         "</style></head><body>",
         f"<h1>Coticula {escape(str(card.get('version')))} scorecard</h1>",
-        f"<p>Command: <code>{escape(str(card.get('command')))}</code><br>",
-        f"Generated (UTC): {escape(str(card.get('generated_at_utc')))}</p>",
     ]
+    parts.extend(_html_counterfactual(card))
+    parts.append(
+        f"<p>Command: <code>{escape(str(card.get('command')))}</code><br>"
+        f"Generated (UTC): {escape(str(card.get('generated_at_utc')))}</p>"
+    )
     note = card.get("eval_set") or ""
     if note:
         parts.append(f"<p>{escape(note)}</p>")
@@ -411,7 +539,7 @@ def html_report(card: dict, plot_names: list[str]) -> str:
     parts.append("<h2>Known limitation</h2>")
     parts.append(f"<p>{escape(residual_limitation_note())}</p>")
     parts.append("<h2>Reading</h2><div class='reading'><ul>")
-    for sentence in card.get("reading") or []:
+    for sentence in terminal_verdict_lines(card):
         parts.append(f"<li>{escape(sentence)}</li>")
     parts.append("</ul></div>")
     if plot_names:
@@ -420,6 +548,36 @@ def html_report(card: dict, plot_names: list[str]) -> str:
             parts.append(f"<img alt='{escape(name)}' src='{escape(name)}'>")
     parts.append("</body></html>")
     return "\n".join(parts)
+
+
+def _html_counterfactual(card: dict) -> list[str]:
+    entries = counterfactual_entries(card)
+    if not entries:
+        return []
+    parts = [
+        "<h2>Counterfactual</h2>",
+        "<table class='counterfactual'><colgroup>"
+        "<col style='width:11%'><col style='width:10%'><col style='width:13%'>"
+        "<col style='width:14%'><col style='width:16%'><col style='width:36%'>"
+        "</colgroup><thead><tr>"
+        "<th>model</th><th>PDE</th><th>model trajectory change</th>"
+        "<th>classical trajectory change</th>"
+        "<th>model vs classical at the new coefficient</th>"
+        "<th>plain English</th></tr></thead><tbody>",
+    ]
+    for entry in entries:
+        parts.append(
+            "<tr>"
+            f"<td>{escape(entry['name'])}</td>"
+            f"<td>{escape(entry['pde'])}</td>"
+            f"<td class='num'>{escape(fmt(entry['model_delta']))}</td>"
+            f"<td class='num'>{escape(fmt(entry['class_delta']))}</td>"
+            f"<td class='num'>{escape(fmt(entry['vs']))}</td>"
+            f"<td class='plain'>{escape(entry['plain'])}</td>"
+            "</tr>"
+        )
+    parts.append("</tbody></table>")
+    return parts
 
 
 def _html_model_table(rows: list[dict]) -> str:

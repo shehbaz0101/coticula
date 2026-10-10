@@ -7,8 +7,28 @@ and the README, and were produced by `python -m scripts.run_eval`,
 This file does not invent metrics.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-The package version in `pyproject.toml` is `0.3.1`. The 0.3.1 entry does not
+The package version in `pyproject.toml` is `0.3.2`. The 0.3.2 entry does not
 create a tag.
+
+## [0.3.2] - 2026-10-10
+
+CLI and report consistency. No new measurements. The residual metric and the
+trust rule are unchanged. No tag.
+
+### Changed
+
+- `coticula demo`, `scorecard.md`, and `report.html` open with a counterfactual
+  table (model, PDE, model trajectory change, classical trajectory change,
+  model vs classical at the new coefficient, and one plain-English line).
+  The cells are the Exam 3 values already on the scorecard.
+- `report.html` Reading uses the same short flag lines as the terminal
+  (`fno burgers: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)`).
+  The Known limitation section stays.
+- The README and the CLI footer state why Exam 4 rule-based and metric-dump
+  differ between `grade` and `demo` on the same holdout: those answers append
+  observations copied only from the FNO and PINO rows on the card. `grade`
+  scores one model, so the other cells are written `not_trained`.
+- The README notes again that PINO heat2d has no checkpoint shipped.
 
 ## [0.3.1] - 2026-10-10
 
@@ -165,6 +185,8 @@ Week 1 is the initial commit on this repo.
 - No claim that keyword rubrics equal explanation quality.
 - No claim that a `trusted` flag means the model understands the PDE.
 
-[0.3.0]: https://github.com/shehbaz0101/coticula/compare/v0.2.0...HEAD
+[0.3.2]: https://github.com/shehbaz0101/coticula/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/shehbaz0101/coticula/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/shehbaz0101/coticula/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/shehbaz0101/coticula/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/shehbaz0101/coticula/releases/tag/v0.1.0

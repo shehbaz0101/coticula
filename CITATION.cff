@@ -10,11 +10,13 @@ abstract: >-
   v0.2 added a 48-item Exam 4 set with rule-based (non-LLM) grades and
   residual-vs-L2 diagnostics. v0.3.0 adds a command-line scorecard and a
   small adapter interface for a user model. v0.3.1 polishes that scorecard.
+  v0.3.2 puts the counterfactual table on the scorecard and states why Exam 4
+  rule-based and metric-dump differ between grade and demo.
   Reports contain only measured numbers; missing checkpoints stay not_trained.
 authors:
   - family-names: Pathan
     given-names: Shehbaz
-version: "0.3.1"
+version: "0.3.2"
 date-released: "2026-10-10"
 url: "https://github.com/shehbaz0101/coticula"
 repository-code: "https://github.com/shehbaz0101/coticula"
@@ -31,6 +33,6 @@ preferred-citation:
   authors:
     - family-names: Pathan
       given-names: Shehbaz
-  version: "0.3.1"
+  version: "0.3.2"
   url: "https://github.com/shehbaz0101/coticula"
   year: 2026

@@ -8,8 +8,16 @@ import numpy as np
 import pytest
 
 from coticula.cli import main
-from coticula.grading import _fallback_idx, _formula_holdout_idx, build_scorecard, holdout_idx
-from coticula.report import markdown_table, terminal_scorecard, verdict_line, write_plots
+from coticula.grading import _fallback_idx, _formula_holdout_idx, _observations_report, build_scorecard, holdout_idx
+from coticula.report import (
+    exam4_cli_footer,
+    html_report,
+    markdown_table,
+    terminal_scorecard,
+    verdict_line,
+    write_plots,
+)
+from metrics.explain import grade_metric_dump_exam4, grade_rule_based_exam4, observations_from_report
 
 
 def test_demo_smoke_writes_scorecard(tmp_path: Path):
@@ -367,3 +375,181 @@ def test_generated_plots_keep_text_inside_the_figure(tmp_path: Path):
     small_dir = tmp_path / "small"
     small_dir.mkdir()
     write_plots(small, {}, small_dir)
+
+
+def _learned_row(name: str, rel_l2: float, residual: float, cf_vs: float) -> dict:
+    return {
+        "name": name,
+        "status": "ok",
+        "role": "surrogate",
+        "predict": {"rel_l2_mean": rel_l2},
+        "conserve": {"residual_rel_l2": residual},
+        "counterfactual": {"rel_l2_vs_classical_cf": cf_vs},
+        "trust": {"status": "untrusted", "reasons": ["residual_too_high"]},
+    }
+
+
+def _exam4_coverages(sections: dict) -> tuple[float, float]:
+    obs = observations_from_report(_observations_report(sections))
+    rule = grade_rule_based_exam4(obs)["mean_coverage"]
+    dump = grade_metric_dump_exam4(obs)["mean_coverage"]
+    return rule, dump
+
+
+def test_exam4_scores_follow_which_models_are_on_the_card():
+    """Same published cells. grade omits models, so the keyword text changes."""
+    fno_b = _learned_row("fno", 1.573143e-01, 4.848762e00, 1.793023e-01)
+    pino_b = _learned_row("pino", 1.880157e-01, 1.732850e00, 2.0e-01)
+    fno_h = _learned_row("fno", 3.221335e-01, 1.303385e01, 9.553082e-01)
+    pino_missing = {
+        "name": "pino",
+        "status": "not_trained",
+        "reason": "missing_checkpoint",
+        "role": "surrogate",
+    }
+    demo_rule, demo_dump = _exam4_coverages(
+        {
+            "burgers": {"models": [fno_b, pino_b], "ood": []},
+            "heat2d": {"models": [fno_h, pino_missing], "ood": []},
+        }
+    )
+    assert demo_rule == pytest.approx(0.878472, abs=1e-6)
+    assert demo_dump == pytest.approx(0.090278, abs=1e-6)
+    fno_rule, fno_dump = _exam4_coverages({"burgers": {"models": [fno_b], "ood": []}})
+    pino_rule, pino_dump = _exam4_coverages({"burgers": {"models": [pino_b], "ood": []}})
+    heat_rule, heat_dump = _exam4_coverages({"heat2d": {"models": [fno_h], "ood": []}})
+    assert fno_rule == pytest.approx(0.871528, abs=1e-6)
+    assert pino_rule == pytest.approx(0.871528, abs=1e-6)
+    assert heat_rule == pytest.approx(demo_rule)
+    assert fno_dump == pytest.approx(0.104167, abs=1e-6)
+    assert pino_dump == pytest.approx(fno_dump)
+    assert heat_dump == pytest.approx(fno_dump)
+    footer = exam4_cli_footer()
+    assert "same holdout" in footer
+    assert "not_trained" in footer
+    assert "0.878472" in footer
+    assert "0.104167" in footer
+    assert "0.871528" in footer
+    assert "PINO heat2d" in footer
+    assert "no checkpoint shipped" in footer
+
+
+def test_counterfactual_table_leads_and_html_reading_matches_terminal():
+    card = {
+        "version": "0.3.2",
+        "command": "coticula demo",
+        "command_kind": "demo",
+        "smoke": False,
+        "generated_at_utc": "2026-10-10T00:00:00+00:00",
+        "eval_set": "Eval set: burgers: checkpoint holdout, 12 of 48 trajectories, indices 36-47.",
+        "trust_policy": {"predict_untrusted": 0.5, "residual_untrusted": 1.0, "rule": "fail closed"},
+        "pdes": {
+            "burgers": {
+                "label_source": "labels",
+                "split": "holdout",
+                "split_label": "checkpoint holdout",
+                "n_total": 48,
+                "n_eval": 12,
+                "eval_idx": list(range(36, 48)),
+                "models": [
+                    {
+                        "name": "classical_fd",
+                        "status": "ok",
+                        "role": "labeler",
+                        "predict": {"rel_l2_mean": 0.0},
+                        "conserve": {"residual_rel_l2": 1.319436e-02},
+                        "counterfactual": {
+                            "rel_l2_traj_delta_model": 1.473826e-01,
+                            "rel_l2_traj_delta_classical": 1.473826e-01,
+                            "rel_l2_vs_classical_cf": 0.0,
+                        },
+                        "trust": {"status": "reference", "reasons": []},
+                    },
+                    {
+                        "name": "fno",
+                        "status": "ok",
+                        "role": "surrogate",
+                        "predict": {"rel_l2_mean": 1.573143e-01},
+                        "conserve": {"residual_rel_l2": 4.848762e00},
+                        "counterfactual": {
+                            "rel_l2_traj_delta_model": 3.954555e-03,
+                            "rel_l2_traj_delta_classical": 1.473826e-01,
+                            "rel_l2_vs_classical_cf": 1.793023e-01,
+                        },
+                        "trust": {"status": "untrusted", "reasons": ["residual_too_high"]},
+                    },
+                ],
+                "ood": [],
+            },
+            "heat2d": {
+                "label_source": "labels",
+                "split": "holdout",
+                "split_label": "checkpoint holdout",
+                "n_total": 32,
+                "n_eval": 8,
+                "eval_idx": list(range(24, 32)),
+                "models": [
+                    {
+                        "name": "fno",
+                        "status": "ok",
+                        "role": "surrogate",
+                        "predict": {"rel_l2_mean": 3.221335e-01},
+                        "conserve": {"residual_rel_l2": 1.303385e01},
+                        "counterfactual": {
+                            "rel_l2_traj_delta_model": 1.703234e-02,
+                            "rel_l2_traj_delta_classical": 2.338120e-01,
+                            "rel_l2_vs_classical_cf": 9.553082e-01,
+                        },
+                        "trust": {"status": "untrusted", "reasons": ["residual_too_high"]},
+                    },
+                    {
+                        "name": "pino",
+                        "status": "not_trained",
+                        "reason": "missing_checkpoint",
+                        "role": "surrogate",
+                    },
+                ],
+                "ood": [],
+            },
+        },
+        "explain": {
+            "n_items": 48,
+            "gold": {"mean_coverage": 1.0, "status": "ok"},
+            "rule_based": {"mean_coverage": 0.878472, "status": "ok"},
+            "metric_dump": {"mean_coverage": 0.090278, "status": "ok"},
+            "llm": {"status": "not_trained"},
+        },
+        "reading": [
+            "fno burgers: Predict rel-L2 1.573143e-01 is under the 0.5 cut. "
+            "Residual rel-L2 4.848762e+00 is over the 1 cut. Trust is untrusted "
+            "(residual_too_high)."
+        ],
+    }
+    plain = terminal_scorecard(card, color=False)
+    assert plain.startswith("Counterfactual\n")
+    head = plain.split("Coticula", 1)[0]
+    assert "classical_fd" not in head
+    assert "fno heat2d: moves 0.017 when the coefficient changes; the solver moves 0.234" in head
+    assert "fno burgers: moves 0.004 when the coefficient changes; the solver moves 0.147" in head
+    assert "1.703234e-02" not in head
+    assert exam4_cli_footer() in plain
+    md = markdown_table(card)
+    assert md.index("## Counterfactual") < md.index("## burgers")
+    assert "1.703234e-02" in md
+    assert "2.338120e-01" in md
+    assert "9.553082e-01" in md
+    assert "fno heat2d: moves 0.017 when the coefficient changes; the solver moves 0.234" in md
+    assert "over the 1 cut" in md
+    html = html_report(card, [])
+    assert html.index("<h2>Counterfactual</h2>") < html.index("Fail-closed")
+    assert "fno heat2d: moves 0.017 when the coefficient changes; the solver moves 0.234" in html
+    assert "1.703234e-02" in html
+    assert "Known limitation" in html
+    assert "1.134730e+00" in html
+    reading = html.split("<h2>Reading</h2>", 1)[1].split("</div>", 1)[0]
+    assert "Trust is untrusted" not in reading
+    assert "over the 1 cut" not in reading
+    assert "fno burgers: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)" in reading
+    assert "fno heat2d: Predict 0.322, residual 13.034 (flag: untrusted, residual_too_high)" in reading
+    assert "pino heat2d: no checkpoint shipped (flag: not_trained)" in reading
+    assert "classical_fd burgers: Predict 0.000, residual 0.013 (flag: reference)" in reading
