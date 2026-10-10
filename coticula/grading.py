@@ -318,6 +318,62 @@ def smoke_burgers() -> tuple[dict, str]:
     return data, "smoke generated burgers n_traj=4 nx=16 nt=8 seed=0"
 
 
+def _formula_holdout_idx(pde: str, n: int) -> np.ndarray:
+    """Match ``baselines.fno.train._split_indices`` for the shipped defaults.
+
+    Burgers asks for 16 eval trajectories and heat asks for 12. Both are
+    capped at ``n // 4``, which is 12 of 48 and 8 of 32 on the label sets.
+    """
+    requested = 16 if pde == "burgers" else 12
+    eval_n = min(int(requested), max(1, int(n) // 4))
+    train_n = int(n) - eval_n
+    if train_n < 1:
+        train_n = max(1, int(n) - 1)
+    return np.arange(train_n, int(n))
+
+
+def _read_shipped_eval_idx(pde: str) -> list[int] | None:
+    """Eval indices stored on the shipped FNO checkpoint, if it is present."""
+    try:
+        import torch
+        from baselines.fno.io import default_ckpt
+    except ImportError:
+        return None
+    path = default_ckpt(pde, "fno")
+    if not path.is_file():
+        return None
+    try:
+        payload = torch.load(path, map_location="cpu", weights_only=False)
+    except TypeError:
+        payload = torch.load(path, map_location="cpu")
+    if not isinstance(payload, dict):
+        return None
+    idx = ((payload.get("extra") or {}).get("split") or {}).get("eval_idx")
+    if not idx:
+        return None
+    return [int(i) for i in idx]
+
+
+def holdout_idx(pde: str, n: int, n_eval: int | None = None) -> np.ndarray:
+    """Checkpoint holdout for ``pde``, capped to ``n_eval`` when that is set.
+
+    Prefers the indices saved on the shipped FNO checkpoint. The training
+    formula is the fallback when that file, or torch, is absent. Indices
+    outside ``[0, n)`` are dropped.
+    """
+    raw = _read_shipped_eval_idx(pde)
+    if raw is None:
+        arr = _formula_holdout_idx(pde, n)
+    else:
+        arr = np.asarray(raw, dtype=int)
+        arr = arr[(arr >= 0) & (arr < int(n))]
+        if len(arr) == 0:
+            arr = _formula_holdout_idx(pde, n)
+    if n_eval is not None:
+        arr = arr[: int(n_eval)]
+    return np.asarray(arr, dtype=int)
+
+
 def _eval_idx_from_checkpoint(loaded: dict, n: int, n_eval: int | None) -> np.ndarray | None:
     extra = loaded.get("extra") or {}
     idx = (extra.get("split") or {}).get("eval_idx")
@@ -493,16 +549,6 @@ def reading_lines(card: dict) -> list[str]:
                 f"Residual rel-L2 {res:.6e} is {res_side} the {res_cut:g} cut. "
                 f"Trust is {trust} ({reasons})."
             )
-            if (
-                row.get("role") != "labeler"
-                and pred <= pred_cut
-                and res > res_cut
-                and trust == "untrusted"
-            ):
-                lines.append(
-                    f"Fail-closed: {name} on {pde} is inside the Predict cut and outside "
-                    f"the Conserve cut, so the flag is untrusted."
-                )
             cf = row.get("counterfactual") or {}
             model_delta = cf.get("rel_l2_traj_delta_model")
             class_delta = cf.get("rel_l2_traj_delta_classical")
@@ -592,6 +638,49 @@ def reading_lines(card: dict) -> list[str]:
     return lines
 
 
+def _index_span(idx: list[int]) -> str:
+    if not idx:
+        return "no indices"
+    if idx == list(range(idx[0], idx[-1] + 1)):
+        return f"indices {idx[0]}-{idx[-1]}"
+    shown = ",".join(str(i) for i in idx[:8])
+    return f"indices {shown}" + ("..." if len(idx) > 8 else "")
+
+
+def eval_set_note(card: dict) -> str:
+    """One or two sentences naming the trajectories this card actually scored."""
+    parts: list[str] = []
+    for pde, section in (card.get("pdes") or {}).items():
+        idx = [int(i) for i in (section.get("eval_idx") or [])]
+        n_total = section.get("n_total")
+        total = f" of {n_total}" if n_total is not None else ""
+        label = section.get("split_label") or "eval"
+        parts.append(
+            f"{pde}: {label}, {section.get('n_eval')}{total} trajectories, {_index_span(idx)}"
+        )
+    sentence = "Eval set: " + "; ".join(parts) + "."
+    if card.get("smoke"):
+        return sentence + " Smoke grid, not the shipped checkpoint holdout."
+    splits = {section.get("split") for section in (card.get("pdes") or {}).values()}
+    if card.get("command_kind") == "demo":
+        return (
+            sentence
+            + " demo scores this checkpoint holdout."
+            + " grade scores every trajectory when no shipped checkpoint is loaded"
+            + " (Burgers 48, heat 32). grade --split holdout matches these indices."
+        )
+    if splits == {"holdout"}:
+        return sentence + " Same checkpoint holdout as coticula demo."
+    if splits == {"all"}:
+        return (
+            sentence
+            + " grade default without a shipped checkpoint is every trajectory."
+            + " coticula demo uses the checkpoint holdout (Burgers 12, heat 8)."
+            + " Pass --split holdout to match demo."
+        )
+    return sentence
+
+
 def build_scorecard(
     *,
     pdes: list[str],
@@ -603,8 +692,19 @@ def build_scorecard(
     adapter=None,
     command: str = "coticula",
     out_dir: Path | None = None,
+    split: str = "auto",
+    command_kind: str = "grade",
 ) -> tuple[dict, dict]:
-    """Grade the requested models. Returns ``(scorecard, plot_arrays)``."""
+    """Grade the requested models. Returns ``(scorecard, plot_arrays)``.
+
+    ``split="auto"`` keeps the historical choice: a loaded checkpoint's
+    eval indices, otherwise every trajectory (the last 2 on a smoke grid).
+    ``split="holdout"`` is the checkpoint holdout ``coticula demo`` uses.
+    ``split="all"`` is every trajectory in the label set.
+    """
+    requested = (split or "auto").lower()
+    if requested not in {"auto", "holdout", "all"}:
+        raise ValueError(f"unknown split {split!r}")
     from datetime import datetime, timezone
 
     from coticula import __version__
@@ -669,8 +769,28 @@ def build_scorecard(
         if adapter is not None:
             prepared.append((adapter, getattr(adapter, "role", "surrogate")))
 
-        if shared_idx is None:
-            shared_idx = _fallback_idx(n, 2 if smoke else n_eval)
+        from_checkpoint = shared_idx is not None
+        if requested == "all":
+            shared_idx = _fallback_idx(n, n_eval)
+            split_name = "all"
+            split_label = "all trajectories"
+        elif requested == "holdout":
+            if not from_checkpoint:
+                shared_idx = holdout_idx(pde, n, n_eval)
+            split_name = "holdout"
+            split_label = "checkpoint holdout"
+        elif shared_idx is None:
+            cap = 2 if smoke else n_eval
+            shared_idx = _fallback_idx(n, cap)
+            if cap is None or int(cap) >= n:
+                split_name = "all"
+                split_label = "all trajectories"
+            else:
+                split_name = "tail"
+                split_label = f"last {len(shared_idx)} trajectories"
+        else:
+            split_name = "holdout"
+            split_label = "checkpoint holdout"
 
         rows = []
         for obj, role in prepared:
@@ -719,8 +839,11 @@ def build_scorecard(
         sections[pde] = {
             "label_source": source,
             "grid": grid,
+            "n_total": n,
             "n_eval": int(len(shared_idx)),
             "eval_idx": shared_idx.tolist(),
+            "split": split_name,
+            "split_label": split_label,
             "models": rows,
             "ood": ood_rows,
         }
@@ -730,6 +853,7 @@ def build_scorecard(
         "version": __version__,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "command": command,
+        "command_kind": command_kind,
         "smoke": bool(smoke),
         "trust_policy": {
             "name": TRUST_POLICY["name"],
@@ -753,4 +877,5 @@ def build_scorecard(
         "observations": obs,
     }
     card["reading"] = reading_lines(card)
+    card["eval_set"] = eval_set_note(card)
     return card, arrays

@@ -7,7 +7,7 @@ Coticula tests whether a PDE surrogate actually understands the physics, not jus
 
 **Repo:** https://github.com/shehbaz0101/coticula  
 **Brand:** coticula.ai (domain TBD)  
-**Author:** Shehbaz Pathan · v0.3.0
+**Author:** Shehbaz Pathan · v0.3.1
 
 Try: `coticula demo --out reports/demo` (see the README for the measured scorecard).
 
@@ -20,9 +20,9 @@ Neither automatically means the system **understands** the dynamics.
 
 A model can score low error and still:
 
-- violate conservation / PDE residuals  
-- ignore coefficient changes (bad counterfactuals)  
-- look fine in-distribution and fail under mild OOD shift  
+- ignore a coefficient change
+- look rough under a strong-form residual (a roughness flag, not a proved PDE violation)
+- move under a mild OOD shift  
 
 Most SciML papers report MSE. That is not enough.
 
@@ -41,7 +41,7 @@ Four exams, scored separately:
 | **3. Counterfactual** | If I change viscosity / diffusivity, do you respond? |
 | **4. Explain** | Can short answers cite the right law? (48-item keyword rubric; rule-based baseline in v0.2) |
 
-Fail-closed trust flags: `ood` / `untrusted`. Pretty plots are not allowed to hide bad physics.
+Flags are `trusted`, `ood`, `untrusted`, or `reference`. The residual flag is a roughness indicator, not a physics verdict. The counterfactual exam is the comparison to read first.
 
 ---
 

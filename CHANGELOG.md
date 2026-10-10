@@ -7,8 +7,35 @@ and the README, and were produced by `python -m scripts.run_eval`,
 This file does not invent metrics.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-The package version in `pyproject.toml` is `0.3.0`. This entry prepares that
-release. It does not create the tag.
+The package version in `pyproject.toml` is `0.3.1`. The 0.3.1 entry does not
+create a tag.
+
+## [0.3.1] - 2026-10-10
+
+Interview-demo polish. No new measurements and no new checkpoints.
+
+### Changed
+
+- Field-plot titles are a short measured caption (Predict, residual, flag)
+  wrapped so they fit the figure. `field_burgers_fno.png` and
+  `field_heat2d_fno.png` were checked, and so were the bar charts. The long
+  trust-module banner stays in the JSON and is not the plot headline.
+- `coticula demo` and `coticula grade` print an aligned scorecard. Color is
+  used when stdout is a TTY, and plain text otherwise. Terminal numbers are
+  short (`0.157`). JSON and Markdown keep full precision. Each model ends
+  with the measured values and the flag, for example
+  `fno: Predict 0.157, residual 4.849 (flag: untrusted, residual_too_high)`.
+- The residual flag is described as a roughness indicator. A noise probe,
+  `python -m scripts.probe_residual_noise`, measured residual rel-L2
+  1.134730e+00 after 1% white noise on one exact Burgers trajectory. The
+  trust rule is unchanged. The README leads with the reproduced
+  counterfactual comparison.
+- The terminal output and the README name the evaluation set. `demo` scores
+  the checkpoint holdout (Burgers 12, heat 8). `grade` scores that holdout
+  when a shipped checkpoint is loaded, and every trajectory otherwise
+  (Burgers 48, heat 32). `grade --split holdout` matches `demo`.
+- The README labels the PINO heat2d `not_trained` row: no checkpoint shipped,
+  to keep the repo small.
 
 ## [0.3.0] - 2026-10-10
 

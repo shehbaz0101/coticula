@@ -9,12 +9,12 @@ abstract: >-
   Conserve, Counterfactual, Explain) score viscous Burgers (1D) and heat (2D).
   v0.2 added a 48-item Exam 4 set with rule-based (non-LLM) grades and
   residual-vs-L2 diagnostics. v0.3.0 adds a command-line scorecard and a
-  small adapter interface for a user model. Reports contain only measured
-  numbers; missing checkpoints stay not_trained.
+  small adapter interface for a user model. v0.3.1 polishes that scorecard.
+  Reports contain only measured numbers; missing checkpoints stay not_trained.
 authors:
   - family-names: Pathan
     given-names: Shehbaz
-version: "0.3.0"
+version: "0.3.1"
 date-released: "2026-10-10"
 url: "https://github.com/shehbaz0101/coticula"
 repository-code: "https://github.com/shehbaz0101/coticula"
@@ -31,6 +31,6 @@ preferred-citation:
   authors:
     - family-names: Pathan
       given-names: Shehbaz
-  version: "0.3.0"
+  version: "0.3.1"
   url: "https://github.com/shehbaz0101/coticula"
   year: 2026

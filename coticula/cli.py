@@ -23,7 +23,10 @@ def _parser() -> argparse.ArgumentParser:
 
     demo = sub.add_parser(
         "demo",
-        help="Score the shipped FNO and PINO plus the toy persist_ic adapter.",
+        help=(
+            "Score the shipped FNO and PINO plus persist_ic on the checkpoint "
+            "holdout (Burgers 12 trajectories, heat 8)."
+        ),
     )
     demo.add_argument(
         "--pde",
@@ -43,11 +46,15 @@ def _parser() -> argparse.ArgumentParser:
         help="Tiny Burgers grid and a 1-epoch FNO. For CI. Not the shipped checkpoint.",
     )
     demo.add_argument("--no-ood", action="store_true", help="Skip the param-shift probe.")
-    demo.add_argument("--n-eval", type=int, default=None, help="Cap the holdout size.")
+    demo.add_argument("--n-eval", type=int, default=None, help="Cap the checkpoint holdout.")
 
     grade = sub.add_parser(
         "grade",
-        help="Score one model. classical_fd is included as the reference row.",
+        help=(
+            "Score one model. classical_fd is the reference row. "
+            "Default split: the checkpoint holdout when a shipped model is loaded, "
+            "otherwise every trajectory (Burgers 48, heat 32)."
+        ),
     )
     grade.add_argument(
         "--model",
@@ -69,7 +76,22 @@ def _parser() -> argparse.ArgumentParser:
     grade.add_argument("--out", type=Path, default=None)
     grade.add_argument("--smoke", action="store_true")
     grade.add_argument("--no-ood", action="store_true")
-    grade.add_argument("--n-eval", type=int, default=None)
+    grade.add_argument(
+        "--split",
+        choices=("auto", "holdout", "all"),
+        default="auto",
+        help=(
+            "auto (default): checkpoint holdout if a shipped model is loaded, "
+            "otherwise every trajectory. holdout: the same indices as coticula demo "
+            "(Burgers 12, heat 8). all: every trajectory."
+        ),
+    )
+    grade.add_argument(
+        "--n-eval",
+        type=int,
+        default=None,
+        help="Cap how many trajectories from the chosen split are scored.",
+    )
     return parser
 
 
@@ -99,6 +121,8 @@ def main(argv: list[str] | None = None) -> int:
             include_ood=not args.no_ood,
             command=command.strip(),
             out_dir=out,
+            split="holdout",
+            command_kind="demo",
         )
     else:
         if args.smoke and args.pde == "heat2d":
@@ -124,8 +148,10 @@ def main(argv: list[str] | None = None) -> int:
             adapter=user,
             command=command.strip(),
             out_dir=out,
+            split=args.split,
+            command_kind="grade",
         )
-    print(terminal_scorecard(card))
+    print(terminal_scorecard(card, color=sys.stdout.isatty()))
     written = write_scorecard(card, arrays, out)
     print()
     for path in written:
